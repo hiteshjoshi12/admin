@@ -1,11 +1,12 @@
-import { Instagram, InstagramIcon } from 'lucide-react';
+import { Instagram } from 'lucide-react';
 
 const posts = [
-  { id: 1, img: "https://images.unsplash.com/photo-1603189343302-e603f7add05a?q=80&w=600", style: "rotate-[-2deg] md:col-span-2 md:row-span-2 h-[500px]" }, 
-  { id: 2, img: "https://images.unsplash.com/photo-1603189343302-e603f7add05a?q=80&w=600", style: "rotate-[3deg] md:mt-12 h-[300px] z-10 shadow-xl" }, 
-  { id: 3, img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=600", style: "rotate-[-1deg] h-[400px]" }, 
-  { id: 4, img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600", style: "rotate-[2deg] md:-mt-24 h-[350px] z-20 shadow-lg" }, 
-  { id: 5, img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600", style: "rotate-[-3deg] h-[300px]" }, 
+  // Removed hardcoded rotations for mobile (added 'md:' prefix to rotation classes)
+  { id: 1, img: "https://images.unsplash.com/photo-1603189343302-e603f7add05a?q=80&w=600", style: "md:rotate-[-2deg] md:col-span-2 md:row-span-2 h-[300px] md:h-[500px]" }, 
+  { id: 2, img: "https://images.unsplash.com/photo-1603189343302-e603f7add05a?q=80&w=600", style: "md:rotate-[3deg] md:mt-12 h-[200px] md:h-[300px] z-10 shadow-xl" }, 
+  { id: 3, img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=600", style: "md:rotate-[-1deg] h-[200px] md:h-[400px]" }, 
+  { id: 4, img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600", style: "md:rotate-[2deg] md:-mt-24 h-[200px] md:h-[350px] z-20 shadow-lg" }, 
+  { id: 5, img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600", style: "md:rotate-[-3deg] h-[200px] md:h-[300px]" }, 
 ];
 
 // The official Instagram Gradient configuration
@@ -13,7 +14,7 @@ const instaGradientClass = "bg-gradient-to-tr from-[#833ab4] via-[#fd1d1d] to-[#
 
 export default function InstagramFeed() {
   return (
-    <section className="py-24 px-4 bg-[#F9F8F6] relative overflow-hidden border-t border-gray-200">
+    <section className="py-12 md:py-24 px-4 bg-[#F9F8F6] relative overflow-hidden border-t border-gray-200">
       
       {/* Decorative Stamp Background */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-5 pointer-events-none">
@@ -24,42 +25,67 @@ export default function InstagramFeed() {
 
       <div className="max-w-[1440px] mx-auto">
         
-        {/* Header Container (Centered) */}
-        <div className="text-center relative z-30 mb-16">
-          {/* Pill Label */}
+        {/* Header Container */}
+        <div className="text-center relative z-30 mb-8 md:mb-16">
           <div className="inline-flex items-center justify-center gap-2 mb-4 bg-white px-4 py-2 rounded-full shadow-sm">
-            {/* Gradient Icon using text-clip hack */}
+            {/* Using a simpler icon approach for stability */}
             <span className={`${instaGradientClass} bg-clip-text text-transparent`}>
-              <InstagramIcon className="w-4 h-4" />
+              <Instagram className="w-4 h-4 text-[#833ab4]" /> {/* Fallback color if clip fails */}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-widest text-brand-black">@BeadsAndBloom</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-serif text-brand-black mb-6">
+          <h2 className="text-3xl md:text-5xl font-serif text-brand-black mb-6">
             As Seen On You
           </h2>
         </div>
 
         {/* The Collage Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 relative z-10 p-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 relative z-10 p-2 md:p-4">
             
             {posts.map((post) => (
               <div 
                 key={post.id} 
-                className={`relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-500 hover:rotate-0 hover:scale-105 hover:shadow-2xl hover:z-50 ${post.style}`}
+                className={`relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-500 
+                  /* DESKTOP HOVER: Rotate to 0, Scale up */
+                  md:hover:rotate-0 md:hover:scale-105 md:hover:shadow-2xl md:hover:z-50
+                  
+                  /* MOBILE DEFAULT: No rotation, normal scale */
+                  rotate-0 scale-100 shadow-md
+                  
+                  /* Apply per-post custom styles (mostly rotations) only on MD screens */
+                  ${post.style}
+                `}
               >
                 <img src={post.img} alt="Instagram Post" className="w-full h-full object-cover" />
-                {/* Overlay (Keep white for contrast) */}
-                <div className="absolute inset-0 bg-brand-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <Instagram className="text-white w-8 h-8" />
+                
+                {/* Overlay: Always visible on mobile (slight dark tint), visible on hover for desktop */}
+                <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300
+                  bg-black/20 opacity-100  /* Mobile: Visible tint */
+                  md:bg-black/40 md:opacity-0 md:group-hover:opacity-100 /* Desktop: Hidden until hover */
+                ">
+                   <Instagram className="text-white w-6 h-6 md:w-8 md:h-8 drop-shadow-lg" />
                 </div>
               </div>
             ))}
             
-            {/* Circular Call to Action "Sticker" - Now with Gradient Background */}
-            <a href="#" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 group">
-              <div className={`w-32 h-32 md:w-40 md:h-40 rounded-full ${instaGradientClass} text-white flex flex-col items-center justify-center text-center p-4 shadow-xl transition-transform duration-300 group-hover:scale-110 hover:rotate-12`}>
-                <Instagram className="w-7 h-7 mb-2" />
-                <span className="text-[10px] font-bold uppercase tracking-widest leading-tight">Follow <br/> The Brand</span>
+            {/* Circular Sticker: Bottom Right on Mobile to avoid blocking content */}
+            <a href="#" className="
+              absolute z-40 group
+              /* Mobile Position: Bottom Right, Fixed Size */
+              bottom-0 right-4 translate-y-1/2
+              
+              /* Desktop Position: Center, Centered transform */
+              md:top-1/2 md:left-1/2 md:bottom-auto md:right-auto md:-translate-x-1/2 md:-translate-y-1/2
+            ">
+              <div className={`
+                w-24 h-24 md:w-40 md:h-40 rounded-full ${instaGradientClass} text-white 
+                flex flex-col items-center justify-center text-center p-4 shadow-xl 
+                transition-transform duration-300 
+                active:scale-95 /* Mobile Click Effect */
+                md:group-hover:scale-110 md:hover:rotate-12
+              `}>
+                <Instagram className="w-5 h-5 md:w-7 md:h-7 mb-1 md:mb-2" />
+                <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest leading-tight">Follow <br/> The Brand</span>
               </div>
             </a>
 
