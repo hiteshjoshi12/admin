@@ -26,7 +26,10 @@ export default function CollectionTiles() {
   return (
     <section className="py-24 px-4 md:px-12 max-w-[1440px] mx-auto">
       
-      <div className="flex items-end justify-between mb-16 px-2">
+      {/* FIX 1: Changed to 'flex-col md:flex-row' to stack items on mobile 
+          FIX 2: Added 'gap-6' for spacing on mobile
+      */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 px-2 gap-6 md:gap-0">
         <div>
           <h2 className="text-4xl md:text-5xl font-serif text-brand-black mb-2">
             Curated Collections
@@ -36,9 +39,10 @@ export default function CollectionTiles() {
           </p>
         </div>
         
+        {/* FIX 3: Removed 'hidden' class so it is visible on all screens */}
         <Link 
           to="/shop" 
-          className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-gray-500 transition-colors"
+          className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-gray-500 transition-colors"
         >
           View All <ArrowRight className="w-4 h-4" />
         </Link>
