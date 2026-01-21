@@ -28,9 +28,33 @@ const products = [
 export default function BestSellers() {
   
   // Reusable Overlay Component to ensure consistency
+ // Reusable Overlay Component
   const QuickAddOverlay = () => (
-    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8 z-20">
-      <button className="bg-white text-brand-black px-6 py-3 rounded-full text-xs uppercase tracking-widest font-bold flex items-center gap-2 hover:bg-brand-gold hover:text-white transition-all shadow-xl transform translate-y-4 group-hover:translate-y-0 duration-500 ease-out">
+    <div className="
+      absolute inset-0 
+      z-20 flex items-end justify-center pb-8 
+      transition-opacity duration-300
+      
+      /* MOBILE: Always visible, slight dark overlay */
+      bg-black/10 opacity-100 
+
+      /* DESKTOP: Hidden by default, visible on hover */
+      md:opacity-0 md:group-hover:opacity-100
+    ">
+      <button className="
+        bg-white text-brand-black 
+        px-6 py-3 rounded-full 
+        text-xs uppercase tracking-widest font-bold 
+        flex items-center gap-2 
+        shadow-xl transition-all duration-500 ease-out
+        hover:bg-brand-gold hover:text-white
+
+        /* MOBILE: Always in final position */
+        translate-y-0
+
+        /* DESKTOP: Slides up on hover */
+        md:translate-y-4 md:group-hover:translate-y-0
+      ">
         <ShoppingBag className="w-4 h-4"/> Quick Add
       </button>
     </div>

@@ -14,17 +14,31 @@
   background-color: var(--color-brand-bg);
   color: var(--color-brand-text);
   font-family: var(--font-sans);
-  
-  /* CRITICAL: Ensure this is NOT 'smooth' */
-  scroll-behavior: auto !important; 
+  scroll-behavior: smooth; /* Native smooth scroll */
 }
 
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Prevents horizontal scrollbar */
-  width: 100%;
+  overflow-x: hidden;
 }
+
+/* --- NATIVE ANIMATIONS --- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  opacity: 0; /* Hidden by default */
+  animation: fadeUp 1s ease-out forwards; /* Runs once, stays visible */
+}
+
+/* Stagger Delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-500 { animation-delay: 500ms; }
 
 /* Hide Scrollbar */
 .scrollbar-hide::-webkit-scrollbar { display: none; }

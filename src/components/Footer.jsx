@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail } from 'lucide-react';
+import { Facebook, Instagram, Twitter } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-black text-white pt-20 pb-10">
-      <div className="max-w-[360] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+    // FIX 1: Used hardcoded hex #1C1917 (Charcoal) to ensure background is dark
+    <footer className="bg-[#1C1917] text-white pt-20 pb-10">
+      
+      {/* FIX 2: Changed max-w-[360] to max-w-[1440px] */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
         
         {/* Brand Column */}
         <div className="md:col-span-1">
@@ -14,7 +17,12 @@ export default function Footer() {
           </p>
           <div className="flex gap-4">
             {[Instagram, Facebook, Twitter].map((Icon, i) => (
-              <a key={i} href="#" className="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center hover:bg-white hover:text-black transition-all">
+              <a 
+                key={i} 
+                href="#" 
+                // Social Icons: White border/icon default -> White bg / Black icon on hover
+                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white transition-all duration-300 hover:bg-white hover:text-black hover:border-white"
+              >
                 <Icon className="w-4 h-4" />
               </a>
             ))}
@@ -23,7 +31,7 @@ export default function Footer() {
 
         {/* Links Column 1 */}
         <div>
-          <h4 className="text-brand-gold text-xs font-bold uppercase tracking-widest mb-6">Shop</h4>
+          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Shop</h4>
           <ul className="space-y-4 text-sm text-gray-400">
             <li><Link to="/shop" className="hover:text-white transition-colors">New Arrivals</Link></li>
             <li><Link to="/shop" className="hover:text-white transition-colors">Best Sellers</Link></li>
@@ -34,7 +42,7 @@ export default function Footer() {
 
         {/* Links Column 2 */}
         <div>
-          <h4 className="text-brand-gold text-xs font-bold uppercase tracking-widest mb-6">Support</h4>
+          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Support</h4>
           <ul className="space-y-4 text-sm text-gray-400">
             <li><Link to="/help" className="hover:text-white transition-colors">Track Order</Link></li>
             <li><Link to="/help" className="hover:text-white transition-colors">Shipping & Returns</Link></li>
@@ -45,7 +53,7 @@ export default function Footer() {
 
         {/* Newsletter */}
         <div>
-          <h4 className="text-brand-gold text-xs font-bold uppercase tracking-widest mb-6">Stay in the Loop</h4>
+          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Stay in the Loop</h4>
           <p className="text-gray-400 text-sm mb-4">Subscribe for exclusive updates.</p>
           <div className="flex border-b border-gray-700 pb-2">
             <input 
@@ -53,7 +61,7 @@ export default function Footer() {
               placeholder="Enter your email" 
               className="bg-transparent w-full text-sm outline-none placeholder-gray-600 text-white"
             />
-            <button className="text-xs font-bold uppercase tracking-widest hover:text-brand-gold">
+            <button className="text-xs font-bold uppercase tracking-widest hover:text-[#C5A059] text-white">
               Join
             </button>
           </div>
