@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 const content = {
   photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img1_cwdqem.jpg", 
   photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img2_rssgsc.jpg", 
-  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069585/vid1_kpiiu5.mp4" 
+  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769071460/reel_sqyodd.mp4" 
 };
 
 // Official Instagram Gradient
