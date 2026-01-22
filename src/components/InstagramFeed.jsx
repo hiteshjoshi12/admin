@@ -3,9 +3,9 @@ import { useRef, useState } from 'react';
 
 // Configuration: 2 Photos, 1 Reel
 const content = {
-  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img1_cwdqem.jpg", // Photo 1
-  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img2_rssgsc.jpg", // Photo 2
-  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069585/vid1_kpiiu5.mp4" // The Reel
+  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img1_cwdqem.jpg", 
+  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img2_rssgsc.jpg", 
+  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069585/vid1_kpiiu5.mp4" 
 };
 
 // Official Instagram Gradient
@@ -35,7 +35,9 @@ export default function InstagramFeed() {
              <span className={`${instaGradientClass} bg-clip-text text-transparent`}>
                 <Instagram className="w-4 h-4 text-[#833ab4]" /> 
              </span>
-            <a href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer"><span className="text-[10px] font-bold uppercase tracking-widest text-brand-black">@beadsnbloom.india</span></a> 
+             <a href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-black">@beadsnbloom.india</span>
+             </a> 
           </div>
           <h2 className="text-4xl md:text-5xl font-serif text-brand-black">
             The Gram
@@ -102,26 +104,27 @@ export default function InstagramFeed() {
                 {/* "Reel" Tag at bottom */}
                 <div className="absolute bottom-6 left-6 flex items-center gap-2">
                    <div className="w-8 h-8 rounded-full border border-white overflow-hidden">
-                      <img src="/logo.png" alt="B&B" className="w-full h-full object-cover bg-white" /> {/* Placeholder for logo */}
+                      <img src="/logo.png" alt="B&B" className="w-full h-full object-cover bg-white" />
                    </div>
                    <span className="text-white text-xs font-bold tracking-widest drop-shadow-md">Watch Reel</span>
                 </div>
              </div>
           </div>
 
-          {/* THE STICKER: Floating Between Layers */}
+          {/* THE STICKER: Centered with Thicker Border & Larger Size */}
           <a target="_blank"
              href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" 
-             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 group"
+             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 group"
           >
              <div className={`
-                w-28 h-28 md:w-36 md:h-36 rounded-full ${instaGradientClass} text-white 
-                flex flex-col items-center justify-center text-center p-4 shadow-[0_10px_40px_-10px_rgba(255,40,101,0.5)]
+                w-36 h-36 md:w-48 md:h-48 rounded-full ${instaGradientClass} text-white 
+                flex flex-col items-center justify-center text-center p-4 
+                shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]
+                border-[6px] border-[#F9F8F6]  /* Thick border matching background color to "cut out" the sticker */
                 transition-transform duration-300 hover:scale-110 hover:rotate-12
              `}>
-                <Instagram className="w-9 h-9 mb-1" />
-                <span className="text-[9px] font-bold uppercase tracking-widest leading-tight">Follow <br/>@beadsn<br/>bloom.india</span>
-    
+                <Instagram className="w-10 h-10 md:w-12 md:h-12 mb-2" />
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest leading-tight">Follow <br/>@beadsn<br/>bloom.india</span>
              </div>
           </a>
 
