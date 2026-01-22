@@ -3,9 +3,12 @@ import { useRef, useState } from 'react';
 
 // Configuration: 2 Photos, 1 Reel
 const content = {
-  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img1_cwdqem.jpg", 
-  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img2_rssgsc.jpg", 
-  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769071460/reel_sqyodd.mp4" 
+  // Images: f_auto (format), q_auto (quality)
+  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069569/img1_cwdqem.jpg", 
+  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069569/img2_rssgsc.jpg", 
+  
+  // Video: f_auto, q_auto, AND bitrate limit (br_2m) to prevent lag
+  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,br_2m/v1769071460/reel_sqyodd.mp4" 
 };
 
 // Official Instagram Gradient

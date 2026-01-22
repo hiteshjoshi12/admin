@@ -7,21 +7,22 @@ const products = [
     tag: "The Icon",
     name: "Zardosi Bridal Mule", 
     price: "₹4,200", 
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769075057/IMG_1050_bt6gdf.jpg",
+    // Added: w_500 (resize), f_auto, q_auto
+    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075057/IMG_1050_bt6gdf.jpg",
   },
   { 
     id: 2, 
     tag: "Trending Now",
     name: "Rani Pink Potli", 
     price: "₹2,899", 
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769075143/IMG_0972_1_gzc9om.jpg",
+    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075143/IMG_0972_1_gzc9om.jpg",
   },
   { 
     id: 3, 
     tag: "Everyday Luxury",
     name: "Gold Thread Wedge", 
     price: "₹3,100", 
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769075245/IMG_9775_mebgcp.jpg",
+    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075245/IMG_9775_mebgcp.jpg",
   },
 ];
 

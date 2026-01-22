@@ -5,7 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const slides = [
   {
     id: 1,
-    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069487/banner1_viwl2e.png",
+    // PNG -> WebP/AVIF conversion happens here automatically
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069487/banner1_viwl2e.png",
     subtitle: "The Wedding Edit '26",
     titleLine1: "Handcrafted",
     titleLine2: "Perfection",
@@ -14,7 +15,7 @@ const slides = [
   },
   {
     id: 2,
-    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069491/banner2_cb3r0t.png", 
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069491/banner2_cb3r0t.png", 
     subtitle: "Vibrant Heritage",
     titleLine1: "Threads of",
     titleLine2: "Tradition",
@@ -23,7 +24,7 @@ const slides = [
   },
   {
     id: 3,
-    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069485/banner3_beah8o.png", 
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069485/banner3_beah8o.png", 
     subtitle: "New Arrivals",
     titleLine1: "Walk in",
     titleLine2: "Poetry",

@@ -6,19 +6,20 @@ const collections = [
     id: 1, 
     name: "The Bridal Edit", 
     count: "12 Designs",
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769071597/IMG_0279_l2cibn.jpg" 
+    // Added w_600 to resize for card layout
+    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071597/IMG_0279_l2cibn.jpg" 
   },
   { 
     id: 2, 
     name: "Everyday Mules", 
     count: "24 Designs",
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769071706/IMG_0705_odxdlw.jpg" 
+    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg" 
   },
   { 
     id: 3, 
     name: "Luxury Potlis", 
     count: "8 Designs",
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769071749/IMG_0336_bqm5ue.jpg" 
+    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg" 
   }
 ];
 

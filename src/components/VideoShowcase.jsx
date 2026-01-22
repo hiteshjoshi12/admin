@@ -11,29 +11,29 @@ import { Badge } from "@/components/ui/badge";
 const videos = [
   {
     id: 1,
-    // Replace with your actual video file paths (e.g., "/videos/shoot1.mp4")
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069368/j5_ketdz3.mp4", 
+    // Added: f_auto,q_auto,w_720,br_2m
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069368/j5_ketdz3.mp4", 
     title: "Bridal BTS",
     price: "Shop The Look",
     link: "/shop"
   },
   {
     id: 2,
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069341/j8_fjkfoe.mp4", 
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069341/j8_fjkfoe.mp4", 
     title: "Summer Walk",
     price: "View Collection",
     link: "/shop"
   },
   {
     id: 3,
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069290/j2_hkesie.mp4", 
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069290/j2_hkesie.mp4", 
     title: "Festive Vibes",
     price: "Shop Festive",
     link: "/shop"
   },
   {
     id: 4,
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069283/j11_t5m4rh.mp4", 
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069283/j11_t5m4rh.mp4", 
     title: "Close Up Details",
     price: "See Details",
     link: "/shop"
