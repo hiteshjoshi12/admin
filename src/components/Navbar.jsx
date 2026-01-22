@@ -1,6 +1,6 @@
-import { ShoppingBag, Search, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { ShoppingBag, Search, Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -8,47 +8,50 @@ export default function Navbar() {
 
   // --- CONFIGURATION: Define your links here ---
   const navLinks = [
-    { name: 'New Arrivals', path: '/shop' },
-    { name: 'Bridal', path: '/shop' }, // You can change this to /shop?category=bridal later
-    { name: 'Mules', path: '/shop' },
-    { name: 'About', path: '/about' },   // <--- Added About Page
-    { name: 'Journal', path: '/journal' } // <--- Separate Route
+    { name: "New Arrivals", path: "/shop" },
+    { name: "Bridal", path: "/shop" }, // You can change this to /shop?category=bridal later
+    { name: "Mules", path: "/shop" },
+    { name: "About", path: "/about" }, // <--- Added About Page
+    { name: "Journal", path: "/journal" }, // <--- Separate Route
   ];
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Lock body scroll when menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     }
   }, [isMobileMenuOpen]);
 
   return (
     <>
-      <div 
+      <div
         className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-500 ease-in-out ${
-          isScrolled ? 'pt-0 px-0' : 'pt-6 px-4'
+          isScrolled ? "pt-0 px-0" : "pt-2 px-3"
         }`}
       >
-        <nav 
+        <nav
           className={`bg-white flex items-center justify-between transition-all duration-500 ease-in-out ${
-            isScrolled 
-              ? 'w-full max-w-full rounded-none px-6 md:px-10 py-4 shadow-md' 
-              : 'w-full max-w-[1300px] rounded-full px-6 md:px-8 py-4 shadow-2xl animate-fade-up' 
+            isScrolled
+              ? "w-full max-w-full rounded-none px-6 md:px-10 py-4 shadow-md"
+              : "w-full max-w-325 rounded-full px-6 md:px-8 py-4 shadow-2xl animate-fade-up"
           }`}
         >
-          
           {/* LEFT: Brand */}
-          <Link to="/" className="flex flex-col group z-50 relative" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link
+            to="/"
+            className="flex flex-col group z-50 relative"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
             <span className="font-serif text-xl font-bold tracking-wide text-brand-black leading-none group-hover:text-gray-600 transition-colors">
               BEADS & BLOOM
             </span>
@@ -60,9 +63,9 @@ export default function Navbar() {
           {/* CENTER: Desktop Navigation Links (Dynamic) */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
-                to={link.path} 
+              <Link
+                key={link.name}
+                to={link.path}
                 className="text-xs font-medium uppercase tracking-widest text-gray-600 hover:text-black transition-colors relative group"
               >
                 {link.name}
@@ -73,30 +76,32 @@ export default function Navbar() {
 
           {/* RIGHT: Auth & Icons */}
           <div className="flex items-center gap-3 md:gap-5 z-50 relative">
-
-            <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors group">
+            <Link
+              to="/cart"
+              className="relative p-2 hover:bg-gray-100 rounded-full transition-colors group"
+            >
               <ShoppingBag className="w-5 h-5 text-gray-700" />
               <span className="absolute top-2 right-1 h-2 w-2 bg-black rounded-full border-2 border-white group-hover:scale-110 transition-transform"></span>
-            </button>
-            
+            </Link>
+
             {/* DESKTOP AUTH BUTTONS (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-4 mr-2 border-r border-gray-200 pr-6">
-                <Link 
-                  to="/login" 
-                  className="text-xs font-medium uppercase tracking-widest text-gray-600 hover:text-black transition-colors"
-                >
-                  Log In
-                </Link>
-                <Link 
-                  to="/signup" 
-                  className="text-xs font-medium uppercase tracking-widest bg-black text-white px-5 py-2 rounded-full hover:bg-gray-800 transition-all hover:scale-105"
-                >
-                  Sign Up
-                </Link>
+              <Link
+                to="/login"
+                className="text-xs font-medium uppercase tracking-widest text-gray-600 hover:text-black transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                to="/signup"
+                className="text-xs font-medium uppercase tracking-widest bg-black text-white px-5 py-2 rounded-full hover:bg-gray-800 transition-all hover:scale-105"
+              >
+                Sign Up
+              </Link>
             </div>
 
             {/* MOBILE TOGGLE BUTTON */}
-            <button 
+            <button
               className="md:hidden p-2 hover:bg-gray-100 rounded-full transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
@@ -107,46 +112,50 @@ export default function Navbar() {
               )}
             </button>
           </div>
-
         </nav>
       </div>
 
       {/* MOBILE MENU OVERLAY */}
-      <div 
+      <div
         className={`fixed inset-0 z-40 bg-white flex flex-col items-center justify-center transition-all duration-500 ease-in-out ${
-          isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+          isMobileMenuOpen
+            ? "opacity-100 visible"
+            : "opacity-0 invisible pointer-events-none"
         }`}
       >
         <div className="flex flex-col items-center gap-6 w-full max-w-xs">
-          
           {/* Mobile Nav Links (Dynamic) */}
           {navLinks.map((link, index) => (
-            <Link 
-              key={link.name} 
-              to={link.path} 
+            <Link
+              key={link.name}
+              to={link.path}
               onClick={() => setIsMobileMenuOpen(false)}
               className={`text-2xl font-serif text-brand-black hover:text-brand-gold transition-colors duration-300 transform ${
-                isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+                isMobileMenuOpen
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-10 opacity-0"
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
               {link.name}
             </Link>
           ))}
-          
+
           <div className="w-12 h-[1px] bg-gray-200 my-4"></div>
 
           {/* MOBILE AUTH BUTTONS */}
-          <div className={`flex flex-col gap-3 w-full transition-all duration-500 delay-300 ${isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <Link 
-              to="/login" 
+          <div
+            className={`flex flex-col gap-3 w-full transition-all duration-500 delay-300 ${isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          >
+            <Link
+              to="/login"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full text-center py-3 border border-gray-300 rounded-full text-sm font-sans uppercase tracking-widest text-gray-700 hover:border-black hover:text-black transition-colors"
             >
               Log In
             </Link>
-            <Link 
-              to="/signup" 
+            <Link
+              to="/signup"
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full text-center py-3 bg-black text-white rounded-full text-sm font-sans uppercase tracking-widest hover:bg-gray-800 transition-colors"
             >

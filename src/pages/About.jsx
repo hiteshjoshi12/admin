@@ -76,43 +76,33 @@ export default function About() {
       </section>
 
       {/* --- FOUNDER SECTION --- */}
+      {/* --- FOUNDER/BRAND SECTION (Centered, No Image) --- */}
       <section className="bg-[#1C1917] py-24 px-6 text-white relative overflow-hidden z-10">
+        
+        {/* Background Texture */}
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
 
-        <div className="max-w-[1000px] mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
-            <div className="w-full md:w-1/2">
-              <div className="relative aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-xl border border-white/10 shadow-2xl group">
-                 <img 
-                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop" 
-                   alt="Founder" 
-                   className="w-full h-full object-cover filter sepia-[0.2] transition-transform duration-700 group-hover:scale-105"
-                 />
-                 <div className="absolute bottom-6 left-6 bg-white/10 backdrop-blur-md px-6 py-3 border border-white/20">
-                    <p className="font-serif italic text-xl">Founder Name</p>
-                    <p className="text-[10px] uppercase tracking-widest opacity-70">Creative Director</p>
-                 </div>
-              </div>
-            </div>
-            <div className="w-full md:w-1/2 text-center md:text-left">
-              <h2 className="text-3xl md:text-5xl font-serif mb-8">
-                A Connection Deeper<br/> Than <span className="text-[#FF2865] italic">Fashion.</span>
-              </h2>
-              <div className="space-y-6 text-gray-300 font-light leading-relaxed">
-                <p>
-                  "When a woman slips into Beads & Bloom for the first time,
-                  she doesn’t just feel style. She feels belonging."
-                </p>
-                <p>
-                  I started this journey not just to create footwear, but to build a bridge between the heritage I grew up with and the modern world we live in. It is a quiet confidence. A celebration of where we come from.
-                </p>
-              </div>
-             
-            </div>
+        <div className="max-w-3xl mx-auto relative z-10 text-center">
+          
+          <h2 className="text-3xl md:text-5xl font-serif mb-8 leading-tight">
+            A Connection Deeper<br/> Than <span className="text-[#FF2865] italic">Fashion.</span>
+          </h2>
+          
+          <div className="space-y-8 text-gray-300 font-light leading-relaxed">
+            <p className="text-xl md:text-2xl font-serif italic text-white/90">
+              "When a woman slips into Beads & Bloom for the first time,
+              she doesn’t just feel style. She feels belonging."
+            </p>
+            <p>
+              I started this journey not just to create footwear, but to build a bridge between the heritage I grew up with and the modern world we live in. It is a quiet confidence. A celebration of where we come from.
+            </p>
           </div>
+
+  
+
         </div>
       </section>
-      
+
       {/* --- VALUES SECTION --- */}
       <section className="relative z-20 py-24 w-full bg-brand-bg">
         <div className="w-full px-4 md:px-16 text-center">

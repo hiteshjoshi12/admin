@@ -44,10 +44,11 @@ export default function Footer() {
         <div>
           <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Support</h4>
           <ul className="space-y-4 text-sm text-gray-400">
-            <li><Link to="/help" className="hover:text-white transition-colors">Track Order</Link></li>
-            <li><Link to="/help" className="hover:text-white transition-colors">Shipping & Returns</Link></li>
-            <li><Link to="/help" className="hover:text-white transition-colors">Size Guide</Link></li>
-            <li><Link to="/help" className="hover:text-white transition-colors">Contact Us</Link></li>
+            {/* LINKED THESE TO /terms PAGE */}
+            <li><Link to="/terms" className="hover:text-white transition-colors">Track Order</Link></li>
+            <li><Link to="/terms" className="hover:text-white transition-colors">Shipping & Returns</Link></li>
+            <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide</Link></li>
+            <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
           </ul>
         </div>
 
@@ -72,8 +73,8 @@ export default function Footer() {
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 uppercase tracking-widest">
         <p>© 2026 Beads & Bloom. All rights reserved.</p>
         <div className="flex gap-6 mt-4 md:mt-0">
-          <a href="#" className="hover:text-gray-400">Privacy Policy</a>
-          <a href="#" className="hover:text-gray-400">Terms of Service</a>
+          <Link to="/terms" className="hover:text-gray-400">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-gray-400">Terms of Service</Link>
         </div>
       </div>
     </footer>

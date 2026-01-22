@@ -1,0 +1,108 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Mail, Lock, User } from 'lucide-react';
+
+export default function Signup() {
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 2000);
+  };
+
+  return (
+    <div className="min-h-screen flex bg-white pt-24">
+      
+      {/* --- LEFT: FORM SECTION (Swapped order for variety) --- */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 bg-white relative">
+        <div className="w-full max-w-md animate-fade-up">
+          
+          <div className="mb-10">
+            <span className="text-[#FF2865] text-xs font-bold uppercase tracking-[0.3em] mb-2 block">Join the Family</span>
+            <h1 className="text-4xl font-serif text-[#1C1917] mb-3">Create Account</h1>
+            <p className="text-gray-500">
+              Already a member? <Link to="/login" className="text-[#FF2865] font-bold hover:underline">Sign in</Link>
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input 
+                  type="text" 
+                  required 
+                  className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
+                  placeholder="Jane Doe"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input 
+                  type="email" 
+                  required 
+                  className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
+                  placeholder="name@example.com"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input 
+                  type="password" 
+                  required 
+                  className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 mt-4">
+              <input type="checkbox" id="terms" required className="mt-1 accent-[#FF2865]" />
+              <label htmlFor="terms" className="text-sm text-gray-500">
+                I agree to the <Link to="/terms" className="underline hover:text-[#FF2865]">Terms of Service</Link> and <Link to="/terms" className="underline hover:text-[#FF2865]">Privacy Policy</Link>.
+              </label>
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full bg-[#1C1917] text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] hover:bg-[#FF2865] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70"
+            >
+              {isLoading ? 'Creating Account...' : 'Sign Up'}
+              {!isLoading && <ArrowRight className="w-4 h-4" />}
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+
+      {/* --- RIGHT: IMAGE SECTION (Hidden on mobile) --- */}
+      <div className="hidden lg:block w-1/2 relative bg-[#F9F8F6]">
+        <img 
+          src="https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071597/IMG_0279_l2cibn.jpg" 
+          alt="Fashion Details" 
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/10"></div>
+      </div>
+
+    </div>
+  );
+}
