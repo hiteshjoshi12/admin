@@ -21,6 +21,7 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+   -webkit-overflow-scrolling: touch; /* Adds momentum on iOS */
 }
 
 /* --- NATIVE ANIMATIONS --- */
@@ -43,3 +44,24 @@ body {
 /* Hide Scrollbar */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+
+/* Ensure images don't cause layout shifts */
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Fix Mobile Scroll Momentum (Critical for iPhone) */
+html {
+  overflow-x: hidden;
+}
+
+
