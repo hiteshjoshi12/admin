@@ -51,8 +51,8 @@ body {
   backface-visibility: hidden;
 }
 /* Fix Mobile Scroll Momentum (Critical for iPhone) */
-html {
+/* html {
   overflow-x: hidden;
-}
+} */
 
 
