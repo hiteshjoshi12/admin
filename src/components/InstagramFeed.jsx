@@ -1,93 +1,129 @@
-import { Instagram } from 'lucide-react';
+import { Instagram, Play, Heart } from 'lucide-react';
+import { useRef, useState } from 'react';
 
-const posts = [
-  // Removed hardcoded rotations for mobile (added 'md:' prefix to rotation classes)
-  { id: 1, img: "https://images.unsplash.com/photo-1603189343302-e603f7add05a?q=80&w=600", style: "md:rotate-[-2deg] md:col-span-2 md:row-span-2 h-[300px] md:h-[500px]" }, 
-  { id: 2, img: "https://images.unsplash.com/photo-1603189343302-e603f7add05a?q=80&w=600", style: "md:rotate-[3deg] md:mt-12 h-[200px] md:h-[300px] z-10 shadow-xl" }, 
-  { id: 3, img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=600", style: "md:rotate-[-1deg] h-[200px] md:h-[400px]" }, 
-  { id: 4, img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600", style: "md:rotate-[2deg] md:-mt-24 h-[200px] md:h-[350px] z-20 shadow-lg" }, 
-  { id: 5, img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600", style: "md:rotate-[-3deg] h-[200px] md:h-[300px]" }, 
-];
+// Configuration: 2 Photos, 1 Reel
+const content = {
+  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img1_cwdqem.jpg", // Photo 1
+  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img2_rssgsc.jpg", // Photo 2
+  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069585/vid1_kpiiu5.mp4" // The Reel
+};
 
-// The official Instagram Gradient configuration
+// Official Instagram Gradient
 const instaGradientClass = "bg-gradient-to-tr from-[#833ab4] via-[#fd1d1d] to-[#fcb045]";
 
 export default function InstagramFeed() {
-  return (
-    <section className="py-12 md:py-24 px-4 bg-[#F9F8F6] relative overflow-hidden border-t border-gray-200">
-      
-      {/* Decorative Stamp Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-5 pointer-events-none">
-         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-           <path fill="#C5A059" d="M42.7,-62.3C54.1,-52.3,61.3,-38.4,66.6,-23.8C71.9,-9.2,75.3,6.1,71.8,19.4C68.4,32.7,58.1,43.9,46,52.4C33.9,60.9,20,66.6,5.2,68.3C-9.5,70,-24.1,67.6,-37.4,60.1C-50.7,52.6,-62.8,39.9,-70.2,24.5C-77.5,9.1,-80.2,-9,-75.5,-24.4C-70.8,-39.8,-58.8,-52.5,-44.8,-61.1C-30.9,-69.7,-15.4,-74.2,-0.2,-74.5C15,-74.8,31.3,-67.2,42.7,-62.3Z" transform="translate(100 100)" />
-         </svg>
-      </div>
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-      <div className="max-w-[1440px] mx-auto">
+  // Toggle play/pause for the reel on click
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) videoRef.current.pause();
+      else videoRef.current.play();
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <section className="py-24 px-4 bg-[#F9F8F6] relative overflow-hidden border-t border-gray-200">
+      
+      <div className="max-w-[1200px] mx-auto">
         
-        {/* Header Container */}
-        <div className="text-center relative z-30 mb-8 md:mb-16">
+        {/* Header */}
+        <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center gap-2 mb-4 bg-white px-4 py-2 rounded-full shadow-sm">
-            {/* Using a simpler icon approach for stability */}
-            <span className={`${instaGradientClass} bg-clip-text text-transparent`}>
-              <Instagram className="w-4 h-4 text-[#833ab4]" /> {/* Fallback color if clip fails */}
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-black">@BeadsAndBloom</span>
+             <span className={`${instaGradientClass} bg-clip-text text-transparent`}>
+                <Instagram className="w-4 h-4 text-[#833ab4]" /> 
+             </span>
+            <a href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer"><span className="text-[10px] font-bold uppercase tracking-widest text-brand-black">@beadsnbloom.india</span></a> 
           </div>
-          <h2 className="text-3xl md:text-5xl font-serif text-brand-black mb-6">
-            As Seen On You
+          <h2 className="text-4xl md:text-5xl font-serif text-brand-black">
+            The Gram
           </h2>
         </div>
 
-        {/* The Collage Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 relative z-10 p-2 md:p-4">
+        {/* THE MOODBOARD LAYOUT */}
+        <div className="relative grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          
+          {/* LEFT COLUMN: The Stacked Photos */}
+          <div className="md:col-span-5 flex flex-col gap-8 relative z-10 px-4 md:px-0">
             
-            {posts.map((post) => (
-              <div 
-                key={post.id} 
-                className={`relative group rounded-xl overflow-hidden cursor-pointer transition-all duration-500 
-                  /* DESKTOP HOVER: Rotate to 0, Scale up */
-                  md:hover:rotate-0 md:hover:scale-105 md:hover:shadow-2xl md:hover:z-50
-                  
-                  /* MOBILE DEFAULT: No rotation, normal scale */
-                  rotate-0 scale-100 shadow-md
-                  
-                  /* Apply per-post custom styles (mostly rotations) only on MD screens */
-                  ${post.style}
-                `}
-              >
-                <img src={post.img} alt="Instagram Post" className="w-full h-full object-cover" />
+            {/* PHOTO 1: Tilted Left */}
+            <div className="relative group w-full max-w-[320px] aspect-square bg-white p-3 shadow-xl transform rotate-[-3deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-start">
+               <div className="relative w-full h-full overflow-hidden bg-gray-100">
+                  <img src={content.photo1} alt="Insta Photo 1" className="w-full h-full object-cover" />
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Heart className="text-white w-8 h-8 fill-white" />
+                  </div>
+               </div>
+            </div>
+
+            {/* PHOTO 2: Tilted Right (Offset) */}
+            <div className="relative group w-full max-w-[320px] aspect-[4/5] bg-white p-3 shadow-xl transform rotate-[4deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-end md:-mt-12">
+               <div className="relative w-full h-full overflow-hidden bg-gray-100">
+                  <img src={content.photo2} alt="Insta Photo 2" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Heart className="text-white w-8 h-8 fill-white" />
+                  </div>
+               </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT COLUMN: The Reel (Cinematic) */}
+          <div className="md:col-span-7 relative z-0 md:pl-12">
+             <div 
+               className="relative w-full md:max-w-[400px] mx-auto aspect-[9/16] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white transform hover:scale-[1.02] transition-transform duration-500 cursor-pointer"
+               onClick={togglePlay}
+             >
+                <video
+                  ref={videoRef}
+                  src={content.reel}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
                 
-                {/* Overlay: Always visible on mobile (slight dark tint), visible on hover for desktop */}
-                <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300
-                  bg-black/20 opacity-100  /* Mobile: Visible tint */
-                  md:bg-black/40 md:opacity-0 md:group-hover:opacity-100 /* Desktop: Hidden until hover */
-                ">
-                   <Instagram className="text-white w-6 h-6 md:w-8 md:h-8 drop-shadow-lg" />
+                {/* Reel UI Overlay */}
+                <div className="absolute top-4 right-4 bg-black/20 backdrop-blur-md p-2 rounded-full">
+                   <Instagram className="w-5 h-5 text-white" />
                 </div>
-              </div>
-            ))}
-            
-            {/* Circular Sticker: Bottom Right on Mobile to avoid blocking content */}
-            <a href="#" className="
-              absolute z-40 group
-              /* Mobile Position: Bottom Right, Fixed Size */
-              bottom-0 right-4 translate-y-1/2
-              
-              /* Desktop Position: Center, Centered transform */
-              md:top-1/2 md:left-1/2 md:bottom-auto md:right-auto md:-translate-x-1/2 md:-translate-y-1/2
-            ">
-              <div className={`
-                w-24 h-24 md:w-40 md:h-40 rounded-full ${instaGradientClass} text-white 
-                flex flex-col items-center justify-center text-center p-4 shadow-xl 
-                transition-transform duration-300 
-                active:scale-95 /* Mobile Click Effect */
-                md:group-hover:scale-110 md:hover:rotate-12
-              `}>
-                <Instagram className="w-5 h-5 md:w-7 md:h-7 mb-1 md:mb-2" />
-                <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest leading-tight">Follow <br/> The Brand</span>
-              </div>
-            </a>
+                
+                {/* Play/Pause Indicator (Fades out when playing) */}
+                <div className={`absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}>
+                   <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                      <Play className="w-8 h-8 text-white fill-white ml-1" />
+                   </div>
+                </div>
+
+                {/* "Reel" Tag at bottom */}
+                <div className="absolute bottom-6 left-6 flex items-center gap-2">
+                   <div className="w-8 h-8 rounded-full border border-white overflow-hidden">
+                      <img src="/logo.png" alt="B&B" className="w-full h-full object-cover bg-white" /> {/* Placeholder for logo */}
+                   </div>
+                   <span className="text-white text-xs font-bold tracking-widest drop-shadow-md">Watch Reel</span>
+                </div>
+             </div>
+          </div>
+
+          {/* THE STICKER: Floating Between Layers */}
+          <a target="_blank"
+             href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" 
+             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 group"
+          >
+             <div className={`
+                w-28 h-28 md:w-36 md:h-36 rounded-full ${instaGradientClass} text-white 
+                flex flex-col items-center justify-center text-center p-4 shadow-[0_10px_40px_-10px_rgba(255,40,101,0.5)]
+                transition-transform duration-300 hover:scale-110 hover:rotate-12
+             `}>
+                <Instagram className="w-6 h-6 mb-1" />
+                <span className="text-[9px] font-bold uppercase tracking-widest leading-tight">Follow <br/>@beadsnbloom.india</span>
+    
+             </div>
+          </a>
 
         </div>
       </div>
