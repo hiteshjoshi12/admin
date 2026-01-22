@@ -8,12 +8,13 @@ export default function Navbar() {
 
   // --- CONFIGURATION: Define your links here ---
   const navLinks = [
-    { name: "New Arrivals", path: "/shop" },
-    { name: "Bridal", path: "/shop" }, // You can change this to /shop?category=bridal later
-    { name: "Mules", path: "/shop" },
-    { name: "About", path: "/about" }, // <--- Added About Page
-    { name: "Journal", path: "/journal" }, // <--- Separate Route
-  ];
+  { name: 'Sale', path: '/sale', isSpecial: true }, // Add this special flag
+  { name: 'New Arrivals', path: '/shop' },
+  { name: 'Bridal', path: '/shop' },
+  { name: 'Mules', path: '/shop' },
+  { name: 'About', path: '/about' },
+  { name: 'Journal', path: '/journal' }
+];
 
   useEffect(() => {
     const handleScroll = () => {
