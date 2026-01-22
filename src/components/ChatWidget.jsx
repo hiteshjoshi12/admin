@@ -4,25 +4,25 @@ import { MessageCircle, Instagram, Mail, X, MessageSquare } from 'lucide-react';
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Replace these with your actual links
   const contactInfo = {
-    whatsapp: "https://wa.me/919599766993", // Add your phone number here (e.g., 919876543210)
+    whatsapp: "https://wa.me/919599766993", 
     instagram: "https://instagram.com/beadsnbloom.india",
     email: "mailto:hello@beadsandbloom.com"
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    // FIX 1: Added 'pointer-events-none' here so the wrapper doesn't block clicks
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
       
-      {/* THE CHAT CARD (Hidden by default) */}
+      {/* THE CHAT CARD */}
       <div 
+        // FIX 2: Added 'pointer-events-auto' so you can click the card when it is open
         className={`
           mb-4 w-[320px] bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 origin-bottom-right
-          border border-gray-100
+          border border-gray-100 pointer-events-auto
           ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-10 pointer-events-none'}
         `}
       >
-        {/* Header - The "Hot Pink" Brand Color */}
         <div className="bg-[#FF2865] p-6 text-white">
           <h3 className="text-xl font-serif font-medium mb-1">Hi there! 👋</h3>
           <p className="text-xs text-white/90 font-sans tracking-wide">
@@ -30,10 +30,8 @@ export default function ChatWidget() {
           </p>
         </div>
 
-        {/* Options List */}
         <div className="p-4 flex flex-col gap-3 bg-gray-50">
           
-          {/* WhatsApp Button */}
           <a 
             href={contactInfo.whatsapp} 
             target="_blank" 
@@ -54,7 +52,6 @@ export default function ChatWidget() {
             </div>
           </a>
 
-          {/* Instagram Button */}
           <a 
             href={contactInfo.instagram}
             target="_blank" 
@@ -75,7 +72,6 @@ export default function ChatWidget() {
             </div>
           </a>
 
-          {/* Email / Generic Button */}
           <a 
             href={contactInfo.email}
             className="group flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#FF2865]/30 transition-all duration-200"
@@ -96,17 +92,17 @@ export default function ChatWidget() {
 
         </div>
 
-        {/* Footer */}
         <div className="bg-gray-50 p-2 text-center border-t border-gray-100">
           <p className="text-[9px] text-gray-400 uppercase tracking-widest">Powered by Beads & Bloom</p>
         </div>
       </div>
 
-      {/* THE TOGGLE BUTTON (Floating Action Button) */}
+      {/* THE TOGGLE BUTTON */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
+        // FIX 3: Added 'pointer-events-auto' here so the button remains clickable
         className={`
-          relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300
+          relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 pointer-events-auto
           ${isOpen ? 'bg-white text-[#FF2865] rotate-90' : 'bg-[#FF2865] text-white hover:scale-110'}
         `}
       >
@@ -115,7 +111,6 @@ export default function ChatWidget() {
         ) : (
           <>
             <MessageCircle className="w-6 h-6" />
-            {/* Notification Dot */}
             <span className="absolute top-0 right-0 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400 border-2 border-[#FF2865]"></span>

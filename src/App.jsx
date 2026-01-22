@@ -1,25 +1,25 @@
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import CollectionTiles from './components/CollectionTiles';
-import BestSellers from './components/BestSellers';
-import BrandStory from './components/BrandStory';
-import InstagramFeed from './components/InstagramFeed';
 import Footer from './components/Footer';
-import VideoShowcase from './components/VideoShowcase';
 import ChatWidget from './components/ChatWidget';
+import HomePage from './pages/HomePage';
+import About from './pages/About'; // Import the new page
 
 function App() {
   return (
-    // No more <SmoothScroll> wrapper
     <>
       <Navbar />
       <main>
-        <Hero />
-        <CollectionTiles />
-        <BestSellers />
-        <VideoShowcase />
-        <BrandStory />
-        <InstagramFeed />
+        <Routes>
+          {/* Main Home Page */}
+          <Route path="/" element={<HomePage />} />
+          
+          {/* New About Page */}
+          <Route path="/about" element={<About />} />
+          
+          {/* Placeholder for Shop (optional) */}
+          <Route path="/shop" element={<div className="pt-32 text-center">Shop Page Coming Soon</div>} />
+        </Routes>
       </main>
       <Footer />
       <ChatWidget />
