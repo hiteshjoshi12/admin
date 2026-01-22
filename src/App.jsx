@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Cart from './pages/Cart';
 import Sale from './pages/Sale';
+import Checkout from './pages/Checkout';
 
 function App() {
   return (
@@ -29,7 +30,9 @@ function App() {
           <Route path="/size-chart" element={<SizeChart />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/sale" element={<Sale />} />
+          
 
           
           {/* Placeholder for Shop (optional) */}

@@ -42,14 +42,7 @@ export default function SizeChart() {
           {/* --- RIGHT COLUMN: INSTRUCTIONS & NOTE --- */}
           <div className="w-full lg:w-1/2 space-y-12 animate-fade-up delay-200">
             
-            {/* Important Note */}
-            <div className="bg-[#FF2865]/10 p-8 rounded-2xl border-l-4 border-[#FF2865]">
-              <h3 className="text-xl font-serif text-[#1C1917] mb-3">Important Note</h3>
-              <p className="text-lg text-[#1C1917] font-medium">
-                If you are in between sizes, then <span className="text-[#FF2865] font-bold">go for a size bigger.</span>
-              </p>
-            </div>
-
+    
             {/* How to Measure Steps */}
             <div>
               <h2 className="text-3xl font-serif text-[#1C1917] mb-8">How to Measure</h2>
@@ -59,7 +52,7 @@ export default function SizeChart() {
                   number="1"
                   icon={Ruler}
                   title="Find your foot length"
-                  desc="Place a ruler flat on the floor. Measure the distance between your heel and the tip of your longest toe."
+                  desc="Place a measuring tape flat on the floor. Measure the distance between your heel and the tip of your longest toe."
                 />
                 
                 <Step 
