@@ -50,15 +50,6 @@ body {
   will-change: transform;
   backface-visibility: hidden;
 }
-
-
-/* Ensure images don't cause layout shifts */
-img, video {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
 /* Fix Mobile Scroll Momentum (Critical for iPhone) */
 html {
   overflow-x: hidden;
