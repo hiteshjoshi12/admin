@@ -119,8 +119,8 @@ export default function InstagramFeed() {
                 flex flex-col items-center justify-center text-center p-4 shadow-[0_10px_40px_-10px_rgba(255,40,101,0.5)]
                 transition-transform duration-300 hover:scale-110 hover:rotate-12
              `}>
-                <Instagram className="w-6 h-6 mb-1" />
-                <span className="text-[9px] font-bold uppercase tracking-widest leading-tight">Follow <br/>@beadsnbloom.india</span>
+                <Instagram className="w-9 h-9 mb-1" />
+                <span className="text-[9px] font-bold uppercase tracking-widest leading-tight">Follow <br/>@beadsn<br/>bloom.india</span>
     
              </div>
           </a>
