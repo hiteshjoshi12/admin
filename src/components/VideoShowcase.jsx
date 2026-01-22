@@ -6,7 +6,7 @@ const videos = [
   {
     id: 1,
     // Replace with your actual video file paths (e.g., "/videos/shoot1.mp4")
-    src: "j2.mp4", 
+    src: "https://res.cloudinary.com/dzgwhua6z/video/upload/v1769060277/j2_qikrha.mp4", 
     title: "Bridal BTS",
     price: "Shop The Look",
     link: "/shop"
