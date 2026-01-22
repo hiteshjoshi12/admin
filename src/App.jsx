@@ -5,6 +5,7 @@ import BestSellers from './components/BestSellers';
 import BrandStory from './components/BrandStory';
 import InstagramFeed from './components/InstagramFeed';
 import Footer from './components/Footer';
+import VideoShowcase from './components/VideoShowcase';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Hero />
         <CollectionTiles />
         <BestSellers />
+        <VideoShowcase />
         <BrandStory />
         <InstagramFeed />
       </main>
