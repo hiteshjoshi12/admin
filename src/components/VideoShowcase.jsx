@@ -3,10 +3,35 @@ import { Play, Volume2, VolumeX, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const videos = [
-  { id: 1, src: "j2.mp4", title: "Bridal BTS", price: "Shop The Look", link: "/shop" },
-  { id: 2, src: "j5.mp4", title: "Summer Walk", price: "View Collection", link: "/shop" },
-  { id: 3, src: "j8.mp4", title: "Festive Vibes", price: "Shop Festive", link: "/shop" },
-  { id: 4, src: "j11.mp4", title: "Close Up Details", price: "See Details", link: "/shop" }
+  {
+    id: 1,
+    // Replace with your actual video file paths (e.g., "/videos/shoot1.mp4")
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069368/j5_ketdz3.mp4", 
+    title: "Bridal BTS",
+    price: "Shop The Look",
+    link: "/shop"
+  },
+  {
+    id: 2,
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069341/j8_fjkfoe.mp4", 
+    title: "Summer Walk",
+    price: "View Collection",
+    link: "/shop"
+  },
+  {
+    id: 3,
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069290/j2_hkesie.mp4", 
+    title: "Festive Vibes",
+    price: "Shop Festive",
+    link: "/shop"
+  },
+  {
+    id: 4,
+    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069283/j11_t5m4rh.mp4", 
+    title: "Close Up Details",
+    price: "See Details",
+    link: "/shop"
+  }
 ];
 
 export default function VideoShowcase() {
@@ -73,7 +98,7 @@ export default function VideoShowcase() {
             <VideoCard key={video.id} video={video} />
           ))}
 
-          <Link to="/shop" className="flex-none w-[280px] md:w-[320px] aspect-[9/16] rounded-2xl border border-white/10 flex flex-col items-center justify-center text-center snap-center">
+          <Link to="/shop" className="flex-none w-[280px] md:w-[320px] aspect-9/16 rounded-2xl border border-white/10 flex flex-col items-center justify-center text-center snap-center">
              <div className="w-12 h-12 rounded-full border border-[#FF2865] text-[#FF2865] flex items-center justify-center mb-3">
                <ArrowUpRight className="w-5 h-5" />
              </div>
@@ -97,3 +122,6 @@ export default function VideoShowcase() {
     </section>
   );
 }
+
+
+
