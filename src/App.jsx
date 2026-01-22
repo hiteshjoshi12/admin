@@ -6,6 +6,7 @@ import BrandStory from './components/BrandStory';
 import InstagramFeed from './components/InstagramFeed';
 import Footer from './components/Footer';
 import VideoShowcase from './components/VideoShowcase';
+import ChatWidget from './components/ChatWidget';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <InstagramFeed />
       </main>
       <Footer />
+      <ChatWidget />
     </>
   );
 }
