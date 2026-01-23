@@ -12,6 +12,8 @@ import Signup from './pages/Signup';
 import Cart from './pages/Cart';
 import Sale from './pages/Sale';
 import Checkout from './pages/Checkout';
+import Shop from './pages/Shop';
+import ProductDetail from './pages/ProductDetail';
 
 function App() {
   return (
@@ -32,6 +34,9 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/sale" element={<Sale />} />
+
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           
 
           
