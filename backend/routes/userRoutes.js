@@ -1,9 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { saveAddress } = require('../controllers/userController'); // Import the controller we made
-const { protect } = require('../middleware/authMiddleware'); // Import auth middleware
+const { 
+  registerUser, 
+  authUser, 
+  saveAddress, 
+  updateAddress,
+  deleteAddress 
+} = require('../controllers/userController');
+const { protect } = require('../middleware/authMiddleware');
 
-// Define the route
-router.post('/profile/address', protect, saveAddress);
+// --- AUTHENTICATION ---
+router.post('/', registerUser);         // Matches POST /api/users (Register)
+router.post('/login', authUser);        // Matches POST /api/users/login (Login)
+
+// --- ADDRESS MANAGEMENT ---
+router.post('/profile/address', protect, saveAddress);       
+router.put('/profile/address/:id', protect, updateAddress);  
+router.delete('/profile/address/:id', protect, deleteAddress); 
 
 module.exports = router;

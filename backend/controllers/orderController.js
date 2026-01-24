@@ -102,19 +102,20 @@ const addOrderItems = async (req, res) => {
 // @route   GET /api/orders/:id
 // @access  Private
 const getOrderById = async (req, res) => {
-  try {
-    // Populate attaches the Name and Email of the user to the order data
-    const order = await Order.findById(req.params.id).populate('user', 'name email');
+  const order = await Order.findById(req.params.id).populate(
+    'user',
+    'name email'
+  );
 
-    if (order) {
-      res.json(order);
-    } else {
-      res.status(404).json({ message: 'Order not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+  if (order) {
+    res.json(order);
+  } else {
+    res.status(404);
+    throw new Error('Order not found');
   }
 };
+
+
 
 // @desc    Get logged in user orders
 // @route   GET /api/orders/myorders
@@ -128,4 +129,9 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-module.exports = { addOrderItems, getOrderById, getMyOrders };
+// Don't forget to export it!
+module.exports = {
+  addOrderItems,
+  getMyOrders,
+  getOrderById, // <--- Make sure this is here
+};

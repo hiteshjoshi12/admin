@@ -1,19 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// 1. ASYNC THUNK: Login User
+// 1. LOGIN
 export const login = createAsyncThunk('auth/login', async ({ email, password, localCart }, { rejectWithValue }) => {
   try {
-    const response = await fetch('http://localhost:5000/api/auth/login', {
+    const response = await fetch('http://localhost:5000/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, localCart }), // Send cart to merge
+      body: JSON.stringify({ email, password, localCart }),
     });
-
     const data = await response.json();
-
     if (!response.ok) throw new Error(data.message || 'Login failed');
-
-    // Save to LocalStorage so they stay logged in on refresh
     localStorage.setItem('userInfo', JSON.stringify(data));
     return data;
   } catch (error) {
@@ -21,23 +17,18 @@ export const login = createAsyncThunk('auth/login', async ({ email, password, lo
   }
 });
 
-// 2. ASYNC THUNK: Register User
+// 2. REGISTER
 export const register = createAsyncThunk(
   'auth/register', 
-  // Destructure localCart from the arguments
   async ({ name, email, password, localCart }, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      const response = await fetch('http://localhost:5000/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Send localCart in the body
         body: JSON.stringify({ name, email, password, localCart }),
       });
-
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message || 'Registration failed');
-
       localStorage.setItem('userInfo', JSON.stringify(data));
       return data;
     } catch (error) {
@@ -46,13 +37,12 @@ export const register = createAsyncThunk(
   }
 );
 
-// NEW ASYNC THUNK: Save Address
+// 3. SAVE ADDRESS
 export const saveAddressToProfile = createAsyncThunk(
   'auth/saveAddress',
   async (addressData, { getState, rejectWithValue }) => {
     try {
       const { auth: { userInfo } } = getState();
-      
       const response = await fetch('http://localhost:5000/api/users/profile/address', {
         method: 'POST',
         headers: {
@@ -61,10 +51,34 @@ export const saveAddressToProfile = createAsyncThunk(
         },
         body: JSON.stringify(addressData),
       });
-
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
+// 4. UPDATE ADDRESS (FIXED: Added this thunk)
+export const updateAddressInProfile = createAsyncThunk(
+  'auth/updateAddress',
+  async ({ id, addressData }, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { userInfo } } = getState();
+      // Notice the URL includes the ID: /address/${id}
+      const response = await fetch(`http://localhost:5000/api/users/profile/address/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+        body: JSON.stringify(addressData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      
       // Update LocalStorage
       localStorage.setItem('userInfo', JSON.stringify(data));
       return data;
@@ -74,9 +88,29 @@ export const saveAddressToProfile = createAsyncThunk(
   }
 );
 
+// 5. DELETE ADDRESS (FIXED: Added this thunk)
+export const deleteAddressFromProfile = createAsyncThunk(
+  'auth/deleteAddress',
+  async (id, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { userInfo } } = getState();
+      const response = await fetch(`http://localhost:5000/api/users/profile/address/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
-
-// Helper to load user from local storage
 const loadUserFromStorage = () => {
   try {
     const userInfo = localStorage.getItem('userInfo');
@@ -89,7 +123,7 @@ const loadUserFromStorage = () => {
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    userInfo: loadUserFromStorage(), // Load on start
+    userInfo: loadUserFromStorage(),
     loading: false,
     error: null,
   },
@@ -101,16 +135,11 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-  
       // LOGIN
       .addCase(login.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.userInfo = action.payload;
-      })
-      // NEW CASE: Update User Info when Address is saved
-      .addCase(saveAddressToProfile.fulfilled, (state, action) => {
-        state.userInfo = action.payload; // Updates Redux with new address list
       })
       .addCase(login.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       
@@ -120,8 +149,18 @@ const authSlice = createSlice({
         state.loading = false;
         state.userInfo = action.payload;
       })
-      .addCase(register.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
-      
+      .addCase(register.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // ADDRESS CASES (CRITICAL FIX: Ensure all 3 are here)
+      .addCase(saveAddressToProfile.fulfilled, (state, action) => {
+        state.userInfo = action.payload; 
+      })
+      .addCase(updateAddressInProfile.fulfilled, (state, action) => {
+        state.userInfo = action.payload; // <--- This updates the UI when you click "Set as Primary"
+      })
+      .addCase(deleteAddressFromProfile.fulfilled, (state, action) => {
+        state.userInfo = action.payload; // <--- This updates the UI when you delete
+      });
   },
 });
 

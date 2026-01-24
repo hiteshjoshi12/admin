@@ -17,6 +17,7 @@ import ProductDetail from './pages/ProductDetail';
 import Profile from './pages/Profile';
 import MyOrders from './pages/MyOrders';
 import PrivateRoute from './components/PrivateRoute';
+import OrderDetails from './pages/OrderDetails';
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
         <Route element={<PrivateRoute />}>
            <Route path="/profile" element={<Profile />} />
            <Route path="/myorders" element={<MyOrders />} />
-           {/* Add Checkout Page here later */}
+           <Route path="/order/:id" element={<OrderDetails />} />
         </Route>
 
           
