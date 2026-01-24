@@ -4,6 +4,9 @@ const initialState = {
   items: [], 
   totalQuantity: 0,
   totalAmount: 0,
+  // --- NEW FIELDS FOR CHECKOUT ---
+  shippingAddress: {}, 
+  paymentMethod: 'Razorpay', 
 };
 
 const cartSlice = createSlice({
@@ -76,9 +79,31 @@ const cartSlice = createSlice({
       state.items = [];
       state.totalQuantity = 0;
       state.totalAmount = 0;
+      state.shippingAddress = {}; // Optional: clear address on logout
+    },
+
+    // --- NEW REDUCERS FOR CHECKOUT ---
+    
+    // 6. SAVE SHIPPING ADDRESS
+    saveShippingAddress: (state, action) => {
+      state.shippingAddress = action.payload;
+    },
+
+    // 7. SAVE PAYMENT METHOD
+    savePaymentMethod: (state, action) => {
+      state.paymentMethod = action.payload;
     }
   },
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart, setCart } = cartSlice.actions;
+export const { 
+  addToCart, 
+  removeFromCart, 
+  updateQuantity, 
+  clearCart, 
+  setCart,
+  saveShippingAddress, // Exporting new action
+  savePaymentMethod    // Exporting new action
+} = cartSlice.actions;
+
 export default cartSlice.reducer;

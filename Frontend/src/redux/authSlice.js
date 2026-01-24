@@ -22,24 +22,29 @@ export const login = createAsyncThunk('auth/login', async ({ email, password, lo
 });
 
 // 2. ASYNC THUNK: Register User
-export const register = createAsyncThunk('auth/register', async ({ name, email, password }, { rejectWithValue }) => {
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
-    });
+export const register = createAsyncThunk(
+  'auth/register', 
+  // Destructure localCart from the arguments
+  async ({ name, email, password, localCart }, { rejectWithValue }) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // Send localCart in the body
+        body: JSON.stringify({ name, email, password, localCart }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) throw new Error(data.message || 'Registration failed');
+      if (!response.ok) throw new Error(data.message || 'Registration failed');
 
-    localStorage.setItem('userInfo', JSON.stringify(data));
-    return data;
-  } catch (error) {
-    return rejectWithValue(error.message);
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
   }
-});
+);
 
 // Helper to load user from local storage
 const loadUserFromStorage = () => {

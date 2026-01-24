@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Mail, Lock, User } from 'lucide-react';
+import { setCart } from '../redux/cartSlice';
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +14,9 @@ export default function Signup() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // 1. Get the current guest cart items
+  const { items: localCart } = useSelector((state) => state.cart);
 
   // --- STATE ---
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
@@ -34,11 +38,19 @@ export default function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // 2. Dispatch register with localCart
     dispatch(register({
       name: formData.name,
       email: formData.email,
-      password: formData.password
-    }));
+      password: formData.password,
+      localCart // <--- PASS IT HERE
+    })).then((res) => {
+       // 3. If registration succeeded and backend returned a cart, update Redux
+       if(res.payload && res.payload.cart) {
+           dispatch(setCart(res.payload.cart));
+       }
+    });
   };
 
   return (

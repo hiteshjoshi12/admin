@@ -69,10 +69,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// @desc    Register user
+// @desc    Register user & MERGE CART
 // @route   POST /api/auth/signup
 router.post('/signup', async (req, res) => {
-  const { name, email, password } = req.body;
+  // 1. Accept localCart from the request body
+  const { name, email, password, localCart } = req.body;
+
   try {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'User already exists' });
@@ -80,13 +82,37 @@ router.post('/signup', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ name, email, password: hashedPassword });
+    // 2. Create the User (initially empty cart)
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
+    // 3. If there was a Local Cart, format it and save to the new User
+    if (user && localCart && localCart.length > 0) {
+      // Map frontend items to match Mongoose schema structure
+      const dbCart = localCart.map(item => ({
+        productId: item.id,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        size: item.size,
+        quantity: item.quantity
+      }));
+      
+      user.cart = dbCart;
+      await user.save(); // Save the update
+    }
+
+    // 4. Send response (include the cart so Redux can update)
     if (user) {
       res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
+        isAdmin: user.isAdmin,
+        cart: user.cart, // <--- IMPORTANT: Send back the merged cart
         token: generateToken(user._id),
       });
     } else {
