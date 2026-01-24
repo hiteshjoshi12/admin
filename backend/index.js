@@ -15,6 +15,14 @@ enableCors(app);
 
 connectDB();
 
+app.get('/api/debug/env', (req, res) => {
+  res.json({
+    FRONTEND_URL: process.env.FRONTEND_URL || null,
+    NODE_ENV: process.env.NODE_ENV,
+  });
+});
+
+
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
