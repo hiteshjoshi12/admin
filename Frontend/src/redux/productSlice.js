@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import config from '../../config/config';
+import config from '../config/config';
 
 // 1. ASYNC THUNK: Fetch All Products (with Pagination & Search)
 // Accepts an object: { keyword: 'silk', pageNumber: 1 }
