@@ -17,6 +17,7 @@ export const createOrder = createAsyncThunk(
           'Content-Type': 'application/json',
           Authorization: `Bearer ${userInfo.token}`, // Secure Route
         },
+        credentials: 'include',
         body: JSON.stringify(orderData),
       });
 

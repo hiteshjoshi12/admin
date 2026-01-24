@@ -7,6 +7,7 @@ export const login = createAsyncThunk('auth/login', async ({ email, password, lo
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, localCart }),
+      credentials: 'include',
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Login failed');
@@ -26,6 +27,7 @@ export const register = createAsyncThunk(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, localCart }),
+        credentials: 'include',
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Registration failed');
@@ -50,6 +52,7 @@ export const saveAddressToProfile = createAsyncThunk(
           Authorization: `Bearer ${userInfo.token}`,
         },
         body: JSON.stringify(addressData),
+        credentials: 'include',
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
@@ -75,6 +78,7 @@ export const updateAddressInProfile = createAsyncThunk(
           Authorization: `Bearer ${userInfo.token}`,
         },
         body: JSON.stringify(addressData),
+        credentials: 'include',
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
@@ -99,6 +103,7 @@ export const deleteAddressFromProfile = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
         },
+        credentials: 'include',
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);

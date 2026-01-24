@@ -24,6 +24,7 @@ export default function OrderDetails() {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
+          credentials: 'include',
         });
 
         if (!res.ok) throw new Error('Order not found');
