@@ -1,25 +1,50 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Mail, Lock, User } from 'lucide-react';
 
+// REDUX IMPORTS
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../redux/authSlice';
+
 export default function Signup() {
-  
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const [isLoading, setIsLoading] = useState(false);
+  // --- STATE ---
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  
+  // Get Auth State
+  const { loading, error, userInfo } = useSelector((state) => state.auth);
+
+  // Redirect if logged in
+  useEffect(() => {
+    if (userInfo) {
+      navigate('/shop');
+    }
+  }, [userInfo, navigate]);
+
+  // --- HANDLERS ---
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000);
+    dispatch(register({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password
+    }));
   };
 
   return (
     <div className="min-h-screen flex bg-white pt-24">
       
-      {/* --- LEFT: FORM SECTION (Swapped order for variety) --- */}
+      {/* --- LEFT: FORM SECTION --- */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 bg-white relative">
         <div className="w-full max-w-md animate-fade-up">
           
@@ -31,6 +56,13 @@ export default function Signup() {
             </p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-6 text-sm border border-red-100 text-center">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             
             <div className="space-y-2">
@@ -38,7 +70,10 @@ export default function Signup() {
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="text" 
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   required 
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="Jane Doe"
@@ -51,7 +86,10 @@ export default function Signup() {
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="email" 
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   required 
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="name@example.com"
@@ -64,7 +102,10 @@ export default function Signup() {
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="password" 
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   required 
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="••••••••"
@@ -81,11 +122,11 @@ export default function Signup() {
 
             <button 
               type="submit" 
-              disabled={isLoading}
+              disabled={loading}
               className="w-full bg-[#1C1917] text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] hover:bg-[#FF2865] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70"
             >
-              {isLoading ? 'Creating Account...' : 'Sign Up'}
-              {!isLoading && <ArrowRight className="w-4 h-4" />}
+              {loading ? 'Creating Account...' : 'Sign Up'}
+              {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
 
           </form>
@@ -93,7 +134,7 @@ export default function Signup() {
         </div>
       </div>
 
-      {/* --- RIGHT: IMAGE SECTION (Hidden on mobile) --- */}
+      {/* --- RIGHT: IMAGE SECTION --- */}
       <div className="hidden lg:block w-1/2 relative bg-[#F9F8F6]">
         <img 
           src="https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071597/IMG_0279_l2cibn.jpg" 

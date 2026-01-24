@@ -1,26 +1,58 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Mail, Lock } from 'lucide-react';
 
+// REDUX IMPORTS
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/authSlice';
+import { setCart } from '../redux/cartSlice';
+
 export default function Login() {
-  
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const [isLoading, setIsLoading] = useState(false);
+  // --- STATE ---
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  
+  // Get Auth State & Local Cart
+  const { loading, error, userInfo } = useSelector((state) => state.auth);
+  const { items: localCart } = useSelector((state) => state.cart);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (userInfo) {
+      navigate('/shop'); 
+    }
+  }, [userInfo, navigate]);
+
+  // --- HANDLERS ---
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    // Simulate login delay
-    setTimeout(() => setIsLoading(false), 2000);
+    
+    dispatch(login({ 
+      email: formData.email, 
+      password: formData.password, 
+      localCart // Sending cart to backend for merging
+    })).then((result) => {
+      // If login successful and backend returned a merged cart, update Redux immediately
+      if (result.payload && result.payload.cart) {
+        dispatch(setCart(result.payload.cart));
+      }
+    });
   };
 
   return (
     <div className="min-h-screen flex bg-white pt-20">
       
-      {/* --- LEFT: IMAGE SECTION (Hidden on mobile) --- */}
+      {/* --- LEFT: IMAGE SECTION --- */}
       <div className="hidden lg:block w-1/2 relative bg-[#F9F8F6]">
         <img 
           src="https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075057/IMG_1050_bt6gdf.jpg" 
@@ -45,6 +77,13 @@ export default function Login() {
             </p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-6 text-sm border border-red-100 text-center">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             
             <div className="space-y-2">
@@ -52,7 +91,10 @@ export default function Login() {
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="email" 
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   required 
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="name@example.com"
@@ -63,12 +105,15 @@ export default function Login() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Password</label>
-                <a href="#" className="text-xs text-gray-400 hover:text-[#FF2865]">Forgot?</a>
+                <Link to="/forgot-password" className="text-xs text-gray-400 hover:text-[#FF2865]">Forgot?</Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="password" 
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   required 
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="••••••••"
@@ -78,11 +123,11 @@ export default function Login() {
 
             <button 
               type="submit" 
-              disabled={isLoading}
+              disabled={loading}
               className="w-full bg-[#1C1917] text-white py-5 rounded-xl font-bold uppercase tracking-[0.2em] hover:bg-[#FF2865] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70"
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
-              {!isLoading && <ArrowRight className="w-4 h-4" />}
+              {loading ? 'Signing In...' : 'Sign In'}
+              {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
 
           </form>

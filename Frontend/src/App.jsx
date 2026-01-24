@@ -14,6 +14,9 @@ import Sale from './pages/Sale';
 import Checkout from './pages/Checkout';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
+import Profile from './pages/Profile';
+import MyOrders from './pages/MyOrders';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
@@ -37,11 +40,15 @@ function App() {
 
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          
+
+          {/* --- PROTECTED ROUTES --- */}
+        <Route element={<PrivateRoute />}>
+           <Route path="/profile" element={<Profile />} />
+           <Route path="/myorders" element={<MyOrders />} />
+           {/* Add Checkout Page here later */}
+        </Route>
 
           
-          {/* Placeholder for Shop (optional) */}
-          <Route path="/shop" element={<div className="pt-32 text-center">Shop Page Coming Soon</div>} />
         </Routes>
       </main>
       <Footer />

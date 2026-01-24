@@ -5,153 +5,31 @@ import {
   ShieldCheck, ShoppingBag, X, ZoomIn, Droplets, Sun, Wind, Feather
 } from 'lucide-react';
 
-// --- DATABASE (J1 - J12) ---
-// This acts as your product database. 
-// In the future, this data will come from your Backend/CMS.
-const productsDatabase = [
-  {
-    id: 1,
-    name: "The Royal Silk Dabka",
-    price: 4200,
-    originalPrice: 5500,
-    base: "Pure Silk",
-    work: "Hand-done Dabka & Bead Work",
-    description: "A regal masterpiece featuring intricate Dabka artistry on a luxurious pure silk base. Perfect for weddings and high-end soirées.",
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41]
-  },
-  {
-    id: 2,
-    name: "Gotta Pati Charm",
-    price: 3800,
-    originalPrice: 4500,
-    base: "Pure Crepe",
-    work: "Traditional Gotta Pati & Bead Work",
-    description: "The vibrancy of Gotta Pati meets the sheen of pure crepe. A festive essential that captures the spirit of celebration.",
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40]
-  },
-  {
-    id: 3,
-    name: "Bharwa Tanka Heritage",
-    price: 4100,
-    originalPrice: null,
-    base: "Pure Crepe",
-    work: "Bharwa Tanka Work with Beads",
-    description: "Filled with history, the Bharwa Tanka technique creates a dense, rich texture that makes this pair a true collector's item.",
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [37, 38, 39, 40]
-  },
-  {
-    id: 4,
-    name: "Mirror & Bead Illusion",
-    price: 3500,
-    originalPrice: 4200,
-    base: "Pure Crepe",
-    work: "Real Mirror Work & Beads",
-    description: "Reflecting light with every step, the real mirror work on pure crepe adds a glamorous sparkle to any outfit.",
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41]
-  },
-  {
-    id: 5,
-    name: "Chain Stitch Elegance",
-    price: 3200,
-    originalPrice: null,
-    base: "Pure Crepe",
-    work: "Chain Stitch, Sequins & Dabka",
-    description: "A delicate fusion of chain stitch fluency and the sparkle of sequins, finished with a touch of antique Dabka.",
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [38, 39, 40]
-  },
-  {
-    id: 6,
-    name: "Golden Zari Classic",
-    price: 3600,
-    originalPrice: 4000,
-    base: "Pure Crepe",
-    work: "Traditional Zari with Gold Metallic Threads",
-    description: "Timeless luxury. The gold-tone metallic threads woven into traditional Zari work create an aura of royalty.",
-   images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41]
-  },
-  {
-    id: 7,
-    name: "Thread & Mirror Fusion",
-    price: 3400,
-    originalPrice: null,
-    base: "Pure Crepe",
-    work: "Mirror Work with Thread Detailing",
-    description: "A playful yet sophisticated combination of mirrors and colorful thread detailing on a smooth crepe canvas.",
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40]
-  },
-  {
-    id: 8,
-    name: "Floral Resham Beads",
-    price: 3900,
-    originalPrice: 4500,
-    base: "Pure Crepe",
-    work: "Seed Beads & Resham Outlining",
-    description: "Tiny seed beads meet soft silk (Resham) threads to create delicate floral motifs that bloom on your feet.",
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg","https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41]
-  },
-  {
-    id: 9,
-    name: "Silk Zardozi Cut-Dana",
-    price: 4500,
-    originalPrice: 6000,
-    base: "Pure Silk",
-    work: "Zardozi Bead, Cut Dana & Sequins",
-    description: "Our premium offering. A silk base heavily embellished with a mix of Zardozi, sharp Cut Dana, and shimmering sequins.",
-    images: ["https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=1200"],
-    sizes: [37, 38, 39, 40]
-  },
-  {
-    id: 10,
-    name: "Phulkari Shisha Edit",
-    price: 3300,
-    originalPrice: null,
-    base: "Pure Crepe",
-    work: "Phulkari Inspired Embroidery & Shisha",
-    description: "Inspired by the vibrant heritage of Punjab, featuring Phulkari-style geometric patterns highlighted by Shisha glass work.",
-    images: ["https://images.unsplash.com/photo-1600185365926-3a223ddc3410?q=80&w=1200"],
-    sizes: [36, 37, 38, 39, 40, 41]
-  },
-  {
-    id: 11,
-    name: "Resham Zardozi Royale",
-    price: 4400,
-    originalPrice: 5200,
-    base: "Pure Crepe",
-    work: "Cut Dana Zardozi, Sequins & Resham",
-    description: "An intricate dance of textures. Sharp cut dana and soft resham threads come together to create a multi-dimensional look.",
-    images: ["https://images.unsplash.com/photo-1560343090-f0409e92791a?q=80&w=1200"],
-    sizes: [36, 37, 38, 39, 40]
-  },
-  {
-    id: 12,
-    name: "Silver Thread Zardozi",
-    price: 4000,
-    originalPrice: null,
-    base: "Pure Crepe",
-    work: "Zardozi & Silver Thread Embroidery",
-    description: "Cool toned elegance. Silver threads woven into Zardozi patterns on crepe, perfect for evening wear.",
-    images: ["https://images.unsplash.com/photo-1596253406560-c3d3284d7285?q=80&w=1200"],
-    sizes: [36, 37, 38, 39, 40, 41]
-  }
-];
+// 1. REDUX IMPORTS
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProductDetails, clearProductDetails } from '../redux/productSlice';
+import { addToCart } from '../redux/cartSlice';
 
 export default function ProductDetail() {
   const { id } = useParams();
-  
-  // Find product by ID, default to first if not found (for safety)
-  const product = productsDatabase.find(p => p.id === parseInt(id)) || productsDatabase[0];
+  const dispatch = useDispatch();
+
+  // 2. GET REAL DATA FROM REDUX
+  // We renamed 'product' to 'currentProduct' to avoid confusion
+  const { product: currentProduct, loading, error } = useSelector((state) => state.products);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [id]);
+    // 3. FETCH DETAILS ON MOUNT
+    if (id) {
+      dispatch(fetchProductDetails(id));
+    }
+    
+    // Cleanup: Clear details when leaving page so next product doesn't flash old data
+    return () => {
+      dispatch(clearProductDetails());
+    };
+  }, [dispatch, id]);
 
   // --- STATE ---
   const [selectedSize, setSelectedSize] = useState(null);
@@ -170,8 +48,38 @@ export default function ProductDetail() {
       alert("Please select a size first.");
       return;
     }
-    alert(`Added ${quantity} pair(s) of ${product.name} (Size ${selectedSize}) to cart!`);
+    
+    // ADD TO REDUX CART
+    dispatch(addToCart({
+      id: currentProduct._id,
+      name: currentProduct.name,
+      image: currentProduct.images[0],
+      price: currentProduct.price,
+      quantity: quantity,
+      size: selectedSize
+    }));
+
+    alert("Added to Bag!");
   };
+
+  // --- LOADING STATE ---
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1C1917]"></div>
+      </div>
+    );
+  }
+
+  // --- ERROR STATE ---
+  if (error || !currentProduct) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <h2 className="text-2xl font-serif text-red-500 mb-4">Product Not Found</h2>
+        <Link to="/shop" className="underline">Back to Collection</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white min-h-screen pt-20">
@@ -179,7 +87,7 @@ export default function ProductDetail() {
       {/* --- LIGHTBOX --- */}
       {isLightboxOpen && (
         <Lightbox 
-          images={product.images} 
+          images={currentProduct.images} 
           initialIndex={activeImage} 
           onClose={() => setIsLightboxOpen(false)} 
         />
@@ -190,16 +98,16 @@ export default function ProductDetail() {
         
         {/* LEFT: IMAGE GALLERY */}
         <div className="w-full lg:w-3/5">
-           {/* Mobile Slider */}
-           <div className="lg:hidden relative">
+          {/* Mobile Slider */}
+          <div className="lg:hidden relative">
             <div className="aspect-[3/4] overflow-hidden bg-gray-100" onClick={() => openLightbox(activeImage)}>
-              <img src={product.images[activeImage]} alt="Product" className="w-full h-full object-cover" />
+              <img src={currentProduct.images[activeImage]} alt="Product" className="w-full h-full object-cover" />
               <div className="absolute bottom-4 right-4 bg-white/80 p-2 rounded-full text-xs font-bold text-[#1C1917] pointer-events-none">
                 <ZoomIn className="w-4 h-4" />
               </div>
             </div>
             <div className="flex justify-center gap-2 mt-4">
-              {product.images.map((_, idx) => (
+              {currentProduct.images.map((_, idx) => (
                 <button key={idx} onClick={() => setActiveImage(idx)} className={`w-2 h-2 rounded-full transition-all ${activeImage === idx ? 'bg-[#FF2865] w-4' : 'bg-gray-300'}`} />
               ))}
             </div>
@@ -207,7 +115,7 @@ export default function ProductDetail() {
 
           {/* Desktop Grid */}
           <div className="hidden lg:grid grid-cols-2 gap-4">
-            {product.images.map((img, idx) => (
+            {currentProduct.images.map((img, idx) => (
               <div key={idx} onClick={() => openLightbox(idx)} className={`relative overflow-hidden cursor-zoom-in group ${idx === 0 ? 'col-span-2 aspect-[4/3]' : 'col-span-1 aspect-[3/4]'}`}>
                 <img src={img} alt={`View ${idx}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
@@ -227,40 +135,40 @@ export default function ProductDetail() {
             {/* Header Info */}
             <div>
               <div className="flex justify-between items-start mb-2">
-                <h1 className="text-3xl md:text-4xl font-serif text-[#1C1917] leading-tight">{product.name}</h1>
+                <h1 className="text-3xl md:text-4xl font-serif text-[#1C1917] leading-tight">{currentProduct.name}</h1>
                 <button className="p-2 rounded-full hover:bg-gray-50 text-gray-400 hover:text-[#FF2865] transition-colors">
                   <Heart className="w-6 h-6" />
                 </button>
               </div>
               
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-2xl font-bold text-[#1C1917]">₹{product.price.toLocaleString()}</span>
-                {product.originalPrice && (
+                <span className="text-2xl font-bold text-[#1C1917]">₹{currentProduct.price.toLocaleString()}</span>
+                {currentProduct.originalPrice > 0 && (
                   <>
-                    <span className="text-lg text-gray-400 line-through">₹{product.originalPrice.toLocaleString()}</span>
+                    <span className="text-lg text-gray-400 line-through">₹{currentProduct.originalPrice.toLocaleString()}</span>
                     <span className="bg-[#FF2865]/10 text-[#FF2865] text-xs font-bold px-2 py-1 rounded-sm uppercase">
-                      {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                      {Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100)}% OFF
                     </span>
                   </>
                 )}
               </div>
             </div>
 
-            {/* --- SPECIFICATIONS CARD (New Professional Look) --- */}
+            {/* --- SPECIFICATIONS CARD --- */}
             <div className="bg-[#F9F8F6] rounded-xl p-5 border border-gray-100">
               <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Product Details</h3>
               <div className="space-y-3">
                 <div className="flex justify-between border-b border-gray-200 pb-2">
                   <span className="text-sm text-gray-600 font-medium">Base Material</span>
-                  <span className="text-sm font-bold text-[#1C1917]">{product.base}</span>
+                  <span className="text-sm font-bold text-[#1C1917]">{currentProduct.baseMaterial}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-200 pb-2">
                   <span className="text-sm text-gray-600 font-medium">Craftsmanship</span>
-                  <span className="text-sm font-bold text-[#1C1917] text-right max-w-[60%]">{product.work}</span>
+                  <span className="text-sm font-bold text-[#1C1917] text-right max-w-[60%]">{currentProduct.craftsmanship}</span>
                 </div>
                 <div className="flex justify-between pt-1">
-                   <span className="text-sm text-gray-600 font-medium">Padding</span>
-                   <span className="text-sm font-bold text-[#1C1917]">Double Cushioned</span>
+                   <span className="text-sm text-gray-600 font-medium">Category</span>
+                   <span className="text-sm font-bold text-[#1C1917]">{currentProduct.category}</span>
                 </div>
               </div>
             </div>
@@ -272,7 +180,7 @@ export default function ProductDetail() {
                 <Link to="/size-chart" className="text-xs text-[#FF2865] underline decoration-1 underline-offset-2">Size Guide</Link>
               </div>
               <div className="grid grid-cols-6 gap-2">
-                {product.sizes.map((size) => (
+                {currentProduct.sizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -301,7 +209,7 @@ export default function ProductDetail() {
               </button>
             </div>
 
-            {/* --- WASH & CARE GUIDE (Professional Layout) --- */}
+            {/* --- WASH & CARE GUIDE --- */}
             <div className="border border-gray-200 rounded-xl overflow-hidden">
                <div className="bg-gray-50 px-5 py-3 border-b border-gray-200">
                  <h3 className="text-sm font-bold text-[#1C1917] flex items-center gap-2">
@@ -312,20 +220,24 @@ export default function ProductDetail() {
                  <p className="text-xs text-gray-500 leading-relaxed mb-4">
                    Your Beads & Bloom juttis are handcrafted treasures. Treat them with love to ensure they last a lifetime.
                  </p>
-                 
                  <div className="grid grid-cols-2 gap-4">
                     <CareItem icon={Droplets} text="Avoid Water" sub="Keep away from moisture" />
                     <CareItem icon={Sun} text="No Direct Sun" sub="Prevents color fading" />
                     <CareItem icon={Feather} text="Soft Brush" sub="For gentle cleaning" />
                     <CareItem icon={Wind} text="Air Dry" sub="Store in dust bag" />
                  </div>
-
                  <div className="bg-[#FF2865]/5 p-3 rounded-lg border border-[#FF2865]/10 mt-2">
                    <p className="text-[10px] text-gray-600">
                      <span className="font-bold text-[#FF2865]">Pro Tip:</span> For heavy embroidered pairs (Zardozi/Dabka), we strictly recommend <strong>Dry Clean Only</strong>. Rotate pairs regularly to prevent creasing.
                    </p>
                  </div>
                </div>
+            </div>
+
+            {/* Editor's Note */}
+            <div className="bg-[#F9F8F6] p-6 rounded-xl mt-4">
+              <h3 className="font-serif text-lg mb-2">Editor's Note</h3>
+              <p className="text-sm text-gray-600 leading-relaxed font-light">{currentProduct.description}</p>
             </div>
 
             {/* Info Accordions */}
@@ -342,14 +254,14 @@ export default function ProductDetail() {
       <ReviewSection />
 
       {/* --- RELATED PRODUCTS --- */}
-      <RelatedProducts currentId={product.id} />
+      <RelatedProducts currentId={currentProduct._id} />
 
     </div>
   );
 }
 
 // --------------------------------------------------------------------------
-// --- SUB COMPONENTS ---
+// --- SUB COMPONENTS (Same as before, keep them here) ---
 // --------------------------------------------------------------------------
 
 function CareItem({ icon: Icon, text, sub }) {
@@ -424,6 +336,7 @@ function ReviewSection() {
         </form>
       )}
       <div className="space-y-6">
+        {/* We will connect real reviews later */}
         <div className="border-b border-gray-100 pb-6"><div className="flex justify-between items-start mb-2"><div><div className="flex text-[#FFCB45] mb-1">{[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}</div><h4 className="font-bold text-[#1C1917]">Ananya S.</h4></div><span className="text-xs text-gray-400">2 days ago</span></div><p className="text-gray-600 text-sm italic">"Absolutely stunning! The padding is so soft, I wore them for my entire Sangeet."</p></div>
       </div>
     </div>
@@ -431,22 +344,22 @@ function ReviewSection() {
 }
 
 function RelatedProducts({ currentId }) {
-  const products = [
-    { id: 2, name: "Gotta Pati Charm", price: "₹3,800", img: "https://images.unsplash.com/photo-1560343090-f0409e92791a?q=80&w=600" },
-    { id: 3, name: "Bharwa Heritage", price: "₹4,100", img: "https://images.unsplash.com/photo-1605218427368-35b866c24195?q=80&w=600" },
-    { id: 6, name: "Golden Zari Classic", price: "₹3,600", img: "https://images.unsplash.com/photo-1515347619252-60a6bf4fffce?q=80&w=600" },
-    { id: 9, name: "Silk Zardozi", price: "₹4,500", img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=600" }
-  ].filter(p => p.id !== currentId).slice(0, 4);
+  // We can eventually filter this from the Redux store too
+  // For now, let's just show a few placeholder links to other products
+  const { items } = useSelector((state) => state.products);
+  const related = items.filter(p => p._id !== currentId).slice(0, 4);
+
+  if (related.length === 0) return null;
 
   return (
     <section className="py-16 bg-[#F9F8F6]">
        <div className="max-w-[1440px] mx-auto px-6">
           <div className="flex justify-between items-center mb-8"><h2 className="text-2xl font-serif text-[#1C1917]">You May Also Like</h2><Link to="/shop" className="text-xs font-bold uppercase tracking-widest hover:text-[#FF2865]">View All</Link></div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {products.map((p, i) => (
-              <Link to={`/product/${p.id}`} key={i} className="group cursor-pointer">
-                <div className="overflow-hidden rounded-xl mb-3 relative aspect-[3/4]"><img src={p.img} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" /></div>
-                <h3 className="font-serif text-[#1C1917] group-hover:text-[#FF2865] transition-colors">{p.name}</h3><p className="text-sm font-bold text-gray-500">{p.price}</p>
+            {related.map((p, i) => (
+              <Link to={`/product/${p._id}`} key={i} className="group cursor-pointer">
+                <div className="overflow-hidden rounded-xl mb-3 relative aspect-[3/4]"><img src={p.images[0]} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" /></div>
+                <h3 className="font-serif text-[#1C1917] group-hover:text-[#FF2865] transition-colors">{p.name}</h3><p className="text-sm font-bold text-gray-500">₹{p.price}</p>
               </Link>
             ))}
           </div>
