@@ -39,16 +39,16 @@ const cartSlice = createSlice({
     },
 
     // 2. REMOVE ITEM
+   // FIXED REMOVE LOGIC: Checks both ID and Size
     removeFromCart: (state, action) => {
-      const id = action.payload;
-      const existingItem = state.items.find(item => item.id === id);
+      const { id, size } = action.payload; // <--- Get both ID and Size
       
-      if (existingItem) {
-        state.items = state.items.filter(item => item.id !== id);
-        // Recalculate
-        state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-        state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-      }
+      // Keep items that DO NOT match both the ID and the Size
+      state.items = state.items.filter(item => !(item.id === id && item.size === size));
+      
+      // Recalculate Totals
+      state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
+      state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
     },
 
     // 3. UPDATE QUANTITY

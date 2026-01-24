@@ -229,33 +229,50 @@ function FilterGroup({ title, children }) {
   return <div className="space-y-4"><h3 className="font-serif text-lg text-[#1C1917]">{title}</h3><div className="space-y-2">{children}</div></div>;
 }
 
-function ProductCard({ product }) {
-  // Handle MongoDB data structure (images array)
+ function ProductCard({ product }) {
+  // Handle MongoDB data structure
   const imageSrc = product.images?.[0] || '';
   const secondImage = product.images?.[1] || imageSrc;
+  const isOutOfStock = product.countInStock === 0; // Check stock
 
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
     : 0;
 
   return (
-    <Link to={`/product/${product._id}`} className="group block">
+    <Link to={`/product/${product._id}`} className={`group block ${isOutOfStock ? 'opacity-75' : ''}`}>
       <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-gray-100 mb-4">
+        
         {/* Main Image */}
         <img src={imageSrc} alt={product.name} className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:opacity-0" />
-        {/* Hover Image */}
-        <img src={secondImage} alt={product.name} className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+        {/* Hover Image (Only if in stock) */}
+        {!isOutOfStock && (
+           <img src={secondImage} alt={product.name} className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+        )}
+
+        {/* --- SOLD OUT OVERLAY --- */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20">
+            <span className="bg-[#1C1917] text-white px-4 py-2 text-xs font-bold uppercase tracking-widest">
+              Sold Out
+            </span>
+          </div>
+        )}
         
-        {/* Discount Badge */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
-          {discount > 0 && (
+        {/* Discount Badge (Only show if in stock) */}
+        {!isOutOfStock && discount > 0 && (
+          <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             <span className="bg-[#FF2865] text-white text-[9px] font-bold px-2 py-1 rounded-sm shadow-sm uppercase tracking-wider">
               -{discount}%
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-      <h3 className="font-serif text-lg text-[#1C1917] group-hover:text-[#FF2865] transition-colors">{product.name}</h3>
+      
+      <h3 className="font-serif text-lg text-[#1C1917] group-hover:text-[#FF2865] transition-colors">
+        {product.name}
+      </h3>
+      
       <div className="flex items-center gap-2 text-sm">
         <p className="font-bold text-gray-900">₹{product.price.toLocaleString()}</p>
         {product.originalPrice > 0 && (

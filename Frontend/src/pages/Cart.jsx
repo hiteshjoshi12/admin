@@ -25,8 +25,9 @@ export default function Cart() {
     dispatch(updateQuantity({ id, quantity: newQty }));
   };
 
-  const handleRemove = (id) => {
-    dispatch(removeFromCart(id));
+ // 1. Update the handler to accept size
+  const handleRemove = (id, size) => {
+    dispatch(removeFromCart({ id, size })); // <--- Pass object {id, size}
   };
 
   const handleApplyCoupon = () => {
@@ -81,7 +82,7 @@ export default function Cart() {
           <div className="w-full lg:w-2/3 space-y-6">
             {cartItems.map((item) => (
               <div 
-                key={item.id} // This ID is unique (Product ID + Size)
+                key={`${item.id}-${item.size}`} // This ID is unique (Product ID + Size)
                 className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 flex gap-6 items-center shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Product Image */}
@@ -93,7 +94,11 @@ export default function Cart() {
                 <div className="flex-grow">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-serif text-lg md:text-xl text-[#1C1917]">{item.name}</h3>
-                    <button onClick={() => handleRemove(item.id)} className="text-gray-400 hover:text-red-500 transition-colors">
+                    {/* 2. Update the button to pass item.size */}
+                    <button 
+                      onClick={() => handleRemove(item.id, item.size)} // <--- CRITICAL FIX HERE
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>

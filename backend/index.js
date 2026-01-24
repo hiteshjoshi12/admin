@@ -7,6 +7,7 @@ const { connectDB } = require('./config/db');
 // --- IMPORT ROUTES ---
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -20,6 +21,8 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/users', userRoutes);
+
 
 // --- SERVER START ---
 const PORT = process.env.PORT || 5000;

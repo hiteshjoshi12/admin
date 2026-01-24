@@ -46,6 +46,36 @@ export const register = createAsyncThunk(
   }
 );
 
+// NEW ASYNC THUNK: Save Address
+export const saveAddressToProfile = createAsyncThunk(
+  'auth/saveAddress',
+  async (addressData, { getState, rejectWithValue }) => {
+    try {
+      const { auth: { userInfo } } = getState();
+      
+      const response = await fetch('http://localhost:5000/api/users/profile/address', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+        body: JSON.stringify(addressData),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+
+      // Update LocalStorage
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
 // Helper to load user from local storage
 const loadUserFromStorage = () => {
   try {
@@ -71,11 +101,16 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+  
       // LOGIN
       .addCase(login.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.userInfo = action.payload;
+      })
+      // NEW CASE: Update User Info when Address is saved
+      .addCase(saveAddressToProfile.fulfilled, (state, action) => {
+        state.userInfo = action.payload; // Updates Redux with new address list
       })
       .addCase(login.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       
@@ -86,6 +121,7 @@ const authSlice = createSlice({
         state.userInfo = action.payload;
       })
       .addCase(register.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
+      
   },
 });
 

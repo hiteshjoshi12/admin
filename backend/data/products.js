@@ -1,171 +1,282 @@
 const products = [
   {
-    name: "The Royal Silk Dabka",
-    description: "A regal masterpiece featuring intricate Dabka artistry on a luxurious pure silk base. Perfect for weddings and high-end soirées.",
-    baseMaterial: "Pure Silk",
-    craftsmanship: "Hand-done Dabka & Bead Work",
+    name: "Royal Silk Dabka",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637841/IMG_0129_copy_1_whf0f3.jpg",
+    images: [
+       "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637841/IMG_0129_copy_1_whf0f3.jpg",
+       "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637841/IMG_0130_copy_1_abc123.jpg"
+    ],
+    description: "Handcrafted with pure silk and intricate dabka work, perfect for bridal wear.",
     price: 4200,
     originalPrice: 5500,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg", "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41],
     category: "Bridal",
-    countInStock: 15,
-    rating: 5,
-    numReviews: 4
+    rating: 4.8,
+    numReviews: 12,
+    isNewArrival: true,
+    isBestSeller: true,
+    stock: [
+      { size: 36, quantity: 0 }, // Test Out of Stock
+      { size: 37, quantity: 5 },
+      { size: 38, quantity: 8 },
+      { size: 39, quantity: 3 },
+      { size: 40, quantity: 2 },
+      { size: 41, quantity: 4 }
+    ],
+    totalStock: 22
   },
   {
-    name: "Gotta Pati Charm",
-    description: "The vibrancy of Gotta Pati meets the sheen of pure crepe. A festive essential that captures the spirit of celebration.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Traditional Gotta Pati & Bead Work",
+    name: "Velvet Gota Patti",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637841/IMG_0133_copy_1_xyz789.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637841/IMG_0133_copy_1_xyz789.jpg"
+    ],
+    description: "Premium velvet base with traditional Gota Patti work in gold.",
     price: 3800,
     originalPrice: 4500,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg"],
-    sizes: [36, 37, 38, 39, 40],
-    category: "Festive",
-    countInStock: 20,
+    category: "Party Wear",
     rating: 4.5,
-    numReviews: 2
+    numReviews: 8,
+    isNewArrival: false,
+    stock: [
+      { size: 36, quantity: 2 },
+      { size: 37, quantity: 4 },
+      { size: 38, quantity: 0 }, // Out of stock
+      { size: 39, quantity: 6 },
+      { size: 40, quantity: 3 },
+      { size: 41, quantity: 1 }
+    ],
+    totalStock: 16
   },
   {
-    name: "Bharwa Tanka Heritage",
-    description: "Filled with history, the Bharwa Tanka technique creates a dense, rich texture that makes this pair a true collector's item.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Bharwa Tanka Work with Beads",
-    price: 4100,
-    originalPrice: 0, 
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [37, 38, 39, 40],
-    category: "Everyday",
-    countInStock: 10,
-    rating: 0,
-    numReviews: 0
-  },
-  {
-    name: "Mirror & Bead Illusion",
-    description: "Reflecting light with every step, the real mirror work on pure crepe adds a glamorous sparkle to any outfit.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Real Mirror Work & Beads",
-    price: 3500,
-    originalPrice: 4200,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41],
-    category: "Festive",
-    countInStock: 18,
-    rating: 4,
-    numReviews: 1
-  },
-  {
-    name: "Chain Stitch Elegance",
-    description: "A delicate fusion of chain stitch fluency and the sparkle of sequins, finished with a touch of antique Dabka.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Chain Stitch, Sequins & Dabka",
+    name: "Pastel Pearl Mule",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637841/IMG_0137_copy_1_mno456.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637841/IMG_0137_copy_1_mno456.jpg"
+    ],
+    description: "Soft pastel hues embellished with elegant pearls and beads.",
     price: 3200,
     originalPrice: 0,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [38, 39, 40],
-    category: "Limited Edition",
-    countInStock: 5,
-    rating: 5,
-    numReviews: 3
+    category: "Casual",
+    rating: 4.7,
+    numReviews: 10,
+    isNewArrival: true,
+    stock: [
+      { size: 36, quantity: 5 },
+      { size: 37, quantity: 5 },
+      { size: 38, quantity: 5 },
+      { size: 39, quantity: 5 },
+      { size: 40, quantity: 5 },
+      { size: 41, quantity: 5 }
+    ],
+    totalStock: 30
   },
   {
-    name: "Golden Zari Classic",
-    description: "Timeless luxury. The gold-tone metallic threads woven into traditional Zari work create an aura of royalty.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Traditional Zari with Gold Metallic Threads",
-    price: 3600,
-    originalPrice: 4000,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41],
-    category: "Bridal",
-    countInStock: 12,
-    rating: 4.8,
-    numReviews: 6
-  },
-  {
-    name: "Thread & Mirror Fusion",
-    description: "A playful yet sophisticated combination of mirrors and colorful thread detailing on a smooth crepe canvas.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Mirror Work with Thread Detailing",
-    price: 3400,
-    originalPrice: 0,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40],
-    category: "Festive",
-    countInStock: 25,
-    rating: 0,
-    numReviews: 0
-  },
-  {
-    name: "Floral Resham Beads",
-    description: "Tiny seed beads meet soft silk (Resham) threads to create delicate floral motifs that bloom on your feet.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Seed Beads & Resham Outlining",
-    price: 3900,
-    originalPrice: 4500,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41],
-    category: "Everyday",
-    countInStock: 15,
-    rating: 0,
-    numReviews: 0
-  },
-  {
-    name: "Silk Zardozi Cut-Dana",
-    description: "Our premium offering. A silk base heavily embellished with a mix of Zardozi, sharp Cut Dana, and shimmering sequins.",
-    baseMaterial: "Pure Silk",
-    craftsmanship: "Zardozi Bead, Cut Dana & Sequins",
+    name: "Golden Zardosi Glam",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637842/IMG_0140_copy_1_pqr123.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637842/IMG_0140_copy_1_pqr123.jpg"
+    ],
+    description: "Heavy Zardosi embroidery on a golden base, ideal for weddings.",
     price: 4500,
     originalPrice: 6000,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [37, 38, 39, 40],
     category: "Bridal",
-    countInStock: 8,
-    rating: 5,
-    numReviews: 1
+    rating: 5.0,
+    numReviews: 15,
+    isNewArrival: false,
+    stock: [
+      { size: 36, quantity: 1 },
+      { size: 37, quantity: 2 },
+      { size: 38, quantity: 3 },
+      { size: 39, quantity: 0 },
+      { size: 40, quantity: 0 },
+      { size: 41, quantity: 1 }
+    ],
+    totalStock: 7
   },
   {
-    name: "Phulkari Shisha Edit",
-    description: "Inspired by the vibrant heritage of Punjab, featuring Phulkari-style geometric patterns highlighted by Shisha glass work.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Phulkari Inspired Embroidery & Shisha",
+    name: "Rose Gold Sequin",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637842/IMG_0142_copy_1_stu789.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637842/IMG_0142_copy_1_stu789.jpg"
+    ],
+    description: "Shimmering sequins on a rose gold fabric, perfect for evening parties.",
+    price: 2900,
+    originalPrice: 3500,
+    category: "Party Wear",
+    rating: 4.2,
+    numReviews: 5,
+    isNewArrival: true,
+    stock: [
+      { size: 36, quantity: 10 },
+      { size: 37, quantity: 10 },
+      { size: 38, quantity: 10 },
+      { size: 39, quantity: 10 },
+      { size: 40, quantity: 10 },
+      { size: 41, quantity: 10 }
+    ],
+    totalStock: 60
+  },
+  {
+    name: "Emerald Threadwork",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637842/IMG_0146_copy_1_vwx456.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637842/IMG_0146_copy_1_vwx456.jpg"
+    ],
+    description: "Deep emerald green jutti with contrasting thread embroidery.",
+    price: 3100,
+    originalPrice: 0,
+    category: "Casual",
+    rating: 4.6,
+    numReviews: 9,
+    isNewArrival: false,
+    stock: [
+      { size: 36, quantity: 3 },
+      { size: 37, quantity: 3 },
+      { size: 38, quantity: 3 },
+      { size: 39, quantity: 3 },
+      { size: 40, quantity: 3 },
+      { size: 41, quantity: 3 }
+    ],
+    totalStock: 18
+  },
+  {
+    name: "Mirror Magic",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0150_copy_1_yza123.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0150_copy_1_yza123.jpg"
+    ],
+    description: "Traditional mirror work (Sheesha) on a vibrant fabric base.",
+    price: 3400,
+    originalPrice: 4000,
+    category: "Ethnic",
+    rating: 4.4,
+    numReviews: 11,
+    isNewArrival: true,
+    stock: [
+      { size: 36, quantity: 4 },
+      { size: 37, quantity: 0 },
+      { size: 38, quantity: 4 },
+      { size: 39, quantity: 4 },
+      { size: 40, quantity: 4 },
+      { size: 41, quantity: 4 }
+    ],
+    totalStock: 20
+  },
+  {
+    name: "Minimalist Beige",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0153_copy_1_bcd789.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0153_copy_1_bcd789.jpg"
+    ],
+    description: "Elegant and simple beige jutti for everyday comfort.",
+    price: 2500,
+    originalPrice: 0,
+    category: "Casual",
+    rating: 4.3,
+    numReviews: 20,
+    isNewArrival: false,
+    stock: [
+      { size: 36, quantity: 20 },
+      { size: 37, quantity: 20 },
+      { size: 38, quantity: 20 },
+      { size: 39, quantity: 20 },
+      { size: 40, quantity: 20 },
+      { size: 41, quantity: 20 }
+    ],
+    totalStock: 120
+  },
+  {
+    name: "Ruby Red Bridal",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0160_copy_1_efg456.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0160_copy_1_efg456.jpg"
+    ],
+    description: "Classic red bridal jutti with heavy stone and bead work.",
+    price: 4800,
+    originalPrice: 5500,
+    category: "Bridal",
+    rating: 4.9,
+    numReviews: 30,
+    isNewArrival: true,
+    isBestSeller: true,
+    stock: [
+      { size: 36, quantity: 1 },
+      { size: 37, quantity: 2 },
+      { size: 38, quantity: 0 },
+      { size: 39, quantity: 2 },
+      { size: 40, quantity: 1 },
+      { size: 41, quantity: 0 }
+    ],
+    totalStock: 6
+  },
+  {
+    name: "Silver Stardust",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0164_copy_1_hij123.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0164_copy_1_hij123.jpg"
+    ],
+    description: "Contemporary silver finish with subtle sparkle elements.",
+    price: 3600,
+    originalPrice: 0,
+    category: "Party Wear",
+    rating: 4.1,
+    numReviews: 4,
+    isNewArrival: false,
+    stock: [
+      { size: 36, quantity: 6 },
+      { size: 37, quantity: 6 },
+      { size: 38, quantity: 6 },
+      { size: 39, quantity: 6 },
+      { size: 40, quantity: 6 },
+      { size: 41, quantity: 6 }
+    ],
+    totalStock: 36
+  },
+  {
+    name: "Floral Phulkari",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0169_copy_1_klm789.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637843/IMG_0169_copy_1_klm789.jpg"
+    ],
+    description: "Vibrant multi-colored floral embroidery inspired by Phulkari art.",
+    price: 2800,
+    originalPrice: 3200,
+    category: "Ethnic",
+    rating: 4.6,
+    numReviews: 14,
+    isNewArrival: true,
+    stock: [
+      { size: 36, quantity: 2 },
+      { size: 37, quantity: 5 },
+      { size: 38, quantity: 8 },
+      { size: 39, quantity: 4 },
+      { size: 40, quantity: 3 },
+      { size: 41, quantity: 6 }
+    ],
+    totalStock: 28
+  },
+  {
+    name: "Vintage Bronze",
+    image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637844/IMG_0172_copy_1_nop456.jpg",
+    images: [
+      "https://res.cloudinary.com/dtnyrvshf/image/upload/v1737637844/IMG_0172_copy_1_nop456.jpg"
+    ],
+    description: "Antique bronze tone with muted gold detailing for a vintage look.",
     price: 3300,
     originalPrice: 0,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41],
-    category: "Festive",
-    countInStock: 20,
-    rating: 0,
-    numReviews: 0
-  },
-  {
-    name: "Resham Zardozi Royale",
-    description: "An intricate dance of textures. Sharp cut dana and soft resham threads come together to create a multi-dimensional look.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Cut Dana Zardozi, Sequins & Resham",
-    price: 4400,
-    originalPrice: 5200,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071749/IMG_0336_bqm5ue.jpg"],
-    sizes: [36, 37, 38, 39, 40],
-    category: "Bridal",
-    countInStock: 10,
-    rating: 4.9,
-    numReviews: 3
-  },
-  {
-    name: "Silver Thread Zardozi",
-    description: "Cool toned elegance. Silver threads woven into Zardozi patterns on crepe, perfect for evening wear.",
-    baseMaterial: "Pure Crepe",
-    craftsmanship: "Zardozi & Silver Thread Embroidery",
-    price: 4000,
-    originalPrice: 0,
-    images: ["https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071706/IMG_0705_odxdlw.jpg"],
-    sizes: [36, 37, 38, 39, 40, 41],
-    category: "Limited Edition",
-    countInStock: 12,
-    rating: 0,
-    numReviews: 0
+    category: "Casual",
+    rating: 4.5,
+    numReviews: 6,
+    isNewArrival: false,
+    stock: [
+      { size: 36, quantity: 3 },
+      { size: 37, quantity: 3 },
+      { size: 38, quantity: 3 },
+      { size: 39, quantity: 3 },
+      { size: 40, quantity: 3 },
+      { size: 41, quantity: 3 }
+    ],
+    totalStock: 18
   }
 ];
 

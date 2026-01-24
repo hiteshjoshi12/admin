@@ -8,7 +8,8 @@ import {
 // REDUX IMPORTS
 import { useSelector, useDispatch } from 'react-redux';
 import { saveShippingAddress, savePaymentMethod, clearCart } from '../redux/cartSlice';
-import { createOrder, resetOrder } from '../redux/orderSlice'; // <--- Import Order Actions
+import { createOrder, resetOrder } from '../redux/orderSlice';
+import { saveAddressToProfile } from '../redux/authSlice'; // <--- IMPORT NEW ACTION
 
 export default function Checkout() {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ export default function Checkout() {
   // --- REDUX STATE ---
   const { userInfo } = useSelector((state) => state.auth);
   const { items: cartItems, totalAmount, shippingAddress = {} } = useSelector((state) => state.cart);
-  const { loading, success, error, order } = useSelector((state) => state.order); // Order State
+  const { loading, success, error, order } = useSelector((state) => state.order);
 
   // --- LOCAL STATE ---
   const [step, setStep] = useState(1); 
@@ -36,14 +37,33 @@ export default function Checkout() {
     country: 'India'
   });
 
+  // --- AUTO-FILL LOGIC ---
+  // If user has saved addresses AND the current form is empty, auto-fill with Primary address
+  useEffect(() => {
+    if (userInfo && userInfo.addresses && userInfo.addresses.length > 0) {
+       // Find Primary Address (or default to the first one)
+       const primaryAddress = userInfo.addresses.find(addr => addr.isPrimary) || userInfo.addresses[0];
+       
+       // Only fill if shippingAddress in Redux is empty (to avoid overwriting manual edits)
+       if (primaryAddress && !shippingAddress.address) {
+          setFormData({
+            address: primaryAddress.address,
+            city: primaryAddress.city,
+            postalCode: primaryAddress.postalCode,
+            phoneNumber: primaryAddress.phoneNumber,
+            country: 'India'
+          });
+       }
+    }
+  }, [userInfo, shippingAddress]);
+
   // --- CALCULATIONS ---
   const itemsPrice = totalAmount;
   const shippingCost = totalAmount > 2000 ? 0 : 150;
-  const taxPrice = Math.round(itemsPrice * 0.05); // Example: 5% Tax
+  const taxPrice = Math.round(itemsPrice * 0.05);
   const finalTotal = itemsPrice + shippingCost + taxPrice;
 
   // --- EFFECTS ---
-  // If order is successful, clear cart and show success step
   useEffect(() => {
     if (success) {
       dispatch(clearCart());
@@ -52,7 +72,6 @@ export default function Checkout() {
     }
   }, [success, dispatch]);
 
-  // Clean up order state when leaving page
   useEffect(() => {
     return () => {
       dispatch(resetOrder());
@@ -67,15 +86,23 @@ export default function Checkout() {
 
   const handleNextStep = (e) => {
     e.preventDefault();
+    
+    // 1. Save Address to Redux Cart (Temporary for this session)
     dispatch(saveShippingAddress(formData));
+
+    // 2. FEATURE: Save address to User Profile if they don't have one yet
+    // This creates the "Sticky Address" effect for future visits
+    if (userInfo && (!userInfo.addresses || userInfo.addresses.length === 0)) {
+       dispatch(saveAddressToProfile(formData));
+    }
+
     setStep(2);
     window.scrollTo(0, 0);
   };
 
- const handlePlaceOrder = () => {
+  const handlePlaceOrder = () => {
     dispatch(savePaymentMethod(paymentType));
 
-    // 1. Prepare Data for Backend
     const orderData = {
       orderItems: cartItems.map(item => ({
         name: item.name,
@@ -83,7 +110,6 @@ export default function Checkout() {
         image: item.image,
         price: item.price,
         size: item.size,
-        // FIX: Check for 'id' (Guest) OR 'productId' (Logged In) OR '_id' (Fallback)
         product: item.id || item.productId || item._id 
       })),
       shippingAddress: formData,
@@ -94,9 +120,9 @@ export default function Checkout() {
       totalPrice: finalTotal,
     };
 
-    // 2. Dispatch Action
     dispatch(createOrder(orderData));
   };
+
   // --- STEP 3: SUCCESS SCREEN ---
   if (step === 3) {
     return (

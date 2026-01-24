@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, LogOut, Package } from 'lucide-react';
+import { User, LogOut, Package, MapPin } from 'lucide-react'; // Import MapPin
 import { logout } from '../redux/authSlice';
 import { clearCart } from '../redux/cartSlice';
 
@@ -20,7 +20,7 @@ export default function Profile() {
     navigate('/login');
   };
 
-  if (!userInfo) return null; // Should be handled by PrivateRoute, but safe check
+  if (!userInfo) return null;
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12">
@@ -45,17 +45,33 @@ export default function Profile() {
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
            
+           {/* ADDRESS CARD */}
            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start gap-4">
              <div className="bg-gray-50 p-3 rounded-full text-[#1C1917]">
-               <User className="w-6 h-6" />
+               <MapPin className="w-6 h-6" />
              </div>
-             <div>
-               <h3 className="font-bold text-[#1C1917] mb-1">Personal Info</h3>
-               <p className="text-sm text-gray-500">Name: {userInfo.name}</p>
-               <p className="text-xs text-gray-400 mt-2">Member since {new Date().getFullYear()}</p>
+             <div className="flex-1">
+               <h3 className="font-bold text-[#1C1917] mb-1">Saved Address</h3>
+               
+               {userInfo.addresses && userInfo.addresses.length > 0 ? (
+                 userInfo.addresses.map((addr, index) => (
+                   <div key={index} className="text-sm text-gray-500 mb-2 border-b border-gray-50 pb-2 last:border-0">
+                     <div className="flex justify-between items-center mb-1">
+                       <span className="font-bold text-gray-800">{addr.city}</span>
+                       {addr.isPrimary && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">PRIMARY</span>}
+                     </div>
+                     <p className="line-clamp-2">{addr.address}</p>
+                     <p>{addr.postalCode}</p>
+                     <p className="text-xs text-gray-400 mt-1">{addr.phoneNumber}</p>
+                   </div>
+                 ))
+               ) : (
+                 <p className="text-sm text-gray-400">No addresses saved yet.</p>
+               )}
              </div>
            </div>
 
+           {/* ORDERS CARD */}
            <div 
              onClick={() => navigate('/myorders')}
              className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start gap-4 cursor-pointer hover:border-[#FF2865] transition-colors group"

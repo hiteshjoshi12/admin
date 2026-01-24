@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const Product = require('../models/Product'); // <--- Import Product Model
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -17,25 +18,85 @@ const addOrderItems = async (req, res) => {
   if (orderItems && orderItems.length === 0) {
     res.status(400).json({ message: 'No order items' });
     return;
-  } else {
+  } 
+
+  try {
+    // --- STEP 1: STOCK VALIDATION LOOP ---
+    // Check if the specific SIZE is available for every item
+    for (const item of orderItems) {
+      // 1. Find the product
+      // We check for 'product' (standard) or 'id' (frontend compatibility)
+      const productId = item.product || item.id || item._id;
+      const product = await Product.findById(productId);
+      
+      if (!product) {
+        res.status(404);
+        throw new Error(`Product not found: ${item.name}`);
+      }
+
+      // 2. Find the specific size in the stock array
+      // We assume item.size is passed from frontend (e.g., 38)
+      const sizeStock = product.stock.find(s => s.size === Number(item.size));
+
+      if (!sizeStock) {
+        res.status(400);
+        throw new Error(`Size ${item.size} is not valid for ${item.name}`);
+      }
+
+      // 3. Check quantity for that size
+      if (sizeStock.quantity < item.quantity) {
+        res.status(400);
+        throw new Error(`Size ${item.size} is out of stock for ${item.name}`);
+      }
+    }
+
+    // --- STEP 2: STOCK DEDUCTION LOOP ---
+    for (const item of orderItems) {
+      const productId = item.product || item.id || item._id;
+      const product = await Product.findById(productId);
+      
+      // Find the specific size object to update
+      const sizeStock = product.stock.find(s => s.size === Number(item.size));
+      
+      if (sizeStock) {
+        // Deduct quantity
+        sizeStock.quantity -= item.quantity;
+        
+        // Optional: Update global totalStock helper
+        product.totalStock = product.stock.reduce((acc, s) => acc + s.quantity, 0);
+        
+        await product.save();
+      }
+    }
+
+    // --- STEP 3: CREATE ORDER ---
     const order = new Order({
-      orderItems,
-      user: req.user._id, // Comes from authMiddleware
+      orderItems: orderItems.map(x => ({
+        ...x,
+        product: x.product || x.id || x._id, // Ensure correct ID mapping
+        _id: undefined // Remove potential frontend ID conflicts
+      })),
+      user: req.user._id,
       shippingAddress,
       paymentMethod,
       itemsPrice,
       taxPrice,
       shippingPrice,
       totalPrice,
-      // Default to unpaid/undelivered
       isPaid: false, 
       isDelivered: false
     });
 
     const createdOrder = await order.save();
     res.status(201).json(createdOrder);
+
+  } catch (error) {
+    const status = res.statusCode === 200 ? 500 : res.statusCode;
+    res.status(status).json({ message: error.message });
   }
 };
+
+
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
