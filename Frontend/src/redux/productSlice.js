@@ -9,9 +9,9 @@ export const fetchProducts = createAsyncThunk(
     try {
       // Construct URL with query parameters
       const response = await fetch(
-        `https://backend-one-iota-62.vercel.app/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
+        `https://backendd-mu.vercel.app/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
       );
-      
+
       if (!response.ok) {
         throw new Error('Server Error');
       }
