@@ -9,7 +9,8 @@ export const fetchProducts = createAsyncThunk(
     try {
       // Construct URL with query parameters
       const response = await fetch(
-        `${config.API_BASE_URL}/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
+        `${config.API_BASE_URL}/api/products?keyword=${keyword}&pageNumber=${pageNumber}`,
+        { credentials: 'include' }
       );
       
       if (!response.ok) {
