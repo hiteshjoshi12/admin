@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const { connectDB } = require('./config/db');
+const { connectDB } = require('./config/db.js');
 
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
@@ -10,25 +10,8 @@ const userRoutes = require('./routes/userRoutes'); // <--- The only user file we
 
 const app = express();
 
-const allowedOrigins = [
-  'http://localhost:5173', // Vite Localhost
-  process.env.CLIENT_URL   // Vercel Production Link (You will add this to Render settings)
-];
-
 app.use(express.json());
-// CORS CONFIGURATION
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true // Important for cookies/tokens if you use them
-}));
+app.use(cors());
 
 connectDB();
 

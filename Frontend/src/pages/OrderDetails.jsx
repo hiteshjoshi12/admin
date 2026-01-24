@@ -5,7 +5,7 @@ import {
   ArrowLeft, CheckCircle, XCircle, Clock, Truck 
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { API_BASE_URL } from '../util/config';
+import config from '../config/config';
 
 export default function OrderDetails() {
   const { id } = useParams();
@@ -20,7 +20,7 @@ export default function OrderDetails() {
 
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+        const res = await fetch(`${config.API_BASE_URL}/api/orders/${id}`, {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },

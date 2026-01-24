@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, ChevronRight, ShoppingBag, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { API_BASE_URL } from '../util/config';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function MyOrders() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -16,7 +16,7 @@ export default function MyOrders() {
     // Fetch orders directly here (or you could make a Redux slice for orders)
     const fetchOrders = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/orders/myorders`, {
+        const res = await fetch('/api/orders/myorders', {
           headers: {
             Authorization: `Bearer ${userInfo.token}`, // Send Token!
           },
