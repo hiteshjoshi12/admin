@@ -18,7 +18,9 @@ export default function Navbar() {
 
   // 1. GET USER INFO & CART COUNT FROM REDUX
   const { userInfo } = useSelector((state) => state.auth);
-  const { items } = useSelector((state) => state.cart);
+  
+  // FIX: Default items to [] to prevent .reduce crash if state is empty
+  const { items = [] } = useSelector((state) => state.cart);
   const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
   // --- CONFIGURATION: Define your links here ---
@@ -50,7 +52,7 @@ export default function Navbar() {
   // Logout Handler
   const handleLogout = () => {
     dispatch(logout()); // Clear User
-    dispatch(clearCart()); // Clear Cart (Optional: depending on if you want to keep guest cart)
+    dispatch(clearCart()); // Clear Cart 
     setIsMobileMenuOpen(false);
     navigate('/login');
   };
