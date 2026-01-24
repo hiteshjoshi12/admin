@@ -9,7 +9,7 @@ export const fetchProducts = createAsyncThunk(
     try {
       // Construct URL with query parameters
       const response = await fetch(
-        `${config.API_BASE_URL}/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
+        `https://backend-one-iota-62.vercel.app/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
       );
       
       if (!response.ok) {
