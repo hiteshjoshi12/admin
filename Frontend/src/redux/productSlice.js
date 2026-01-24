@@ -9,9 +9,9 @@ export const fetchProducts = createAsyncThunk(
     try {
       // Construct URL with query parameters
       const response = await fetch(
-        `https://backendd-mu.vercel.app/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
+        `${config.API_BASE_URL}/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
       );
-
+      
       if (!response.ok) {
         throw new Error('Server Error');
       }
