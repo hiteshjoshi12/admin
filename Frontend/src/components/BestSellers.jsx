@@ -1,33 +1,29 @@
+import { useEffect, useState } from 'react';
 import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const products = [
-  { 
-    id: 1, 
-    tag: "The Icon",
-    name: "Zardosi Bridal Mule", 
-    price: "₹4,200", 
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075057/IMG_1050_bt6gdf.jpg",
-  },
-  { 
-    id: 2, 
-    tag: "Trending Now",
-    name: "Rani Pink Potli", 
-    price: "₹2,899", 
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075143/IMG_0972_1_gzc9om.jpg",
-  },
-  { 
-    id: 3, 
-    tag: "Everyday Luxury",
-    name: "Gold Thread Wedge", 
-    price: "₹3,100", 
-    img: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075245/IMG_9775_mebgcp.jpg",
-  },
-];
+import  config  from '../config/config.js';
 
 export default function BestSellers() {
-  
-  // Fixed Overlay Component (Removed invalid comments inside className)
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBestSellers = async () => {
+      try {
+        const res = await fetch(`${config.API_BASE_URL}/api/bestsellers`);
+        const data = await res.json();
+        setItems(data);
+        console.log("Best Sellers fetched:", data); 
+      } catch (error) {
+        console.error("Failed to fetch best sellers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBestSellers();
+  }, []);
+
   const QuickAddOverlay = () => (
     <div className="absolute inset-0 z-20 flex items-end justify-center pb-8 transition-opacity duration-300 bg-black/5 opacity-100 md:opacity-0 md:group-hover:opacity-100">
       <button className="bg-white text-[#1C1917] px-6 py-3 rounded-full text-xs uppercase tracking-widest font-bold flex items-center gap-2 shadow-xl transition-all duration-500 ease-out hover:bg-[#C5A059] hover:text-white translate-y-0 md:translate-y-4 md:group-hover:translate-y-0">
@@ -35,6 +31,19 @@ export default function BestSellers() {
       </button>
     </div>
   );
+
+  // Helper to find item by position (1, 2, or 3)
+  const getItem = (pos) => items.find(i => i.position === pos);
+
+  if (loading) return null;
+  
+  // Only render if we have at least one item
+  if (items.length === 0) return null;
+
+  // We assign variables for clarity
+  const heroItem = getItem(1);
+  const pebbleItem = getItem(2);
+  const archItem = getItem(3);
 
   return (
     <section className="py-24 px-4 md:px-12 bg-white relative overflow-hidden">
@@ -54,10 +63,7 @@ export default function BestSellers() {
               The Best Sellers
             </h2>
           </div>
-          <Link 
-            to="/shop" 
-            className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-[#C5A059] hover:border-[#C5A059] transition-colors mt-6 md:mt-0"
-          >
+          <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-[#C5A059] hover:border-[#C5A059] transition-colors mt-6 md:mt-0">
             Shop All Icons <ArrowUpRight className="w-4 h-4" />
           </Link>
         </div>
@@ -65,63 +71,61 @@ export default function BestSellers() {
         {/* The Geometric Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           
-          {/* PRODUCT 1: The Hero Arch */}
-          <div className="md:col-span-5 relative group cursor-pointer">
-            <span className="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-[#1C1917] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-              {products[0].tag}
-            </span>
-            
-            {/* Shape Container */}
-            <div className="relative h-[600px] rounded-t-[15rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all duration-500">
-              <img src={products[0].img} alt={products[0].name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
-              <QuickAddOverlay />
-            </div>
-
-            <div className="text-center mt-6">
-              <h3 className="text-2xl font-serif">{products[0].name}</h3>
-              <p className="text-gray-500 mt-1">{products[0].price}</p>
-            </div>
-          </div>
+          {/* POSITION 1: The Hero Arch */}
+          {heroItem && (
+            <Link to={`/product/${heroItem.product._id}`} className="md:col-span-5 relative group cursor-pointer block">
+              <span className="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-[#1C1917] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                {heroItem.tag}
+              </span>
+              <div className="relative h-[600px] rounded-t-[15rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all duration-500">
+                <img src={heroItem.product.image} alt={heroItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
+                <QuickAddOverlay />
+              </div>
+              <div className="text-center mt-6">
+                <h3 className="text-2xl font-serif">{heroItem.product.name}</h3>
+                <p className="text-gray-500 mt-1">₹{heroItem.product.price.toLocaleString()}</p>
+              </div>
+            </Link>
+          )}
 
           {/* Right Side Container */}
           <div className="md:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-8 relative">
               
-             {/* PRODUCT 2: The Pebble */}
-             <div className="relative group cursor-pointer md:-ml-12 md:mt-12 z-10">
-                <span className="absolute top-4 right-4 z-30 bg-[#C5A059] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                  {products[1].tag}
-                </span>
-                
-                <div className="relative h-[350px] rounded-[4rem] overflow-hidden bg-[#F9F8F6] shadow-xl group-hover:shadow-2xl transition-shadow border-2 border-transparent group-hover:border-[#C5A059]/20">
-                   <img src={products[1].img} alt={products[1].name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
-                   <QuickAddOverlay />
-                </div>
+             {/* POSITION 2: The Pebble */}
+             {pebbleItem && (
+               <Link to={`/product/${pebbleItem.product._id}`} className="relative group cursor-pointer md:-ml-12 md:mt-12 z-10 block">
+                  <span className="absolute top-4 right-4 z-30 bg-[#C5A059] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                    {pebbleItem.tag}
+                  </span>
+                  <div className="relative h-[350px] rounded-[4rem] overflow-hidden bg-[#F9F8F6] shadow-xl group-hover:shadow-2xl transition-shadow border-2 border-transparent group-hover:border-[#C5A059]/20">
+                     <img src={pebbleItem.product.image} alt={pebbleItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
+                     <QuickAddOverlay />
+                  </div>
+                  <div className="text-left mt-4 ml-4">
+                    <h3 className="text-xl font-serif">{pebbleItem.product.name}</h3>
+                    <p className="text-gray-500">₹{pebbleItem.product.price.toLocaleString()}</p>
+                  </div>
+               </Link>
+             )}
 
-                <div className="text-left mt-4 ml-4">
-                  <h3 className="text-xl font-serif">{products[1].name}</h3>
-                  <p className="text-gray-500">{products[1].price}</p>
-                </div>
-             </div>
-
-             {/* PRODUCT 3: The Short Arch */}
-             <div className="relative group cursor-pointer md:mt-32">
-                <span className="absolute top-4 left-4 z-30 bg-white/90 backdrop-blur text-[#1C1917] text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                  {products[2].tag}
-                </span>
-                
-                <div className="relative h-[400px] rounded-t-[10rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all">
-                   <img src={products[2].img} alt={products[2].name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
-                   <QuickAddOverlay />
-                </div>
-
-                <div className="text-center mt-4">
-                  <h3 className="text-xl font-serif">{products[2].name}</h3>
-                  <p className="text-gray-500">{products[2].price}</p>
-                </div>
-             </div>
+             {/* POSITION 3: The Short Arch */}
+             {archItem && (
+               <Link to={`/product/${archItem.product._id}`} className="relative group cursor-pointer md:mt-32 block">
+                  <span className="absolute top-4 left-4 z-30 bg-white/90 backdrop-blur text-[#1C1917] text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                    {archItem.tag}
+                  </span>
+                  <div className="relative h-[400px] rounded-t-[10rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all">
+                     <img src={archItem.product.image} alt={archItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
+                     <QuickAddOverlay />
+                  </div>
+                  <div className="text-center mt-4">
+                    <h3 className="text-xl font-serif">{archItem.product.name}</h3>
+                    <p className="text-gray-500">₹{archItem.product.price.toLocaleString()}</p>
+                  </div>
+               </Link>
+             )}
 
           </div>
-
         </div>
       </div>
     </section>

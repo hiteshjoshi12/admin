@@ -7,6 +7,7 @@ const enableCors = require('./config/cors.js');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
+const bestSellerRoutes = require('./routes/bestSellerRoutes');
 
 const app = express();
 
@@ -18,6 +19,7 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/bestsellers', bestSellerRoutes); // Add this line
 
 // ✅ EXPORT APP FOR VERCEL
 module.exports = app;
