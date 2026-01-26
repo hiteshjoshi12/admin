@@ -8,17 +8,17 @@ export default function CMS() {
   const [activeTab, setActiveTab] = useState('home'); // home | bestsellers | collections
   
   return (
-    <div className="max-w-5xl mx-auto pb-12">
+    <div className="max-w-5xl mx-auto pb-12 px-4 md:px-6">
       {/* HEADER */}
-      <div className="flex items-center justify-between sticky top-0 bg-[#F3F4F6] py-4 z-20 border-b border-gray-200 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between sticky top-0 bg-[#F3F4F6] py-4 z-20 border-b border-gray-200 mb-6 gap-2">
          <div>
            <h1 className="text-2xl font-bold text-gray-800">Content Management</h1>
            <p className="text-sm text-gray-500">Manage your storefront content</p>
          </div>
       </div>
 
-      {/* TABS */}
-      <div className="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto">
+      {/* TABS - Scrollable on mobile */}
+      <div className="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto scrollbar-hide pb-1">
         <TabButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={Layout} label="Home & Socials" />
         <TabButton active={activeTab === 'bestsellers'} onClick={() => setActiveTab('bestsellers')} icon={Star} label="Best Sellers" />
         <TabButton active={activeTab === 'collections'} onClick={() => setActiveTab('collections')} icon={Grid} label="Collections" />
@@ -48,7 +48,7 @@ function TabButton({ active, onClick, icon: Icon, label }) {
 }
 
 // ==========================================
-// 1. HOME & SOCIALS COMPONENT (UPDATED)
+// 1. HOME & SOCIALS COMPONENT (RESPONSIVE)
 // ==========================================
 function HomeCMS({ userInfo }) {
   const [heroLoading, setHeroLoading] = useState(false);
@@ -90,7 +90,7 @@ function HomeCMS({ userInfo }) {
     await fetch(`${API_BASE_URL}/api/content`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
-      body: JSON.stringify({ heroSlides: data.heroSlides }), // Send only Hero data
+      body: JSON.stringify({ heroSlides: data.heroSlides }), 
     });
     setHeroLoading(false);
     alert("Slider Updated!");
@@ -109,7 +109,7 @@ function HomeCMS({ userInfo }) {
     await fetch(`${API_BASE_URL}/api/content`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
-      body: JSON.stringify({ instagram: data.instagram }), // Send only Insta data
+      body: JSON.stringify({ instagram: data.instagram }), 
     });
     setInstaLoading(false);
     alert("Instagram Feed Updated!");
@@ -119,17 +119,17 @@ function HomeCMS({ userInfo }) {
     <div className="space-y-12 animate-fade-in">
       
       {/* --- HERO SLIDER SECTION --- */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-         <div className="flex justify-between items-center mb-6 border-b pb-4">
+      <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
+         <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
             <div className="flex items-center gap-2">
                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Layout className="w-5 h-5" /></div>
                <h3 className="text-lg font-bold text-gray-800">Home Page Slider</h3>
             </div>
-            <div className="flex gap-3">
-               <button onClick={addSlide} className="text-[#FF2865] text-sm font-bold flex items-center gap-1 bg-pink-50 px-3 py-1.5 rounded hover:bg-pink-100 transition-colors">
+            <div className="flex gap-3 w-full md:w-auto">
+               <button onClick={addSlide} className="flex-1 md:flex-none justify-center text-[#FF2865] text-sm font-bold flex items-center gap-1 bg-pink-50 px-3 py-2 md:py-1.5 rounded hover:bg-pink-100 transition-colors">
                   <Plus className="w-4 h-4" /> Add Slide
                </button>
-               <button onClick={saveHero} disabled={heroLoading} className="bg-[#1C1917] text-white px-4 py-1.5 rounded text-sm font-bold flex items-center gap-2 hover:bg-[#333]">
+               <button onClick={saveHero} disabled={heroLoading} className="flex-1 md:flex-none justify-center bg-[#1C1917] text-white px-4 py-2 md:py-1.5 rounded text-sm font-bold flex items-center gap-2 hover:bg-[#333]">
                   <Save className="w-4 h-4" /> {heroLoading ? 'Saving...' : 'Save Slider'}
                </button>
             </div>
@@ -142,8 +142,8 @@ function HomeCMS({ userInfo }) {
          ) : (
             <div className="space-y-6">
               {data.heroSlides.map((slide, i) => (
-                <div key={i} className="p-6 border border-gray-200 rounded-xl bg-gray-50/30 relative hover:shadow-md transition-all">
-                  <button onClick={() => removeSlide(i)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors">
+                <div key={i} className="p-4 md:p-6 border border-gray-200 rounded-xl bg-gray-50/30 relative hover:shadow-md transition-all">
+                  <button onClick={() => removeSlide(i)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors p-2">
                      <Trash2 className="w-5 h-5"/>
                   </button>
                   
@@ -152,9 +152,9 @@ function HomeCMS({ userInfo }) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
                        <label className="text-xs font-bold text-gray-500 uppercase">Image URL</label>
-                       <div className="flex gap-2 mt-1">
+                       <div className="flex flex-col md:flex-row gap-2 mt-1">
                           <input className="flex-1 border p-2 rounded text-sm font-mono" placeholder="https://..." value={slide.image} onChange={e=>handleHeroChange(i,'image',e.target.value)} />
-                          {slide.image && <img src={slide.image} alt="prev" className="w-10 h-10 rounded object-cover border" />}
+                          {slide.image && <img src={slide.image} alt="prev" className="w-full md:w-10 h-32 md:h-10 rounded object-cover border" />}
                        </div>
                     </div>
                     <div>
@@ -180,14 +180,14 @@ function HomeCMS({ userInfo }) {
          )}
       </div>
 
-      {/* --- INSTAGRAM SECTION (Restored UI) --- */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-         <div className="flex justify-between items-center mb-6 border-b pb-4">
+      {/* --- INSTAGRAM SECTION (RESPONSIVE) --- */}
+      <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
+         <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
             <div className="flex items-center gap-2">
                <div className="p-2 bg-pink-50 text-pink-600 rounded-lg"><Instagram className="w-5 h-5" /></div>
                <h3 className="text-lg font-bold text-gray-800">Instagram Feed</h3>
             </div>
-            <button onClick={saveInstagram} disabled={instaLoading} className="bg-[#1C1917] text-white px-4 py-1.5 rounded text-sm font-bold flex items-center gap-2 hover:bg-[#333]">
+            <button onClick={saveInstagram} disabled={instaLoading} className="w-full md:w-auto justify-center bg-[#1C1917] text-white px-4 py-2 md:py-1.5 rounded text-sm font-bold flex items-center gap-2 hover:bg-[#333]">
                <Save className="w-4 h-4" /> {instaLoading ? 'Saving...' : 'Save Instagram'}
             </button>
          </div>
@@ -206,25 +206,25 @@ function HomeCMS({ userInfo }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div>
                   <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Photo 1 URL (Left)</label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col md:flex-row gap-2">
                      <input 
                        className="flex-1 p-3 border border-gray-200 rounded-lg outline-none focus:border-[#FF2865] text-sm font-mono" 
                        value={data.instagram.photo1} 
                        onChange={e => handleInstaChange('photo1', e.target.value)} 
                      />
-                     {data.instagram.photo1 && <img src={data.instagram.photo1} alt="Preview" className="w-12 h-12 rounded object-cover border" />}
+                     {data.instagram.photo1 && <img src={data.instagram.photo1} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
                   </div>
                </div>
 
                <div>
                   <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Photo 2 URL (Right)</label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col md:flex-row gap-2">
                      <input 
                        className="flex-1 p-3 border border-gray-200 rounded-lg outline-none focus:border-[#FF2865] text-sm font-mono" 
                        value={data.instagram.photo2} 
                        onChange={e => handleInstaChange('photo2', e.target.value)} 
                      />
-                     {data.instagram.photo2 && <img src={data.instagram.photo2} alt="Preview" className="w-12 h-12 rounded object-cover border" />}
+                     {data.instagram.photo2 && <img src={data.instagram.photo2} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
                   </div>
                </div>
 
@@ -245,17 +245,16 @@ function HomeCMS({ userInfo }) {
 }
 
 // ==========================================
-// 2. BEST SELLERS COMPONENT (Unchanged)
+// 2. BEST SELLERS COMPONENT (RESPONSIVE)
 // ==========================================
 function BestSellersCMS({ userInfo }) {
   const [slots, setSlots] = useState([]);
-  const [products, setProducts] = useState([]); // For dropdown
+  const [products, setProducts] = useState([]); 
   const [loading, setLoading] = useState(false);
 
   // Fetch Slots & All Products
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/cms/bestsellers`).then(res => res.json()).then(setSlots);
-    // Fetch generic products for the dropdown selector
     fetch(`${API_BASE_URL}/api/products?pageSize=100`).then(res => res.json()).then(data => setProducts(data.products));
   }, []);
 
@@ -268,7 +267,6 @@ function BestSellersCMS({ userInfo }) {
       body: JSON.stringify({ position, productId, tag })
     });
     const updated = await res.json();
-    // Update local state
     setSlots(prev => {
        const filtered = prev.filter(p => p.position !== position);
        return [...filtered, updated].sort((a,b) => a.position - b.position);
@@ -334,7 +332,7 @@ function BestSellersCMS({ userInfo }) {
 }
 
 // ==========================================
-// 3. COLLECTIONS COMPONENT (Unchanged)
+// 3. COLLECTIONS COMPONENT (RESPONSIVE)
 // ==========================================
 function CollectionsCMS({ userInfo }) {
   const [collections, setCollections] = useState([]);
@@ -367,8 +365,8 @@ function CollectionsCMS({ userInfo }) {
 
   return (
     <div className="space-y-8 animate-fade-in">
-       {/* Add New */}
-       <div className="bg-white p-6 rounded-xl border border-gray-200 flex gap-4 items-end">
+       {/* Add New Form */}
+       <div className="bg-white p-6 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-4 md:items-end">
           <div className="flex-1">
             <label className="text-xs font-bold text-gray-500 block mb-1">Collection Name</label>
             <input className="w-full p-2 border rounded" value={newCol.name} onChange={e => setNewCol({...newCol, name: e.target.value})} placeholder="e.g. Wedding Edit" />
@@ -377,18 +375,18 @@ function CollectionsCMS({ userInfo }) {
             <label className="text-xs font-bold text-gray-500 block mb-1">Image URL</label>
             <input className="w-full p-2 border rounded" value={newCol.image} onChange={e => setNewCol({...newCol, image: e.target.value})} placeholder="https://..." />
           </div>
-          <button onClick={handleAdd} className="bg-[#1C1917] text-white px-6 py-2.5 rounded font-bold hover:bg-[#FF2865] transition-colors">Add</button>
+          <button onClick={handleAdd} className="w-full md:w-auto bg-[#1C1917] text-white px-6 py-2.5 rounded font-bold hover:bg-[#FF2865] transition-colors">Add</button>
        </div>
 
-       {/* List */}
-       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+       {/* List Grid */}
+       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {collections.map(c => (
             <div key={c._id} className="relative group rounded-xl overflow-hidden aspect-[4/5]">
                <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <h3 className="text-white font-serif text-xl">{c.name}</h3>
+                  <h3 className="text-white font-serif text-lg md:text-xl text-center px-2">{c.name}</h3>
                </div>
-               <button onClick={() => handleDelete(c._id)} className="absolute top-2 right-2 bg-white p-2 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+               <button onClick={() => handleDelete(c._id)} className="absolute top-2 right-2 bg-white p-2 rounded-full text-red-500 md:opacity-0 group-hover:opacity-100 transition-opacity">
                  <Trash2 className="w-4 h-4" />
                </button>
             </div>
@@ -400,7 +398,7 @@ function CollectionsCMS({ userInfo }) {
 
 
 // ==========================================
-// 4. NEW: RUNWAY CMS COMPONENT
+// 4. RUNWAY CMS COMPONENT (RESPONSIVE)
 // ==========================================
 function RunwayCMS({ userInfo }) {
   const [videos, setVideos] = useState([]);
@@ -470,14 +468,14 @@ function RunwayCMS({ userInfo }) {
        </div>
 
        {/* Video Grid */}
-       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {videos.map(v => (
             <div key={v._id} className="relative group rounded-xl overflow-hidden aspect-[9/16] bg-black">
                <video src={v.videoUrl} className="w-full h-full object-cover opacity-80" muted loop onMouseOver={e => e.target.play()} onMouseOut={e => e.target.pause()} />
                
                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4">
-                  <h3 className="text-white font-serif text-lg leading-tight">{v.title}</h3>
-                  <p className="text-[#FF2865] text-xs font-bold uppercase mt-1">{v.ctaText}</p>
+                  <h3 className="text-white font-serif text-sm md:text-lg leading-tight">{v.title}</h3>
+                  <p className="text-[#FF2865] text-[10px] md:text-xs font-bold uppercase mt-1">{v.ctaText}</p>
                </div>
 
                <button onClick={() => handleDelete(v._id)} className="absolute top-2 right-2 bg-white/20 hover:bg-white p-2 rounded-full text-white hover:text-red-500 transition-all z-20">

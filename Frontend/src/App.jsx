@@ -38,6 +38,8 @@ const CMS = lazy(() => import('./pages/admin/CMS'));
 const Orders = lazy(() => import('./pages/admin/Orders'));
 const AdminOrderDetails = lazy(() => import('./pages/admin/OrderDetails'));
 const Customers = lazy(() => import('./pages/admin/Customers'));
+const Reviews = lazy(() => import('./pages/admin/Reviews'));
+
 
 // 4. Loading Fallback
 const PageLoader = () => (
@@ -76,6 +78,7 @@ function App() {
               <Route path="order/:id" element={<AdminOrderDetails />} />
               <Route path="cms" element={<CMS />} />
               <Route path="customers" element={<Customers />} />
+              <Route path="reviews" element={<Reviews />} />
            </Route>
         </Route>
 

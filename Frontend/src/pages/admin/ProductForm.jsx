@@ -153,29 +153,28 @@ export default function ProductForm() {
   // --- MOCK IMAGE UPLOAD (For now, text input) ---
   // Ideally, you would have a function here that uploads to Cloudinary/ImageKit
   // and sets setFormData({ ...formData, image: url })
-
-  return (
-    <div className="max-w-4xl mx-auto pb-12">
+return (
+    <div className="max-w-4xl mx-auto pb-12 px-4 md:px-6">
       
       {/* HEADER */}
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex items-center gap-4 mb-8 pt-4 md:pt-0">
         <button 
           onClick={() => navigate('/admin/products')}
-          className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-200 rounded-full transition-colors bg-white shadow-sm md:shadow-none"
         >
           <ArrowLeft className="w-6 h-6 text-gray-600" />
         </button>
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           {id ? 'Edit Product' : 'Add New Product'}
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
         
         {/* SECTION 1: BASIC DETAILS */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Basic Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             
             {/* Name */}
             <div className="md:col-span-2">
@@ -250,8 +249,7 @@ export default function ProductForm() {
         </div>
 
         {/* SECTION 2: MEDIA (Images) */}
-       {/* SECTION 2: MEDIA (Images) */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
            <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Product Media</h2>
            
            {/* 1. MAIN IMAGE */}
@@ -259,8 +257,8 @@ export default function ProductForm() {
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Main Display Image <span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-4 items-start">
-                <div className="relative flex-1">
+              <div className="flex flex-col md:flex-row gap-4 items-start">
+                <div className="relative flex-1 w-full">
                   <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input 
                     type="text" 
@@ -274,7 +272,7 @@ export default function ProductForm() {
                 </div>
                 {/* Main Preview */}
                 {formData.image && (
-                  <div className="w-16 h-16 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 shrink-0">
+                  <div className="w-full md:w-16 h-32 md:h-16 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 shrink-0">
                     <img src={formData.image} alt="Main" className="w-full h-full object-cover" />
                   </div>
                 )}
@@ -296,42 +294,37 @@ export default function ProductForm() {
 
              <div className="space-y-3">
                {formData.images.map((url, index) => (
-                 <div key={index} className="flex gap-4 items-start animate-fade-in">
-                    
-                    {/* Index Number */}
-                    <span className="pt-3 text-xs font-bold text-gray-400">#{index + 1}</span>
-
-                    {/* Input Field */}
-                    <div className="relative flex-1">
+                 <div key={index} className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center animate-fade-in">
+                   
+                   <div className="flex-1 w-full flex gap-2 items-center">
+                      <span className="text-xs font-bold text-gray-400 w-6">#{index + 1}</span>
                       <input 
                         type="text" 
                         value={url}
                         onChange={(e) => handleImageChange(index, e.target.value)}
                         className="w-full p-3 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-black/5" 
-                        placeholder="Paste additional image URL..."
+                        placeholder="Paste image URL..."
                       />
-                    </div>
+                   </div>
 
-                    {/* Small Preview (Only if URL exists) */}
-                    {url && (
-                      <div className="w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-50 shrink-0">
-                         <img src={url} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
-                      </div>
-                    )}
-
-                    {/* Delete Button */}
-                    <button 
-                      type="button" 
-                      onClick={() => handleRemoveImage(index)}
-                      className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                   <div className="flex gap-2 w-full sm:w-auto justify-end">
+                      {url && (
+                        <div className="w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-50 shrink-0">
+                           <img src={url} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <button 
+                        type="button" 
+                        onClick={() => handleRemoveImage(index)}
+                        className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                   </div>
                  </div>
                ))}
              </div>
              
-             {/* Empty State Message */}
              {formData.images.length === 0 && (
                <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-400 text-sm">
                  No gallery images added. Click "Add Image" to upload more angles.
@@ -341,7 +334,7 @@ export default function ProductForm() {
         </div>
 
         {/* SECTION 3: INVENTORY & STOCK */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
            <div className="flex justify-between items-center mb-4 border-b pb-2">
               <h2 className="text-lg font-bold text-gray-800">Inventory & Stock</h2>
               <button 
@@ -355,18 +348,19 @@ export default function ProductForm() {
 
            <div className="space-y-3">
              {formData.stock.map((item, index) => (
-               <div key={index} className="flex items-center gap-4 animate-fade-in">
-                  <div className="flex-1">
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Size (EU)</label>
+               <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-3 items-end animate-fade-in">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Size</label>
                     <input 
                       type="number" 
                       value={item.size}
                       onChange={(e) => handleStockChange(index, 'size', e.target.value)}
                       className="w-full p-2 border border-gray-200 rounded-lg"
+                      placeholder="EU"
                     />
                   </div>
-                  <div className="flex-1">
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Quantity</label>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Qty</label>
                     <input 
                       type="number" 
                       value={item.quantity}
@@ -374,16 +368,14 @@ export default function ProductForm() {
                       className="w-full p-2 border border-gray-200 rounded-lg"
                     />
                   </div>
-                  <div className="pt-5">
-                    <button 
-                      type="button" 
-                      onClick={() => removeStockRow(index)}
-                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                      disabled={formData.stock.length === 1} // Prevent deleting last row
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => removeStockRow(index)}
+                    className="p-2 mb-[1px] text-gray-400 hover:text-red-500 bg-gray-50 rounded-lg hover:bg-red-50 transition-colors h-[42px] w-[42px] flex items-center justify-center"
+                    disabled={formData.stock.length === 1} 
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                </div>
              ))}
            </div>
@@ -397,10 +389,10 @@ export default function ProductForm() {
         </div>
 
         {/* SECTION 4: SETTINGS */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
            <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Visibility</h2>
-           <div className="flex gap-8">
-             <label className="flex items-center gap-3 cursor-pointer">
+           <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
+             <label className="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition-colors">
                <input 
                   type="checkbox" 
                   name="isNewArrival"
@@ -411,7 +403,7 @@ export default function ProductForm() {
                <span className="font-medium text-gray-700">Mark as New Arrival</span>
              </label>
 
-             <label className="flex items-center gap-3 cursor-pointer">
+             <label className="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition-colors">
                <input 
                   type="checkbox" 
                   name="isBestSeller"
@@ -425,18 +417,18 @@ export default function ProductForm() {
         </div>
 
         {/* SUBMIT BUTTON */}
-        <div className="flex justify-end gap-4">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 md:gap-4">
            <button 
              type="button"
              onClick={() => navigate('/admin/products')}
-             className="px-6 py-3 rounded-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors"
+             className="w-full sm:w-auto px-6 py-3 rounded-lg font-bold text-gray-500 hover:bg-gray-200 bg-gray-100 transition-colors"
            >
              Cancel
            </button>
            <button 
              type="submit"
              disabled={loading}
-             className="px-8 py-3 rounded-lg font-bold text-white bg-[#1C1917] hover:bg-[#FF2865] transition-all flex items-center gap-2 shadow-lg disabled:opacity-70"
+             className="w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-white bg-[#1C1917] hover:bg-[#FF2865] transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-70"
            >
              {loading ? 'Saving...' : <><Save className="w-5 h-5" /> Save Product</>}
            </button>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Mail, Trash2, User, Search, MapPin, Shield } from 'lucide-react';
+import { Mail, Trash2, Search, MapPin, Shield, Calendar } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
 
@@ -65,6 +65,7 @@ export default function Customers() {
 
   return (
     <div className="space-y-6">
+      
       {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         <div>
@@ -85,8 +86,8 @@ export default function Customers() {
         </div>
       </div>
 
-      {/* TABLE CARD */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* --- DESKTOP VIEW (TABLE) --- */}
+      <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -104,41 +105,41 @@ export default function Customers() {
                   
                   {/* Name & Avatar */}
                   <td className="px-6 py-4">
-                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
-                           {user.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                           <p className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                             {user.name} 
-                             {user.isAdmin && <Shield className="w-3 h-3 text-[#FF2865] fill-current" />}
-                           </p>
-                           <span className="text-xs text-gray-400">ID: {user._id.substring(0,6)}...</span>
-                        </div>
-                     </div>
+                      <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                            {user.name.charAt(0).toUpperCase()}
+                         </div>
+                         <div>
+                            <p className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                              {user.name} 
+                              {user.isAdmin && <Shield className="w-3 h-3 text-[#FF2865] fill-current" />}
+                            </p>
+                            <span className="text-xs text-gray-400">ID: {user._id.substring(0,6)}...</span>
+                         </div>
+                      </div>
                   </td>
 
                   {/* Email */}
                   <td className="px-6 py-4">
-                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Mail className="w-4 h-4 text-gray-400" />
-                        {user.email}
-                     </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                         <Mail className="w-4 h-4 text-gray-400" />
+                         {user.email}
+                      </div>
                   </td>
 
-                  {/* Location (Primary Address) */}
+                  {/* Location */}
                   <td className="px-6 py-4">
-                     {user.addresses && user.addresses.length > 0 ? (
-                        <div className="flex items-start gap-2 text-sm text-gray-600 max-w-[200px]">
-                           <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                           <span className="line-clamp-2">
-                             {user.addresses.find(a => a.isPrimary)?.city || user.addresses[0].city}, 
-                             {' '}{user.addresses.find(a => a.isPrimary)?.postalCode || user.addresses[0].postalCode}
-                           </span>
-                        </div>
-                     ) : (
-                        <span className="text-xs text-gray-400 italic">No address saved</span>
-                     )}
+                      {user.addresses && user.addresses.length > 0 ? (
+                         <div className="flex items-start gap-2 text-sm text-gray-600 max-w-[200px]">
+                            <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                            <span className="line-clamp-2">
+                              {user.addresses.find(a => a.isPrimary)?.city || user.addresses[0].city}, 
+                              {' '}{user.addresses.find(a => a.isPrimary)?.postalCode || user.addresses[0].postalCode}
+                            </span>
+                         </div>
+                      ) : (
+                         <span className="text-xs text-gray-400 italic">No address saved</span>
+                      )}
                   </td>
 
                   {/* Date */}
@@ -172,6 +173,69 @@ export default function Customers() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* --- MOBILE VIEW (CARDS) --- */}
+      <div className="md:hidden space-y-4">
+         {filteredUsers.map((user) => (
+            <div key={user._id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+               
+               {/* Card Header: Avatar, Name, Delete */}
+               <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                     <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xl">
+                        {user.name.charAt(0).toUpperCase()}
+                     </div>
+                     <div>
+                        <p className="font-bold text-gray-900 flex items-center gap-2">
+                           {user.name}
+                           {user.isAdmin && <Shield className="w-3 h-3 text-[#FF2865] fill-current" />}
+                        </p>
+                        <p className="text-xs text-gray-400 font-mono">ID: ...{user._id.slice(-6)}</p>
+                     </div>
+                  </div>
+                  {!user.isAdmin && (
+                     <button 
+                        onClick={() => handleDelete(user._id)}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                     >
+                        <Trash2 className="w-5 h-5" />
+                     </button>
+                  )}
+               </div>
+
+               {/* Card Details */}
+               <div className="space-y-3 text-sm border-t border-gray-100 pt-3">
+                  <div className="flex items-center gap-3 text-gray-600">
+                     <Mail className="w-4 h-4 text-gray-400 shrink-0" />
+                     <span className="truncate">{user.email}</span>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 text-gray-600">
+                     <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                     {user.addresses && user.addresses.length > 0 ? (
+                        <span>
+                           {user.addresses.find(a => a.isPrimary)?.city || user.addresses[0].city}, 
+                           {' '}{user.addresses.find(a => a.isPrimary)?.postalCode || user.addresses[0].postalCode}
+                        </span>
+                     ) : (
+                        <span className="text-gray-400 italic">No address saved</span>
+                     )}
+                  </div>
+
+                  <div className="flex items-center gap-3 text-gray-600">
+                     <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+                     <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                  </div>
+               </div>
+            </div>
+         ))}
+
+         {filteredUsers.length === 0 && (
+            <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+               <p className="text-gray-400 text-sm">No customers found.</p>
+            </div>
+         )}
       </div>
 
     </div>
