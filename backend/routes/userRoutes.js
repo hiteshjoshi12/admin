@@ -7,7 +7,9 @@ const {
   updateAddress,
   deleteAddress,
   getUsers,     // <--- New
-  deleteUser    // <--- New
+  deleteUser,    // <--- New
+  forgotPassword,
+  resetPassword
 } = require('../controllers/userController');
 const { protect,admin } = require('../middleware/authMiddleware');
 
@@ -20,6 +22,9 @@ router.post('/login', authUser);        // Matches POST /api/users/login (Login)
 router.post('/profile/address', protect, saveAddress);       
 router.put('/profile/address/:id', protect, updateAddress);  
 router.delete('/profile/address/:id', protect, deleteAddress); 
+
+router.post('/forgotpassword', forgotPassword);
+router.put('/resetpassword/:resetToken', resetPassword);
 
 // Admin Routes (The new part)
 router.route('/')

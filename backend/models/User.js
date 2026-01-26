@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto'); // <--- 1. Import crypto
 
 // Define Address Schema
 const addressSchema = mongoose.Schema({
@@ -17,7 +18,7 @@ const userSchema = mongoose.Schema({
   password: { type: String, required: true },
   isAdmin: { type: Boolean, required: true, default: false },
   
-  // New Field: Array of Addresses
+  // Existing Field: Array of Addresses
   addresses: [addressSchema], 
 
   cart: [
@@ -29,7 +30,12 @@ const userSchema = mongoose.Schema({
       size: Number,
       quantity: Number
     }
-  ]
+  ],
+
+  // --- 2. NEW FIELDS FOR PASSWORD RESET ---
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
+
 }, {
   timestamps: true,
 });
@@ -38,12 +44,27 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// --- FIX IS HERE ---
-// 1. Removed 'next' from arguments (async functions don't need it in new Mongoose)
-// 2. Added 'return' inside the if-statement to stop execution
+// --- 3. NEW METHOD: Generate Reset Token ---
+userSchema.methods.getResetPasswordToken = function () {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token and set to resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expire (10 minutes)
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
+
+// Password Hash Middleware
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    return; // Just return, don't call next()
+    return;
   }
   
   const salt = await bcrypt.genSalt(10);

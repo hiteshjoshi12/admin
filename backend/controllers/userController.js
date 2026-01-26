@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 // --- HELPER: GENERATE TOKEN ---
 // (Normally in utils, but fine to keep here if you don't have a separate file)
@@ -275,6 +277,96 @@ const deleteUser = async (req, res) => {
   }
 };
 
+
+
+// ... existing authUser, registerUser ...
+
+// @desc    Forgot Password
+// @route   POST /api/users/forgotpassword
+// @access  Public
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  console.log("Attempting to send email...");
+console.log("User:", process.env.EMAIL_USERNAME);
+console.log("Pass exists?", !!process.env.EMAIL_PASSWORD);
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    // Get Reset Token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    // Create Reset URL (Point to Frontend Route)
+    // NOTE: Make sure your frontend runs on localhost:5173 or your domain
+    const resetUrl = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`;
+
+    const message = `You have requested a password reset. Please go to this link to create a new password: \n\n ${resetUrl}`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Password Reset Request',
+        message,
+      });
+
+      res.status(200).json({ success: true, data: 'Email sent' });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+      
+      res.status(500);
+      throw new Error('Email could not be sent');
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Reset Password
+// @route   PUT /api/users/resetpassword/:resetToken
+// @access  Public
+const resetPassword = async (req, res) => {
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.resetToken)
+    .digest('hex');
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }, // Check if not expired
+    });
+
+    if (!user) {
+      res.status(400);
+      throw new Error('Invalid Token');
+    }
+
+    // Set new password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save(); // This triggers the pre-save hook to hash password
+
+    res.status(201).json({ success: true, message: 'Password Updated Success' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
 module.exports = {
   registerUser,
   authUser,
@@ -282,5 +374,7 @@ module.exports = {
   updateAddress,
   deleteAddress,
   getUsers,
-  deleteUser
+  deleteUser,
+  forgotPassword,
+  resetPassword
 };
