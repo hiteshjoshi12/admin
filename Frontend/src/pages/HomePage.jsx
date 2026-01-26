@@ -1,10 +1,10 @@
 import React from "react";
-import Hero from "../components/Hero";
-import CollectionTiles from "../components/CollectionTiles";
-import BestSellers from "../components/BestSellers";
-import VideoShowcase from "../components/VideoShowcase";
-import BrandStory from "../components/BrandStory";
-import InstagramFeed from "../components/InstagramFeed";
+import Hero from "../components/HomePage/Hero";
+import CollectionTiles from "../components/HomePage/CollectionTiles";
+import BestSellers from "../components/HomePage/BestSellers";
+import VideoShowcase from "../components/HomePage/VideoShowcase";
+import BrandStory from "../components/HomePage/BrandStory";
+import InstagramFeed from "../components/HomePage/InstagramFeed";
 
 const HomePage = () => {
   return (

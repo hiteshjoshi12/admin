@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Play, Volume2, VolumeX, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -8,10 +8,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+// LOADER IMPORTS
+import { VideoScrollSkeleton } from '../loaders/SectionLoader';
+
 const videos = [
   {
     id: 1,
-    // Added: f_auto,q_auto,w_720,br_2m
     src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069368/j5_ketdz3.mp4", 
     title: "Bridal BTS",
     price: "Shop The Look",
@@ -41,7 +43,14 @@ const videos = [
 ];
 
 export default function VideoShowcase() {
-  
+  const [loading, setLoading] = useState(true);
+
+  // Simulate loading delay (Remove this if/when you fetch real data)
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const VideoCard = ({ video }) => {
     const videoRef = useRef(null);
     const [isMuted, setIsMuted] = useState(true);
@@ -100,6 +109,9 @@ export default function VideoShowcase() {
     );
   };
 
+  // --- 1. USE SKELETON LOADER ---
+  if (loading) return <VideoScrollSkeleton />;
+
   return (
     <section className="py-16 md:py-24 bg-[#1C1917]">
       <div className="max-w-[1440px] mx-auto px-6">
@@ -125,17 +137,16 @@ export default function VideoShowcase() {
             {/* View All Card */}
             <Link to="/shop">
               <Card className="w-[280px] md:w-[320px] aspect-[9/16] rounded-2xl bg-white/5 border-white/10 hover:bg-white/10 transition-colors flex flex-col items-center justify-center text-center snap-center">
-                 <div className="w-12 h-12 rounded-full border border-[#FF2865] text-[#FF2865] flex items-center justify-center mb-4">
-                   <ArrowUpRight className="w-5 h-5" />
-                 </div>
-                 <h3 className="text-xl font-serif text-white">View All</h3>
-                 <p className="text-xs text-gray-500 mt-1">Explore all stories</p>
+                  <div className="w-12 h-12 rounded-full border border-[#FF2865] text-[#FF2865] flex items-center justify-center mb-4">
+                    <ArrowUpRight className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xl font-serif text-white">View All</h3>
+                  <p className="text-xs text-gray-500 mt-1">Explore all stories</p>
               </Card>
             </Link>
 
           </div>
           
-          {/* This hides the scrollbar visually but keeps scrolling enabled */}
           <ScrollBar orientation="horizontal" className="opacity-0" />
         </ScrollArea>
 

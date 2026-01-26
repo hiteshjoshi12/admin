@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import config from '../config/config.js';
+import config from '../../config/config.js';
 
 // --- IMPORTS FOR SKELETON LOADING ---
-import { GridSkeleton } from './loaders/SectionLoader';
-import { Skeleton } from './ui/Skeleton';
+import { GridSkeleton } from '../loaders/SectionLoader.jsx';
+import { Skeleton } from '../ui/Skeleton.jsx';
 
 export default function CollectionTiles() {
   const [collections, setCollections] = useState([]);

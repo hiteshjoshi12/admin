@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
-  Star, Minus, Plus, Heart, Truck, RefreshCcw, 
+  Star, Minus, Plus, Truck, RefreshCcw, 
   ShieldCheck, ShoppingBag, X, ZoomIn
 } from 'lucide-react';
 
@@ -9,10 +9,13 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductDetails, clearProductDetails } from '../redux/productSlice';
 import { addToCart } from '../redux/cartSlice';
-import {API_BASE_URL} from '../util/config'; // Ensure correct path
+import { API_BASE_URL } from '../util/config'; 
 
 // UTILS IMPORT
 import { getOptimizedImage } from '../util/imageUtils';
+
+// LOADER IMPORTS
+import { ProductDetailSkeleton } from '../components/loaders/SectionLoader';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -36,6 +39,17 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // --- 1. LOADING STATE ---
+  if (loading) return <ProductDetailSkeleton />;
+  
+  // Error State
+  if (error || !currentProduct) return (
+    <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+        <p className="text-xl font-serif text-red-500">Product Not Found</p>
+        <Link to="/shop" className="underline hover:text-[#FF2865]">Return to Shop</Link>
+    </div>
+  );
 
   // --- REAL-TIME STOCK CALCULATION ---
   const dbStock = selectedSize && currentProduct?.stock
@@ -72,18 +86,14 @@ export default function ProductDetail() {
     dispatch(addToCart({
       id: currentProduct._id,
       name: currentProduct.name,
-      image: currentProduct.images[0], // We store original URL in cart, optimization happens on display
+      image: currentProduct.images[0], 
       price: currentProduct.price,
       quantity: quantity,
       size: selectedSize
     }));
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1C1917]"></div></div>;
-  if (error || !currentProduct) return <div className="min-h-screen flex items-center justify-center">Product Not Found</div>;
-
   // --- IMAGE OPTIMIZATION ---
-  // We use a higher resolution (e.g., 1000px) for the main detail images
   const optimizedImages = currentProduct.images.map(img => getOptimizedImage(img, 1000));
 
   return (
@@ -92,7 +102,7 @@ export default function ProductDetail() {
       {/* Lightbox */}
       {isLightboxOpen && (
         <Lightbox 
-          images={optimizedImages} // Use optimized images in lightbox too
+          images={optimizedImages} 
           initialIndex={activeImage} 
           onClose={() => setIsLightboxOpen(false)} 
         />
@@ -103,7 +113,7 @@ export default function ProductDetail() {
         {/* LEFT: IMAGE GALLERY */}
         <div className="w-full lg:w-3/5">
            
-           {/* MOBILE VIEW: Horizontal Scroll Snap (Fixed visibility) */}
+           {/* MOBILE VIEW: Horizontal Scroll Snap */}
            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
              {optimizedImages.map((img, idx) => (
                <div key={idx} className="w-full flex-shrink-0 snap-center">
@@ -308,8 +318,6 @@ function InfoRow({ icon: Icon, title, text }) {
   );
 }
 
-
-
 function ReviewSection({ productId }) {
   const [reviews, setReviews] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -320,7 +328,6 @@ function ReviewSection({ productId }) {
 
   const { userInfo } = useSelector((state) => state.auth);
 
-  // 1. FETCH REVIEWS (Independent of Product Data)
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -349,7 +356,6 @@ function ReviewSection({ productId }) {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || 'Error');
 
       setMessage("Review submitted! It will appear after approval.");
@@ -413,31 +419,8 @@ function ReviewSection({ productId }) {
   );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function RelatedProducts({ currentId }) {
-  // Access items from Redux. Note: Ideally, you'd fetch "Recommended" from API.
   const { items } = useSelector((state) => state.products);
-  
-  // Basic recommendation logic: filter out current product, take first 4
-  // You should ideally optimize these images too!
   const related = items.filter(p => p._id !== currentId).slice(0, 4);
 
   if (related.length === 0) return null;
@@ -448,7 +431,6 @@ function RelatedProducts({ currentId }) {
           <div className="flex justify-between items-center mb-8"><h2 className="text-2xl font-serif text-[#1C1917]">You May Also Like</h2><Link to="/shop" className="text-xs font-bold uppercase tracking-widest hover:text-[#FF2865]">View All</Link></div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {related.map((p, i) => {
-               // Optimization for related products (smaller cards)
                const optImg = getOptimizedImage(p.images ? p.images[0] : p.image, 400);
                return (
                   <Link to={`/product/${p._id}`} key={i} className="group cursor-pointer">

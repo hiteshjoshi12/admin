@@ -1,24 +1,29 @@
 import { Instagram, Play, Heart } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+
+// LOADER IMPORTS
+import { InstagramSkeleton } from '../loaders/SectionLoader';
 
 // Configuration: 2 Photos, 1 Reel
 const content = {
-  // Images: f_auto (format), q_auto (quality)
   photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069569/img1_cwdqem.jpg", 
   photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069569/img2_rssgsc.jpg", 
-  
-  // Video: f_auto, q_auto, AND bitrate limit (br_2m) to prevent lag
   reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,br_2m/v1769071460/reel_sqyodd.mp4" 
 };
 
-// Official Instagram Gradient
 const instaGradientClass = "bg-gradient-to-tr from-[#833ab4] via-[#fd1d1d] to-[#fcb045]";
 
 export default function InstagramFeed() {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // Toggle play/pause for the reel on click
+  // Simulate loading (Remove this when fetching real data)
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) videoRef.current.pause();
@@ -26,6 +31,9 @@ export default function InstagramFeed() {
       setIsPlaying(!isPlaying);
     }
   };
+
+  // --- 1. USE SKELETON LOADER ---
+  if (loading) return <InstagramSkeleton />;
 
   return (
     <section className="py-24 px-4 bg-[#F9F8F6] relative overflow-hidden border-t border-gray-200">
@@ -35,12 +43,12 @@ export default function InstagramFeed() {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center gap-2 mb-4 bg-white px-4 py-2 rounded-full shadow-sm">
-             <span className={`${instaGradientClass} bg-clip-text text-transparent`}>
+              <span className={`${instaGradientClass} bg-clip-text text-transparent`}>
                 <Instagram className="w-4 h-4 text-[#833ab4]" /> 
-             </span>
-             <a href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
+              </span>
+              <a href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-brand-black">@beadsnbloom.india</span>
-             </a> 
+              </a> 
           </div>
           <h2 className="text-4xl md:text-5xl font-serif text-brand-black">
             The Gram
@@ -56,8 +64,7 @@ export default function InstagramFeed() {
             {/* PHOTO 1: Tilted Left */}
             <div className="relative group w-full max-w-[320px] aspect-square bg-white p-3 shadow-xl transform rotate-[-3deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-start">
                <div className="relative w-full h-full overflow-hidden bg-gray-100">
-                  <img src={content.photo1} alt="Insta Photo 1" className="w-full h-full object-cover" />
-                  {/* Hover Overlay */}
+                  <img src={content.photo1} alt="Insta Photo 1" className="w-full h-full object-cover" loading="lazy" />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Heart className="text-white w-8 h-8 fill-white" />
                   </div>
@@ -67,7 +74,7 @@ export default function InstagramFeed() {
             {/* PHOTO 2: Tilted Right (Offset) */}
             <div className="relative group w-full max-w-[320px] aspect-[4/5] bg-white p-3 shadow-xl transform rotate-[4deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-end md:-mt-12">
                <div className="relative w-full h-full overflow-hidden bg-gray-100">
-                  <img src={content.photo2} alt="Insta Photo 2" className="w-full h-full object-cover" />
+                  <img src={content.photo2} alt="Insta Photo 2" className="w-full h-full object-cover" loading="lazy" />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Heart className="text-white w-8 h-8 fill-white" />
                   </div>
@@ -97,14 +104,12 @@ export default function InstagramFeed() {
                    <Instagram className="w-5 h-5 text-white" />
                 </div>
                 
-                {/* Play/Pause Indicator (Fades out when playing) */}
                 <div className={`absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}>
                    <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
                       <Play className="w-8 h-8 text-white fill-white ml-1" />
                    </div>
                 </div>
 
-                {/* "Reel" Tag at bottom */}
                 <div className="absolute bottom-6 left-6 flex items-center gap-2">
                    <div className="w-8 h-8 rounded-full border border-white overflow-hidden">
                       <img src="/logo.png" alt="B&B" className="w-full h-full object-cover bg-white" />
@@ -114,16 +119,17 @@ export default function InstagramFeed() {
              </div>
           </div>
 
-          {/* THE STICKER: Centered with Thicker Border & Larger Size */}
+          {/* THE STICKER */}
           <a target="_blank"
              href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" 
              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 group"
+             rel="noreferrer"
           >
              <div className={`
                 w-36 h-36 md:w-48 md:h-48 rounded-full ${instaGradientClass} text-white 
                 flex flex-col items-center justify-center text-center p-4 
                 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]
-                border-[6px] border-[#F9F8F6]  /* Thick border matching background color to "cut out" the sticker */
+                border-[6px] border-[#F9F8F6]
                 transition-transform duration-300 hover:scale-110 hover:rotate-12
              `}>
                 <Instagram className="w-10 h-10 md:w-12 md:h-12 mb-2" />

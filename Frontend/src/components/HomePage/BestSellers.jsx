@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import config from '../config/config.js';
+import config from '../../config/config.js';
 
 // --- IMPORTS FOR SKELETON LOADING ---
-import { BestSellerSkeleton } from './loaders/SectionLoader';
-import { Skeleton } from './ui/Skeleton';
+import { BestSellerSkeleton } from '../loaders/SectionLoader.jsx';
+import { Skeleton } from '../ui/Skeleton.jsx';
 
 export default function BestSellers() {
   const [items, setItems] = useState([]);
