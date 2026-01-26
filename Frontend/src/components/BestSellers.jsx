@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import  config  from '../config/config.js';
+import config from '../config/config.js';
+
+// --- IMPORTS FOR SKELETON LOADING ---
+import { BestSellerSkeleton } from './loaders/SectionLoader';
+import { Skeleton } from './ui/Skeleton';
 
 export default function BestSellers() {
   const [items, setItems] = useState([]);
@@ -32,15 +36,37 @@ export default function BestSellers() {
     </div>
   );
 
+  // --- 1. LOADING STATE ---
+  if (loading) return (
+    <section className="py-24 px-4 md:px-12 bg-white relative overflow-hidden">
+       <div className="max-w-[1440px] mx-auto relative z-10">
+         
+         {/* HEADER SKELETON */}
+         <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+            <div>
+              {/* "Curated Favorites" placeholder */}
+              <Skeleton className="h-4 w-32 mb-4" />
+              {/* "The Best Sellers" Title placeholder */}
+              <Skeleton className="h-12 w-64 md:w-96" />
+            </div>
+            {/* "Shop All" Button placeholder */}
+            <Skeleton className="h-4 w-32 hidden md:block" />
+         </div>
+         
+         {/* COMPLEX GRID SKELETON */}
+         {/* This loads the reusable layout we defined in SectionLoader */}
+         <BestSellerSkeleton />
+       </div>
+    </section>
+  );
+
   // Helper to find item by position (1, 2, or 3)
   const getItem = (pos) => items.find(i => i.position === pos);
-
-  if (loading) return null;
   
   // Only render if we have at least one item
   if (items.length === 0) return null;
 
-  // We assign variables for clarity
+  // Assign variables
   const heroItem = getItem(1);
   const pebbleItem = getItem(2);
   const archItem = getItem(3);
@@ -94,34 +120,34 @@ export default function BestSellers() {
              {/* POSITION 2: The Pebble */}
              {pebbleItem && (
                <Link to={`/product/${pebbleItem.product._id}`} className="relative group cursor-pointer md:-ml-12 md:mt-12 z-10 block">
-                  <span className="absolute top-4 right-4 z-30 bg-[#C5A059] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                    {pebbleItem.tag}
-                  </span>
-                  <div className="relative h-[350px] rounded-[4rem] overflow-hidden bg-[#F9F8F6] shadow-xl group-hover:shadow-2xl transition-shadow border-2 border-transparent group-hover:border-[#C5A059]/20">
+                 <span className="absolute top-4 right-4 z-30 bg-[#C5A059] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                   {pebbleItem.tag}
+                 </span>
+                 <div className="relative h-[350px] rounded-[4rem] overflow-hidden bg-[#F9F8F6] shadow-xl group-hover:shadow-2xl transition-shadow border-2 border-transparent group-hover:border-[#C5A059]/20">
                      <img src={pebbleItem.product.image} alt={pebbleItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
                      <QuickAddOverlay />
-                  </div>
-                  <div className="text-left mt-4 ml-4">
-                    <h3 className="text-xl font-serif">{pebbleItem.product.name}</h3>
-                    <p className="text-gray-500">₹{pebbleItem.product.price.toLocaleString()}</p>
-                  </div>
+                 </div>
+                 <div className="text-left mt-4 ml-4">
+                   <h3 className="text-xl font-serif">{pebbleItem.product.name}</h3>
+                   <p className="text-gray-500">₹{pebbleItem.product.price.toLocaleString()}</p>
+                 </div>
                </Link>
              )}
 
              {/* POSITION 3: The Short Arch */}
              {archItem && (
                <Link to={`/product/${archItem.product._id}`} className="relative group cursor-pointer md:mt-32 block">
-                  <span className="absolute top-4 left-4 z-30 bg-white/90 backdrop-blur text-[#1C1917] text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                    {archItem.tag}
-                  </span>
-                  <div className="relative h-[400px] rounded-t-[10rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all">
+                 <span className="absolute top-4 left-4 z-30 bg-white/90 backdrop-blur text-[#1C1917] text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                   {archItem.tag}
+                 </span>
+                 <div className="relative h-[400px] rounded-t-[10rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all">
                      <img src={archItem.product.image} alt={archItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
                      <QuickAddOverlay />
-                  </div>
-                  <div className="text-center mt-4">
-                    <h3 className="text-xl font-serif">{archItem.product.name}</h3>
-                    <p className="text-gray-500">₹{archItem.product.price.toLocaleString()}</p>
-                  </div>
+                 </div>
+                 <div className="text-center mt-4">
+                   <h3 className="text-xl font-serif">{archItem.product.name}</h3>
+                   <p className="text-gray-500">₹{archItem.product.price.toLocaleString()}</p>
+                 </div>
                </Link>
              )}
 
