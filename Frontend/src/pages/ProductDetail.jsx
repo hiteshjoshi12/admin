@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductDetails, clearProductDetails } from '../redux/productSlice';
 import { addToCart } from '../redux/cartSlice';
+import {API_BASE_URL} from '../util/config'; // Ensure correct path
 
 // UTILS IMPORT
 import { getOptimizedImage } from '../util/imageUtils';
@@ -258,7 +259,7 @@ export default function ProductDetail() {
       </div>
       
       {/* Sub Components */}
-      <ReviewSection />
+      <ReviewSection productId={id} />
       <RelatedProducts currentId={currentProduct._id} />
     </div>
   );
@@ -307,28 +308,129 @@ function InfoRow({ icon: Icon, title, text }) {
   );
 }
 
-function ReviewSection() {
+
+
+function ReviewSection({ productId }) {
+  const [reviews, setReviews] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // 1. FETCH REVIEWS (Independent of Product Data)
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/reviews/${productId}`);
+        const data = await res.json();
+        setReviews(data);
+      } catch (err) {
+        console.error("Failed to load reviews", err);
+      }
+    };
+    if (productId) fetchReviews();
+  }, [productId]);
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    if (!comment) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/reviews/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+        body: JSON.stringify({ rating, comment }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Error');
+
+      setMessage("Review submitted! It will appear after approval.");
+      setComment('');
+      setShowForm(false);
+      setError('');
+    } catch (err) {
+      setError(err.message);
+      setMessage('');
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 border-t border-gray-100 mt-16">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-serif text-[#1C1917]">Customer Reviews</h2>
-        <button onClick={() => setShowForm(!showForm)} className="text-xs font-bold uppercase tracking-widest border-b border-[#1C1917] pb-1 hover:text-[#FF2865] hover:border-[#FF2865] transition-colors">{showForm ? 'Cancel Review' : 'Write a Review'}</button>
+        <h2 className="text-3xl font-serif text-[#1C1917]">Customer Reviews ({reviews.length})</h2>
+        {userInfo ? (
+          <button onClick={() => setShowForm(!showForm)} className="text-xs font-bold uppercase tracking-widest border-b border-[#1C1917] pb-1 hover:text-[#FF2865] transition-colors">
+            {showForm ? 'Cancel' : 'Write a Review'}
+          </button>
+        ) : (
+          <Link to="/login" className="text-xs font-bold uppercase tracking-widest text-[#FF2865]">Login to Review</Link>
+        )}
       </div>
+
+      {message && <div className="bg-green-100 text-green-700 p-4 rounded mb-4 text-sm font-bold">{message}</div>}
+      {error && <div className="bg-red-100 text-red-700 p-4 rounded mb-4 text-sm font-bold">{error}</div>}
+
       {showForm && (
-        <form className="bg-[#F9F8F6] p-8 rounded-2xl mb-12 animate-fade-up">
-           <div className="mb-4"><label className="block text-xs font-bold uppercase tracking-widest mb-2 text-gray-500">Your Rating</label><div className="flex gap-2 text-gray-300">{[1,2,3,4,5].map(star => <Star key={star} className="w-6 h-6 hover:text-[#FFCB45] cursor-pointer transition-colors" />)}</div></div>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"><input type="text" placeholder="Your Name" className="p-3 bg-white rounded-lg border border-gray-200 outline-none focus:border-[#FF2865]" /><input type="email" placeholder="Email Address" className="p-3 bg-white rounded-lg border border-gray-200 outline-none focus:border-[#FF2865]" /></div>
-           <textarea rows="4" placeholder="How was the fit and comfort?" className="w-full p-3 bg-white rounded-lg border border-gray-200 outline-none focus:border-[#FF2865] mb-4"></textarea>
-           <button className="bg-[#1C1917] text-white px-8 py-3 rounded-full font-bold uppercase text-xs hover:bg-[#FF2865] transition-colors">Submit Review</button>
+        <form onSubmit={submitHandler} className="bg-[#F9F8F6] p-8 rounded-2xl mb-12 animate-fade-up">
+           <div className="mb-4">
+            <label className="block text-xs font-bold uppercase tracking-widest mb-2 text-gray-500">Rating</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} className={`w-6 h-6 cursor-pointer ${star <= rating ? 'fill-[#FFCB45] text-[#FFCB45]' : 'text-gray-300'}`} onClick={() => setRating(star)} />
+              ))}
+            </div>
+           </div>
+           <textarea rows="4" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Write your review..." className="w-full p-3 rounded-lg border border-gray-200 mb-4"></textarea>
+           <button className="bg-[#1C1917] text-white px-8 py-3 rounded-full font-bold uppercase text-xs">Submit</button>
         </form>
       )}
+
       <div className="space-y-6">
-        <div className="border-b border-gray-100 pb-6"><div className="flex justify-between items-start mb-2"><div><div className="flex text-[#FFCB45] mb-1">{[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-current" />)}</div><h4 className="font-bold text-[#1C1917]">Ananya S.</h4></div><span className="text-xs text-gray-400">2 days ago</span></div><p className="text-gray-600 text-sm italic">"Absolutely stunning! The padding is so soft, I wore them for my entire Sangeet."</p></div>
+        {reviews.length === 0 ? <p className="text-gray-400 italic">No reviews yet.</p> : reviews.map((review) => (
+          <div key={review._id} className="border-b border-gray-100 pb-6">
+            <div className="flex justify-between mb-2">
+              <div>
+                <div className="flex text-[#FFCB45] mb-1">
+                  {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'text-gray-300'}`} />)}
+                </div>
+                <h4 className="font-bold text-[#1C1917]">{review.name}</h4>
+              </div>
+              <span className="text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+            </div>
+            <p className="text-gray-600 text-sm italic">"{review.comment}"</p>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function RelatedProducts({ currentId }) {
   // Access items from Redux. Note: Ideally, you'd fetch "Recommended" from API.
