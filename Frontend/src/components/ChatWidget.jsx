@@ -5,7 +5,6 @@ export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
   const contactInfo = {
-    whatsapp: "https://wa.me/919599766993", 
     instagram: "https://instagram.com/beadsnbloom.india",
     email: "mailto:hello@beadsandbloom.com"
   };
@@ -32,25 +31,8 @@ export default function ChatWidget() {
 
         <div className="p-4 flex flex-col gap-3 bg-gray-50">
           
-          <a 
-            href={contactInfo.whatsapp} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="group flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#FF2865]/30 transition-all duration-200"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#25D366]/10 flex items-center justify-center text-[#25D366]">
-                <MessageSquare className="w-5 h-5 fill-current" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800">WhatsApp</p>
-                <p className="text-[10px] text-gray-500">Chat with our stylist</p>
-              </div>
-            </div>
-            <div className="text-gray-300 group-hover:text-[#FF2865] transition-colors">
-               <svg className="w-5 h-5 transform -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </div>
-          </a>
+          
+           
 
           <a 
             href={contactInfo.instagram}

@@ -6,7 +6,8 @@ const initialState = {
   totalAmount: 0,
   // --- NEW FIELDS FOR CHECKOUT ---
   shippingAddress: {}, 
-  paymentMethod: 'Razorpay', 
+  paymentMethod: 'Razorpay',
+  coupon: null, 
 };
 
 const cartSlice = createSlice({
@@ -92,6 +93,12 @@ const cartSlice = createSlice({
     // 7. SAVE PAYMENT METHOD
     savePaymentMethod: (state, action) => {
       state.paymentMethod = action.payload;
+    },
+    applyDiscount: (state, action) => {
+      state.coupon = action.payload; // Payload: { code, discountAmount }
+    },
+    removeDiscount: (state) => {
+      state.coupon = null;
     }
   },
 });
@@ -103,7 +110,9 @@ export const {
   clearCart, 
   setCart,
   saveShippingAddress, // Exporting new action
-  savePaymentMethod    // Exporting new action
+  savePaymentMethod,
+  applyDiscount,
+  removeDiscount,    // Exporting new action
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
