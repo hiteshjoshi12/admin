@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Mail, Lock } from 'lucide-react';
+import { ArrowRight, Mail, Lock, Eye, EyeOff } from 'lucide-react'; // Added Eye/EyeOff Icons
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ export default function Login() {
 
   // --- STATE ---
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false); // <--- NEW STATE
   
   // Get Auth State & Local Cart
   const { loading, error, userInfo } = useSelector((state) => state.auth);
@@ -26,9 +27,9 @@ export default function Login() {
   useEffect(() => {
     if (userInfo) {
       if (userInfo.isAdmin) {
-        navigate('/admin/dashboard'); // Admins go here
+        navigate('/admin/dashboard');
       } else {
-        navigate('/'); // Customers go here (or '/shop' if you prefer)
+        navigate('/'); 
       }
     }
   }, [userInfo, navigate]);
@@ -44,9 +45,8 @@ export default function Login() {
     dispatch(login({ 
       email: formData.email, 
       password: formData.password, 
-      localCart // Sending cart to backend for merging
+      localCart 
     })).then((result) => {
-      // If login successful and backend returned a merged cart, update Redux immediately
       if (result.payload && result.payload.cart) {
         dispatch(setCart(result.payload.cart));
       }
@@ -109,12 +109,12 @@ export default function Login() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Password</label>
-                <Link to="/forgot-password" className="text-xs text-gray-400 hover:text-[#FF2865]">Forgot?</Link>
+                <Link to="/forgot-password" classname="text-xs text-gray-400 hover:text-[#FF2865]">Forgot?</Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="password"
+                  type={showPassword ? "text" : "password"} // <--- TOGGLE TYPE
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -122,6 +122,18 @@ export default function Login() {
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="••••••••"
                 />
+                {/* --- EYE ICON TOGGLE --- */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1C1917] focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
             </div>
 

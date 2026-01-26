@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Mail, Lock, User } from 'lucide-react';
+import { ArrowRight, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'; // Added Eye/EyeOff Icons
 import { setCart } from '../redux/cartSlice';
 
 // REDUX IMPORTS
@@ -20,6 +20,7 @@ export default function Signup() {
 
   // --- STATE ---
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false); // <--- NEW STATE
   
   // Get Auth State
   const { loading, error, userInfo } = useSelector((state) => state.auth);
@@ -44,7 +45,7 @@ export default function Signup() {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      localCart // <--- PASS IT HERE
+      localCart 
     })).then((res) => {
        // 3. If registration succeeded and backend returned a cart, update Redux
        if(res.payload && res.payload.cart) {
@@ -114,7 +115,7 @@ export default function Signup() {
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type="password"
+                  type={showPassword ? "text" : "password"} // <--- TOGGLE TYPE
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -122,6 +123,18 @@ export default function Signup() {
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="••••••••"
                 />
+                {/* --- EYE ICON TOGGLE --- */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1C1917] focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
               </div>
             </div>
 
