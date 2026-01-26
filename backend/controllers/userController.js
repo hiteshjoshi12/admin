@@ -9,6 +9,8 @@ const sendEmail = require('../utils/sendEmail');
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 
 // --------------------------------------------------------------------------
 // AUTHENTICATION CONTROLLERS
@@ -279,8 +281,6 @@ const deleteUser = async (req, res) => {
 
 
 
-// ... existing authUser, registerUser ...
-
 // @desc    Forgot Password
 // @route   POST /api/users/forgotpassword
 // @access  Public
@@ -306,8 +306,7 @@ console.log("Pass exists?", !!process.env.EMAIL_PASSWORD);
 
     // Create Reset URL (Point to Frontend Route)
     // NOTE: Make sure your frontend runs on localhost:5173 or your domain
-    const resetUrl = `${req.protocol}://localhost:5173/resetpassword/${resetToken}`;
-
+    const resetUrl = `${frontendUrl}/resetpassword/${resetToken}`;
     const message = `You have requested a password reset. Please go to this link to create a new password: \n\n ${resetUrl}`;
 
     try {
