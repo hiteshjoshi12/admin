@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Volume2, VolumeX, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../../util/config';
 
 // Shadcn Imports
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -11,44 +12,56 @@ import { Badge } from "@/components/ui/badge";
 // LOADER IMPORTS
 import { VideoScrollSkeleton } from '../loaders/SectionLoader';
 
-const videos = [
+// Fallback Data (If DB is empty)
+const fallbackVideos = [
   {
-    id: 1,
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069368/j5_ketdz3.mp4", 
+    _id: 1,
+    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069368/j5_ketdz3.mp4", 
     title: "Bridal BTS",
-    price: "Shop The Look",
+    ctaText: "Shop The Look",
     link: "/shop"
   },
   {
-    id: 2,
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069341/j8_fjkfoe.mp4", 
+    _id: 2,
+    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069341/j8_fjkfoe.mp4", 
     title: "Summer Walk",
-    price: "View Collection",
+    ctaText: "View Collection",
     link: "/shop"
   },
   {
-    id: 3,
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069290/j2_hkesie.mp4", 
+    _id: 3,
+    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069290/j2_hkesie.mp4", 
     title: "Festive Vibes",
-    price: "Shop Festive",
-    link: "/shop"
-  },
-  {
-    id: 4,
-    src: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069283/j11_t5m4rh.mp4", 
-    title: "Close Up Details",
-    price: "See Details",
+    ctaText: "Shop Festive",
     link: "/shop"
   }
 ];
 
 export default function VideoShowcase() {
+  const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Simulate loading delay (Remove this if/when you fetch real data)
+  // FETCH DATA
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
+    const fetchVideos = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/cms/runway`);
+        const data = await res.json();
+        
+        if (data && data.length > 0) {
+          setVideos(data);
+        } else {
+          setVideos(fallbackVideos);
+        }
+      } catch (error) {
+        console.error("Failed to fetch videos", error);
+        setVideos(fallbackVideos);
+      } finally {
+        setTimeout(() => setLoading(false), 800);
+      }
+    };
+
+    fetchVideos();
   }, []);
 
   const VideoCard = ({ video }) => {
@@ -58,20 +71,21 @@ export default function VideoShowcase() {
     const toggleAudio = (e) => {
       e.preventDefault(); 
       if (videoRef.current) {
-        videoRef.current.muted = !isMuted;
+        if(isMuted) videoRef.current.muted = false;
+        else videoRef.current.muted = true;
         setIsMuted(!isMuted);
       }
     };
 
     return (
-      <Link to={video.link}>
+      <Link to={video.link || '/shop'}>
         <Card className="relative w-[280px] md:w-[320px] aspect-[9/16] overflow-hidden border-0 rounded-2xl bg-black/5 group cursor-pointer snap-center">
           <CardContent className="p-0 h-full">
             <video
               ref={videoRef}
-              src={video.src}
+              src={video.videoUrl}
               className="w-full h-full object-cover pointer-events-none"
-              autoPlay loop muted={isMuted} playsInline
+              autoPlay loop muted playsInline
             />
 
             {/* Hover Overlay */}
@@ -99,7 +113,7 @@ export default function VideoShowcase() {
               <h3 className="text-xl font-serif font-medium leading-tight">{video.title}</h3>
               
               <div className="flex items-center justify-between pt-2 border-t border-white/20">
-                <p className="text-xs text-gray-300 font-medium">{video.price}</p>
+                <p className="text-xs text-gray-300 font-medium">{video.ctaText}</p>
                 <ArrowUpRight className="w-4 h-4 text-white opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
               </div>
             </div>
@@ -109,7 +123,6 @@ export default function VideoShowcase() {
     );
   };
 
-  // --- 1. USE SKELETON LOADER ---
   if (loading) return <VideoScrollSkeleton />;
 
   return (
@@ -131,7 +144,7 @@ export default function VideoShowcase() {
           <div className="flex gap-4 pb-4">
             
             {videos.map((video) => (
-              <VideoCard key={video.id} video={video} />
+              <VideoCard key={video._id} video={video} />
             ))}
 
             {/* View All Card */}

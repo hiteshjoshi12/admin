@@ -10,6 +10,8 @@ const userRoutes = require('./routes/userRoutes');
 const bestSellerRoutes = require('./routes/bestSellerRoutes');
 const collectionRoutes = require('./routes/collectionRoutes'); // <--- Import
 const reviewRoutes = require('./routes/reviewRoutes');
+const contentRoutes = require('./routes/contentRoutes');
+const cmsRoutes = require('./routes/cmsRoutes');
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/bestsellers', bestSellerRoutes); // Add this line
 app.use('/api/collections', collectionRoutes); // <--- Add this line
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/content', contentRoutes);
+app.use('/api/cms', cmsRoutes);
 
 // ✅ EXPORT APP FOR VERCEL
 module.exports = app;

@@ -22,10 +22,14 @@ export default function Login() {
   const { loading, error, userInfo } = useSelector((state) => state.auth);
   const { items: localCart } = useSelector((state) => state.cart);
 
-  // Redirect if already logged in
+  // Redirect based on role
   useEffect(() => {
     if (userInfo) {
-      navigate('/shop'); 
+      if (userInfo.isAdmin) {
+        navigate('/admin/dashboard'); // Admins go here
+      } else {
+        navigate('/'); // Customers go here (or '/shop' if you prefer)
+      }
     }
   }, [userInfo, navigate]);
 

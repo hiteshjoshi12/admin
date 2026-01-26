@@ -9,7 +9,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { saveShippingAddress, savePaymentMethod, clearCart } from '../redux/cartSlice';
 import { createOrder, resetOrder } from '../redux/orderSlice';
-import { saveAddressToProfile } from '../redux/authSlice'; // <--- IMPORT NEW ACTION
+import { saveAddressToProfile } from '../redux/authSlice'; 
 
 export default function Checkout() {
   const dispatch = useDispatch();
@@ -28,31 +28,30 @@ export default function Checkout() {
   const [step, setStep] = useState(1); 
   const [paymentType, setPaymentType] = useState('upi');
 
-  // Form State
+  // Form State - ADDED 'state'
   const [formData, setFormData] = useState({
     address: shippingAddress?.address || '',
     city: shippingAddress?.city || '',
+    state: shippingAddress?.state || '', // <--- NEW FIELD
     postalCode: shippingAddress?.postalCode || '',
     phoneNumber: shippingAddress?.phoneNumber || '',
     country: 'India'
   });
 
   // --- AUTO-FILL LOGIC ---
-  // If user has saved addresses AND the current form is empty, auto-fill with Primary address
   useEffect(() => {
     if (userInfo && userInfo.addresses && userInfo.addresses.length > 0) {
-       // Find Primary Address (or default to the first one)
        const primaryAddress = userInfo.addresses.find(addr => addr.isPrimary) || userInfo.addresses[0];
        
-       // Only fill if shippingAddress in Redux is empty (to avoid overwriting manual edits)
        if (primaryAddress && !shippingAddress.address) {
-          setFormData({
-            address: primaryAddress.address,
-            city: primaryAddress.city,
-            postalCode: primaryAddress.postalCode,
-            phoneNumber: primaryAddress.phoneNumber,
-            country: 'India'
-          });
+         setFormData({
+           address: primaryAddress.address,
+           city: primaryAddress.city,
+           state: primaryAddress.state || '', // <--- NEW FIELD
+           postalCode: primaryAddress.postalCode,
+           phoneNumber: primaryAddress.phoneNumber,
+           country: 'India'
+         });
        }
     }
   }, [userInfo, shippingAddress]);
@@ -78,7 +77,6 @@ export default function Checkout() {
     };
   }, [dispatch]);
 
-
   // --- HANDLERS ---
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,12 +84,8 @@ export default function Checkout() {
 
   const handleNextStep = (e) => {
     e.preventDefault();
-    
-    // 1. Save Address to Redux Cart (Temporary for this session)
     dispatch(saveShippingAddress(formData));
 
-    // 2. FEATURE: Save address to User Profile if they don't have one yet
-    // This creates the "Sticky Address" effect for future visits
     if (userInfo && (!userInfo.addresses || userInfo.addresses.length === 0)) {
        dispatch(saveAddressToProfile(formData));
     }
@@ -112,9 +106,9 @@ export default function Checkout() {
         size: item.size,
         product: item.id || item.productId || item._id 
       })),
-      shippingAddress: formData,
+      shippingAddress: formData, // Contains state now
       paymentMethod: paymentType,
-      itemsPrice,
+      itemsPrice, // Matches Backend Singular
       shippingPrice: shippingCost,
       taxPrice,
       totalPrice: finalTotal,
@@ -211,14 +205,21 @@ export default function Checkout() {
                         <input type="text" name="city" required value={formData.city} onChange={handleInputChange} className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none" />
                       </div>
                        <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Pincode</label>
-                        <input type="text" name="postalCode" required value={formData.postalCode} onChange={handleInputChange} className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none" />
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">State</label>
+                        {/* You can change this to a dropdown of Indian states later */}
+                        <input type="text" name="state" required value={formData.state} onChange={handleInputChange} className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none" placeholder="e.g. Haryana" />
                       </div>
                     </div>
 
-                    <div className="space-y-2 mb-8">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Phone Number</label>
-                      <input type="text" name="phoneNumber" required value={formData.phoneNumber} onChange={handleInputChange} className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none" placeholder="+91" />
+                    <div className="grid grid-cols-2 gap-6 mb-8">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Pincode</label>
+                        <input type="text" name="postalCode" required value={formData.postalCode} onChange={handleInputChange} className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Phone Number</label>
+                        <input type="text" name="phoneNumber" required value={formData.phoneNumber} onChange={handleInputChange} className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none" placeholder="+91" />
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between pt-6 border-t border-gray-100">
@@ -269,8 +270,8 @@ export default function Checkout() {
                       {paymentType === 'cod' && <div className="w-2.5 h-2.5 rounded-full bg-[#FF2865]"></div>}
                     </div>
                     <div>
-                       <span className="font-bold text-[#1C1917]">Cash on Delivery</span>
-                       <p className="text-xs text-gray-500 mt-1">Pay cash when the order arrives.</p>
+                        <span className="font-bold text-[#1C1917]">Cash on Delivery</span>
+                        <p className="text-xs text-gray-500 mt-1">Pay cash when the order arrives.</p>
                     </div>
                   </div>
                 </div>

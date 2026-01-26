@@ -237,10 +237,50 @@ const deleteAddress = async (req, res) => {
   }
 };
 
+// ... existing imports ...
+
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+const getUsers = async (req, res) => {
+  try {
+    // Fetch all users but DO NOT return the password field
+    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      if (user.isAdmin) {
+        res.status(400);
+        throw new Error('Cannot delete admin user');
+      }
+      await user.deleteOne();
+      res.json({ message: 'User removed' });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   authUser,
   saveAddress,
   updateAddress,
-  deleteAddress
+  deleteAddress,
+  getUsers,
+  deleteUser
 };
