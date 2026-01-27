@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   Star, Minus, Plus, Truck, RefreshCcw, 
-  ShieldCheck, ShoppingBag, X, ZoomIn
+  ShieldCheck, ShoppingBag, X, ZoomIn, HeartHandshake 
 } from 'lucide-react';
 
 // REDUX IMPORTS
@@ -231,13 +231,13 @@ export default function ProductDetail() {
 
               {/* Button Logic */}
               {dbStock === 0 ? (
-                 <button disabled className="flex-1 bg-gray-200 text-gray-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
-                   Select Size
-                 </button>
+                  <button disabled className="flex-1 bg-gray-200 text-gray-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
+                    Select Size
+                  </button>
               ) : remainingStock === 0 ? (
-                 <button disabled className="flex-1 bg-orange-100 text-orange-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
-                   Max Limit Reached
-                 </button>
+                  <button disabled className="flex-1 bg-orange-100 text-orange-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
+                    Max Limit Reached
+                  </button>
               ) : (
                 <button 
                   onClick={handleAddToCart} 
@@ -258,10 +258,26 @@ export default function ProductDetail() {
               <InfoRow icon={ShieldCheck} title="Secure Payment" text="100% secure payment processing." />
             </div>
 
+            {/* --- CARE GUIDE SECTION (Added) --- */}
+            <div className="bg-[#F9F8F6] p-6 rounded-xl mt-6 border border-gray-100">
+              <div className="flex items-center gap-3 mb-3">
+                <HeartHandshake className="w-5 h-5 text-[#FF2865]" />
+                <h3 className="font-serif text-lg text-[#1C1917]">Material & Care</h3>
+              </div>
+              <ul className="text-sm text-gray-600 leading-relaxed font-light space-y-2 list-disc pl-4 marker:text-gray-400">
+                <li><strong>Avoid Water & Heat:</strong> Keep away from water and direct sunlight to prevent damage.</li>
+                <li><strong>Cleaning:</strong> Clean gently with a soft brush or damp cloth. Spot clean stains with mild detergent.</li>
+                <li><strong>Drying:</strong> Always air dry away from direct heat sources.</li>
+                <li><strong>Storage:</strong> Store in a dust bag with moisture absorbers. Rotate pairs regularly.</li>
+                <li><strong>Leather Care:</strong> Condition leather regularly to keep it soft and prevent cracking.</li>
+                <li className="text-[#FF2865] font-medium">For heavy embroidered juttis, Dry Clean Only.</li>
+              </ul>
+            </div>
+
             {/* Editor's Note */}
-            <div className="bg-[#F9F8F6] p-6 rounded-xl mt-4">
-              <h3 className="font-serif text-lg mb-2">Editor's Note</h3>
-              <p className="text-sm text-gray-600 leading-relaxed font-light">{currentProduct.description}</p>
+            <div className="pt-4 border-t border-gray-100 mt-6">
+               <h3 className="text-xs font-bold uppercase tracking-widest text-[#1C1917] mb-2">Editor's Note</h3>
+               <p className="text-sm text-gray-500 leading-relaxed">{currentProduct.description}</p>
             </div>
             
           </div>

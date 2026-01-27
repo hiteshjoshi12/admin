@@ -2,7 +2,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail");
+const { sendEmail } = require('../utils/sendEmail');
 
 // --- HELPER: GENERATE TOKEN ---
 const generateToken = (id) => {
@@ -291,8 +291,6 @@ const deleteUser = async (req, res) => {
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
-  // REMOVED CONSOLE LOGS FOR SECURITY IN PRODUCTION
-
   try {
     const user = await User.findOne({ email });
 
@@ -306,14 +304,23 @@ const forgotPassword = async (req, res) => {
 
     await user.save({ validateBeforeSave: false });
 
+    // Use Environment Variable for the Frontend URL (Best Practice)
+    const frontendUrl = process.env.FRONTEND_URL_PROD || 'http://localhost:5173';
+    
+    // Construct the Reset URL
     const resetUrl = `${frontendUrl}/resetpassword/${resetToken}`;
-    const message = `You have requested a password reset. Please go to this link to create a new password: \n\n ${resetUrl}`;
+
+    // Clean message (No URL here, we pass it separately for the button)
+    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please click the button below to set a new password.`;
 
     try {
       await sendEmail({
         email: user.email,
         subject: "Password Reset Request",
-        message,
+        title: "Reset Your Password",  // <--- New Title Header
+        message,                       // <--- Clean text message
+        url: resetUrl,                 // <--- Pass URL for the Button
+        buttonText: "Reset Password",  // <--- Button Label
       });
 
       res.status(200).json({ success: true, data: "Email sent" });

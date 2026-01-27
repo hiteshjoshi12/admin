@@ -80,19 +80,19 @@ export default function BestSellers() {
       <div className="max-w-[1440px] mx-auto relative z-10">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#C5A059] mb-2 block">
-              Curated Favorites
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-[#1C1917] leading-none">
-              The Best Sellers
-            </h2>
-          </div>
-          <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-[#C5A059] hover:border-[#C5A059] transition-colors mt-6 md:mt-0">
-            Shop All Icons <ArrowUpRight className="w-4 h-4" />
-          </Link>
-        </div>
+       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16">
+  <div>
+    <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#C5A059] mb-2 block">
+      Curated Favorites
+    </span>
+    <h2 className="text-4xl md:text-5xl font-serif text-[#1C1917] leading-none">
+      The Best Sellers
+    </h2>
+  </div>
+  <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-[#C5A059] hover:border-[#C5A059] transition-colors mt-6 md:mt-0">
+    Shop All Icons <ArrowUpRight className="w-4 h-4" />
+  </Link>
+</div>
 
         {/* The Geometric Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">

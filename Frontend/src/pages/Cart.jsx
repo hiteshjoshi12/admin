@@ -76,7 +76,7 @@ export default function Cart() {
   };
 
   const discountVal = appliedCoupon ? appliedCoupon.discountAmount : 0;
-  const shipping = totalAmount > 2000 ? 0 : 150;
+  const shipping = totalAmount > 5000 ? 0 : 150;
   const finalTotal = totalAmount - discountVal + shipping;
 
   if (cartItems.length === 0) {

@@ -48,7 +48,7 @@ export default function Checkout() {
 
   // --- CALCULATIONS (With Breakdown) ---
   const itemsPrice = totalAmount; // Base price of items
-  const shippingCost = totalAmount > 2000 ? 0 : 150;
+  const shippingCost = totalAmount > 5000 ? 0 : 150;
   const taxPrice = Math.round(itemsPrice * 0.05); // 5% Tax
   const discountAmount = coupon ? coupon.discountAmount : 0; // Discount Value
   
@@ -90,7 +90,7 @@ export default function Checkout() {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
         amount: initData.amount,
         currency: initData.currency,
-        name: "Luxe Store",
+        name: "Beads & Bloom",
         description: "Secure Payment",
         order_id: initData.id,
         
