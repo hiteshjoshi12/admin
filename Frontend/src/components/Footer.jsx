@@ -45,7 +45,7 @@ export default function Footer() {
           <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Support</h4>
           <ul className="space-y-4 text-sm text-gray-400">
             {/* LINKED THESE TO /terms PAGE */}
-            <li><Link to="/terms" className="hover:text-white transition-colors">Track Order</Link></li>
+            <li><Link to="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
             <li><Link to="/terms" className="hover:text-white transition-colors">Shipping & Returns</Link></li>
             <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide</Link></li>
             <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>

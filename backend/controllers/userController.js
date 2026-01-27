@@ -129,11 +129,11 @@ const authUser = async (req, res) => {
 // ADDRESS MANAGEMENT CONTROLLERS
 // --------------------------------------------------------------------------
 
-// @desc    Save User Address
+/// @desc    Save User Address
 // @route   POST /api/users/profile/address
-// @access  Private
 const saveAddress = async (req, res) => {
-  const { address, city, postalCode, phoneNumber, country } = req.body;
+  // ADD 'state' to the destructuring
+  const { address, city, state, postalCode, phoneNumber, country } = req.body; 
 
   const user = await User.findById(req.user._id);
 
@@ -143,6 +143,7 @@ const saveAddress = async (req, res) => {
     const newAddress = {
       address,
       city,
+      state, // <--- Save State here
       postalCode,
       country,
       phoneNumber,
@@ -171,7 +172,7 @@ const saveAddress = async (req, res) => {
 // @route   PUT /api/users/profile/address/:id
 // @access  Private
 const updateAddress = async (req, res) => {
-  const { address, city, postalCode, phoneNumber, country, isPrimary } = req.body;
+  const { address, city, state, postalCode, phoneNumber, country, isPrimary } = req.body;
   const addressId = req.params.id;
 
   const user = await User.findById(req.user._id);
@@ -186,6 +187,10 @@ const updateAddress = async (req, res) => {
 
       addressToUpdate.address = address || addressToUpdate.address;
       addressToUpdate.city = city || addressToUpdate.city;
+      
+      // ✅ ADD THIS LINE (Critical for Shiprocket):
+      addressToUpdate.state = state || addressToUpdate.state; 
+      
       addressToUpdate.postalCode = postalCode || addressToUpdate.postalCode;
       addressToUpdate.phoneNumber = phoneNumber || addressToUpdate.phoneNumber;
       addressToUpdate.country = country || addressToUpdate.country;

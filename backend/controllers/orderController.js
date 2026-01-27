@@ -222,6 +222,41 @@ const updateOrderToDelivered = async (req, res) => {
   }
 };
 
+// @desc    Track Order Publicly (No Login Required)
+// @route   POST /api/orders/track
+// @access  Public
+const trackOrderPublic = async (req, res) => {
+  const { orderId, email } = req.body;
+
+  try {
+    const order = await Order.findById(orderId).populate('user', 'name email');
+
+    // SAFETY CHECK: Use optional chaining (?.) in case the User account was deleted
+    // We check if order exists AND user exists AND email matches
+    if (order && order.user && order.user.email.toLowerCase() === email.toLowerCase().trim()) {
+      res.json({
+        _id: order._id,
+        createdAt: order.createdAt,
+        orderStatus: order.orderStatus,
+        isPaid: order.isPaid,
+        isDelivered: order.isDelivered,
+        deliveredAt: order.deliveredAt,
+        awbCode: order.awbCode, 
+        courierName: "Shiprocket",
+        orderItems: order.orderItems, 
+        totalPrice: order.totalPrice
+      });
+    } else {
+      res.status(404).json({ message: 'Order details not found. Please check your Order ID and Email.' });
+    }
+  } catch (error) {
+    console.error(error); // Helpful for debugging
+    res.status(404).json({ message: 'Order details not found.' });
+  }
+};
+
+
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -229,4 +264,5 @@ module.exports = {
   updateOrderToDelivered,
   getMyOrders,
   getOrders,
+  trackOrderPublic
 };

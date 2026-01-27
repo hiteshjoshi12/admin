@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Filter,
@@ -15,6 +15,7 @@ import { fetchProducts } from "../redux/productSlice";
 
 export default function Shop() {
   const dispatch = useDispatch();
+  const topRef = useRef(null); // Ref for scrolling
 
   // Redux State
   const {
@@ -38,8 +39,7 @@ export default function Shop() {
 
   // --- THE TRIGGER ---
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
+    // Fetch Data
     dispatch(
       fetchProducts({
         pageNumber: currentPage,
@@ -47,9 +47,20 @@ export default function Shop() {
         size: filters.size,
         priceRange: filters.priceRange,
         sort: sortOption,
-      }),
+      })
     );
   }, [dispatch, currentPage, filters, sortOption]);
+
+  // --- SCROLL HANDLER ---
+  useEffect(() => {
+    // Scroll to top whenever products update
+    // Use 'smooth' for pagination, 'auto' for filters (instant feel)
+    const scrollBehavior = currentPage > 1 ? 'smooth' : 'auto';
+    if(topRef.current) {
+        topRef.current.scrollIntoView({ behavior: scrollBehavior });
+    }
+  }, [products, currentPage]);
+
 
   // --- HANDLERS ---
   const handlePageChange = (newPage) => {
@@ -59,7 +70,7 @@ export default function Shop() {
   };
 
   const toggleFilter = (type, value) => {
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to page 1 on filter change
     setFilters((prev) => {
       const current = prev[type];
       if (Array.isArray(current)) {
@@ -84,7 +95,7 @@ export default function Shop() {
     setSortOption(e.target.value);
   };
 
-  // --- RENDER HELPERS ---
+  // --- LOADING / ERROR STATES ---
   if (loading && products.length === 0)
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -106,7 +117,7 @@ export default function Shop() {
     );
 
   return (
-    <div className="bg-[#F9F8F6] min-h-screen pt-20">
+    <div className="bg-[#F9F8F6] min-h-screen pt-20" ref={topRef}>
       {/* HEADER */}
       <div className="bg-white border-b border-gray-100 py-12 px-6 text-center">
         <h1 className="text-4xl md:text-5xl font-serif text-[#1C1917] mb-3">
@@ -141,6 +152,7 @@ export default function Shop() {
               <option value="newest">Newest First</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
+              <option value="best-selling">Best Sellers</option>
             </select>
             <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none" />
           </div>
@@ -210,14 +222,20 @@ export default function Shop() {
 
       {/* MOBILE FILTER DRAWER */}
       <div
-        className={`fixed inset-0 z-50 flex lg:hidden ${isMobileFilterOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        className={`fixed inset-0 z-50 flex lg:hidden ${
+          isMobileFilterOpen ? "pointer-events-auto" : "pointer-events-none"
+        }`}
       >
         <div
-          className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${isMobileFilterOpen ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+            isMobileFilterOpen ? "opacity-100" : "opacity-0"
+          }`}
           onClick={() => setIsMobileFilterOpen(false)}
         />
         <div
-          className={`relative bg-white w-4/5 max-w-sm h-full shadow-2xl flex flex-col transition-transform duration-300 ${isMobileFilterOpen ? "translate-x-0" : "-translate-x-full"}`}
+          className={`relative bg-white w-4/5 max-w-sm h-full shadow-2xl flex flex-col transition-transform duration-300 ${
+            isMobileFilterOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         >
           <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <h2 className="font-serif text-xl">Filters</h2>
@@ -248,7 +266,7 @@ export default function Shop() {
   );
 }
 
-// --- FIXED: REUSABLE FILTER COMPONENT ---
+// --- REUSABLE FILTER COMPONENT ---
 function FilterContent({ filters, toggleFilter, clearFilters }) {
   return (
     <>
@@ -261,14 +279,17 @@ function FilterContent({ filters, toggleFilter, clearFilters }) {
           "Party",
           "Casual",
         ].map((cat) => (
-          // ADDED onClick HERE
-          <label
+          <button
             key={cat}
             onClick={() => toggleFilter("category", cat)}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-3 w-full text-left group"
           >
             <div
-              className={`w-4 h-4 border flex items-center justify-center transition-all ${filters.category.includes(cat) ? "bg-[#1C1917] border-[#1C1917]" : "border-gray-300 group-hover:border-[#FF2865]"}`}
+              className={`w-4 h-4 border flex items-center justify-center transition-all ${
+                filters.category.includes(cat)
+                  ? "bg-[#1C1917] border-[#1C1917]"
+                  : "border-gray-300 group-hover:border-[#FF2865]"
+              }`}
             >
               {filters.category.includes(cat) && (
                 <span className="w-2 h-2 bg-white rounded-sm" />
@@ -277,7 +298,7 @@ function FilterContent({ filters, toggleFilter, clearFilters }) {
             <span className="text-sm text-gray-600 group-hover:text-[#1C1917]">
               {cat}
             </span>
-          </label>
+          </button>
         ))}
       </FilterGroup>
 
@@ -287,14 +308,17 @@ function FilterContent({ filters, toggleFilter, clearFilters }) {
           { label: "₹2,500 - ₹5,000", value: "2500-5000" },
           { label: "Above ₹5,000", value: "above-5000" },
         ].map((price) => (
-          // ADDED onClick HERE
-          <label
+          <button
             key={price.value}
             onClick={() => toggleFilter("priceRange", price.value)}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-3 w-full text-left group"
           >
             <div
-              className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${filters.priceRange === price.value ? "border-[#FF2865]" : "border-gray-300"}`}
+              className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+                filters.priceRange === price.value
+                  ? "border-[#FF2865]"
+                  : "border-gray-300"
+              }`}
             >
               {filters.priceRange === price.value && (
                 <div className="w-2 h-2 rounded-full bg-[#FF2865]" />
@@ -303,7 +327,7 @@ function FilterContent({ filters, toggleFilter, clearFilters }) {
             <span className="text-sm text-gray-600 group-hover:text-[#1C1917]">
               {price.label}
             </span>
-          </label>
+          </button>
         ))}
       </FilterGroup>
 
@@ -344,8 +368,7 @@ function FilterGroup({ title, children }) {
   );
 }
 
-// --- FIXED: PRODUCT CARD WITH HOVER EFFECT ---
-// --- FIXED: PRODUCT CARD WITH DISCOUNT BADGE ---
+// --- PRODUCT CARD COMPONENT ---
 function ProductCard({ product }) {
   // 1. Get Raw URLs from Data
   const rawMainImage = product.image || "";
@@ -361,14 +384,14 @@ function ProductCard({ product }) {
   // 3. LOGIC
   const isOutOfStock = product.totalStock === 0;
 
-  // 1. Calculate Discount
+  // 4. Calculate Discount
   // We ensure originalPrice exists AND is strictly greater than the current price
   const hasDiscount =
     product.originalPrice > 0 && product.originalPrice > product.price;
 
   const discountPercent = hasDiscount
     ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100,
+        ((product.originalPrice - product.price) / product.originalPrice) * 100
       )
     : 0;
 

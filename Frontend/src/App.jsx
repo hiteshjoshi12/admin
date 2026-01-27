@@ -159,6 +159,7 @@ const MyOrders = lazy(() => import('./pages/MyOrders'));
 const OrderDetails = lazy(() => import('./pages/OrderDetails'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const TrackOrder = lazy(() => import('./pages/TrackOrder'));
 
 // 3. Lazy Load Admin Pages
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
@@ -236,6 +237,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/resetpassword/:token" element={<ResetPassword />} />
+            <Route path="/track-order" element={<TrackOrder />} />
             
             {/* Static Pages */}
             <Route path="/about" element={<About />} />

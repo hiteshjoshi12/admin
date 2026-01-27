@@ -6,7 +6,8 @@ const {
   updateOrderToPaid, 
   updateOrderToDelivered, 
   getMyOrders, 
-  getOrders 
+  getOrders, 
+  trackOrderPublic
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -21,6 +22,10 @@ router.route('/')
 // GET: Get Logged In User's Orders
 router.route('/myorders').get(protect, getMyOrders);
 
+
+// Public Tracking Route
+router.post('/track', trackOrderPublic);
+
 // Route: /api/orders/:id
 // GET: Get Single Order Details
 router.route('/:id').get(protect, getOrderById);
@@ -32,5 +37,7 @@ router.route('/:id/pay').put(protect, updateOrderToPaid);
 // Route: /api/orders/:id/deliver
 // PUT: Mark Order as Delivered (Admin Only)
 router.route('/:id/deliver').put(protect, admin, updateOrderToDelivered);
+
+router.route('/:id').get(protect, getOrderById);
 
 module.exports = router;

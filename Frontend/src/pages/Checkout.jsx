@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Check, CreditCard, Smartphone, ArrowLeft, 
-  ArrowRight, ShieldCheck, MapPin, Lock 
+  ArrowRight, ShieldCheck, MapPin, Lock, AlertCircle 
 } from 'lucide-react';
 
 // REDUX IMPORTS
@@ -11,13 +11,19 @@ import { saveShippingAddress, savePaymentMethod, clearCart } from '../redux/cart
 import { createOrder, resetOrder } from '../redux/orderSlice';
 import { saveAddressToProfile } from '../redux/authSlice'; 
 
+// CONSTANTS
+const INDIAN_STATES = [
+  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
+  "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli", "Daman and Diu", "Delhi", "Goa", 
+  "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka", 
+  "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", 
+  "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
+
 export default function Checkout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   // --- REDUX STATE ---
   const { userInfo } = useSelector((state) => state.auth);
@@ -28,26 +34,38 @@ export default function Checkout() {
   const [step, setStep] = useState(1); 
   const [paymentType, setPaymentType] = useState('upi');
 
-  // Form State - ADDED 'state'
+  // Form State
   const [formData, setFormData] = useState({
     address: shippingAddress?.address || '',
     city: shippingAddress?.city || '',
-    state: shippingAddress?.state || '', // <--- NEW FIELD
+    state: shippingAddress?.state || '', 
     postalCode: shippingAddress?.postalCode || '',
     phoneNumber: shippingAddress?.phoneNumber || '',
     country: 'India'
   });
+
+  // --- 1. SAFETY CHECK: EMPTY CART ---
+  useEffect(() => {
+    if (cartItems.length === 0 && step !== 3) {
+        navigate('/cart');
+    }
+  }, [cartItems, navigate, step]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
 
   // --- AUTO-FILL LOGIC ---
   useEffect(() => {
     if (userInfo && userInfo.addresses && userInfo.addresses.length > 0) {
        const primaryAddress = userInfo.addresses.find(addr => addr.isPrimary) || userInfo.addresses[0];
        
+       // Only autofill if Redux shipping address is empty
        if (primaryAddress && !shippingAddress.address) {
          setFormData({
            address: primaryAddress.address,
            city: primaryAddress.city,
-           state: primaryAddress.state || '', // <--- NEW FIELD
+           state: primaryAddress.state || '', 
            postalCode: primaryAddress.postalCode,
            phoneNumber: primaryAddress.phoneNumber,
            country: 'India'
@@ -62,7 +80,7 @@ export default function Checkout() {
   const taxPrice = Math.round(itemsPrice * 0.05);
   const finalTotal = itemsPrice + shippingCost + taxPrice;
 
-  // --- EFFECTS ---
+  // --- ORDER SUCCESS EFFECT ---
   useEffect(() => {
     if (success) {
       dispatch(clearCart());
@@ -71,6 +89,7 @@ export default function Checkout() {
     }
   }, [success, dispatch]);
 
+  // Reset order state on unmount
   useEffect(() => {
     return () => {
       dispatch(resetOrder());
@@ -86,12 +105,12 @@ export default function Checkout() {
     e.preventDefault();
     dispatch(saveShippingAddress(formData));
 
+    // Save to profile if user has no addresses yet
     if (userInfo && (!userInfo.addresses || userInfo.addresses.length === 0)) {
        dispatch(saveAddressToProfile(formData));
     }
 
     setStep(2);
-    window.scrollTo(0, 0);
   };
 
   const handlePlaceOrder = () => {
@@ -106,29 +125,51 @@ export default function Checkout() {
         size: item.size,
         product: item.id || item.productId || item._id 
       })),
-      shippingAddress: formData, // Contains state now
+      shippingAddress: formData, 
       paymentMethod: paymentType,
-      itemsPrice, // Matches Backend Singular
+      itemsPrice, 
       shippingPrice: shippingCost,
       taxPrice,
       totalPrice: finalTotal,
     };
 
+    // NOTE: If paymentType is 'upi', Razorpay logic usually happens here or in the Action
     dispatch(createOrder(orderData));
   };
 
+ 
   // --- STEP 3: SUCCESS SCREEN ---
   if (step === 3) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center text-center px-6 animate-fade-up">
+        
         <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6">
           <Check className="w-10 h-10 text-green-500" />
         </div>
+        
         <span className="text-[#FF2865] text-xs font-bold uppercase tracking-[0.2em] mb-2">Order Confirmed</span>
         <h1 className="text-4xl font-serif text-[#1C1917] mb-4">Thank You, {userInfo?.name}!</h1>
-        <p className="text-gray-500 max-w-md mb-8">
-          Your order <strong>#{order?._id?.substring(0, 10)}</strong> has been placed successfully. 
+        
+        <p className="text-gray-500 max-w-md mb-6">
+          Your order has been placed successfully. Please save your Order ID to track your shipment.
         </p>
+
+        {/* --- ORDER ID BOX (New) --- */}
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-8 flex items-center gap-3">
+          <div className="text-left">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Order ID</p>
+            <p className="font-mono text-sm sm:text-base font-bold text-[#1C1917] select-all">
+              {order?._id} 
+            </p>
+          </div>
+          <button 
+            onClick={() => navigator.clipboard.writeText(order?._id)}
+            className="bg-white border border-gray-200 p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500"
+            title="Copy Order ID"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
         
         <div className="bg-[#F9F8F6] p-6 rounded-2xl w-full max-w-md mb-8 text-left border border-gray-100">
            <div className="flex justify-between mb-2">
@@ -141,12 +182,21 @@ export default function Checkout() {
            </div>
         </div>
 
-        <Link 
-          to="/myorders" 
-          className="bg-[#1C1917] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-[#FF2865] transition-all shadow-lg"
-        >
-          View My Orders
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+            <Link 
+            to="/myorders" 
+            className="flex-1 bg-[#1C1917] text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-[#FF2865] transition-all shadow-lg text-center"
+            >
+            View My Orders
+            </Link>
+            <Link 
+            to="/track-order" 
+            className="flex-1 bg-white border border-gray-200 text-[#1C1917] px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition-all text-center"
+            >
+            Track Order
+            </Link>
+        </div>
+
       </div>
     );
   }
@@ -206,8 +256,24 @@ export default function Checkout() {
                       </div>
                        <div className="space-y-2">
                         <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500">State</label>
-                        {/* You can change this to a dropdown of Indian states later */}
-                        <input type="text" name="state" required value={formData.state} onChange={handleInputChange} className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none" placeholder="e.g. Haryana" />
+                        {/* REPLACED TEXT INPUT WITH DROPDOWN */}
+                        <div className="relative">
+                          <select 
+                            name="state" 
+                            required 
+                            value={formData.state} 
+                            onChange={handleInputChange} 
+                            className="w-full bg-[#F9F8F6] border-0 rounded-xl px-5 py-3 focus:ring-2 focus:ring-[#FF2865]/20 outline-none appearance-none cursor-pointer"
+                          >
+                            <option value="">Select State</option>
+                            {INDIAN_STATES.map((state) => (
+                              <option key={state} value={state}>{state}</option>
+                            ))}
+                          </select>
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -238,11 +304,10 @@ export default function Checkout() {
             {/* STEP 2: PAYMENT OPTIONS */}
             {step === 2 && (
               <div className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-gray-100 animate-fade-up">
-                 {/* ERROR MESSAGE DISPLAY */}
                  {error && (
-                    <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-6 text-sm text-center">
-                      Order Failed: {error}
-                    </div>
+                   <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-6 text-sm text-center flex items-center justify-center gap-2">
+                     <AlertCircle className="w-4 h-4" /> {error}
+                   </div>
                  )}
 
                  <div className="flex items-center gap-3 mb-8">
@@ -260,7 +325,7 @@ export default function Checkout() {
                     <div className="flex-grow">
                       <div className="flex items-center gap-2">
                         <Smartphone className="w-4 h-4 text-gray-600" />
-                        <span className="font-bold text-[#1C1917]">UPI (GPay / PhonePe)</span>
+                        <span className="font-bold text-[#1C1917]">UPI (Razorpay Secure)</span>
                       </div>
                     </div>
                   </div>
@@ -299,7 +364,7 @@ export default function Checkout() {
               
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2 scrollbar-thin">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4">
+                  <div key={`${item.id}-${item.size}`} className="flex gap-4">
                     <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                       <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
                     </div>
