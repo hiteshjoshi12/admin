@@ -24,7 +24,7 @@ const orderSchema = mongoose.Schema({
     address: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String, required: true },
-    state: { type: String, required: true }, // <--- REQUIRED for Shiprocket
+    state: { type: String, required: true }, // Required for Shiprocket
     country: { type: String, required: true },
     phoneNumber: { type: String, required: true },
   },
@@ -32,17 +32,18 @@ const orderSchema = mongoose.Schema({
     type: String,
     required: true, 
   },
+  
   // --- MONEY ---
   itemPrice: { type: Number, required: true, default: 0.0 },
   taxPrice: { type: Number, required: true, default: 0.0 },
   shippingPrice: { type: Number, required: true, default: 0.0 },
   totalPrice: { type: Number, required: true, default: 0.0 },
   
-  // --- PAYMENT STATUS ---
+  // --- PAYMENT STATUS (Razorpay) ---
   isPaid: { type: Boolean, required: true, default: false },
   paidAt: { type: Date },
   
-  // Razorpay Specifics (For verification)
+  // Security Fields for Razorpay Verification
   razorpayOrderId: { type: String }, 
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
@@ -51,16 +52,20 @@ const orderSchema = mongoose.Schema({
   orderStatus: { 
     type: String, 
     required: true, 
-    default: 'Processing', // Processing -> Ready to Ship -> Shipped -> Delivered
+    // ENUM: Prevents typos like "shipped" vs "Shipped"
+    enum: ['Processing', 'Ready to Ship', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'],
+    default: 'Processing', 
   },
+  
   isDelivered: { type: Boolean, required: true, default: false },
   deliveredAt: { type: Date },
 
   // --- SHIPROCKET DATA ---
-  shiprocketOrderId: { type: String }, 
-  shiprocketShipmentId: { type: String },
-  awbCode: { type: String }, 
-
+  shiprocketOrderId: { type: String },      // Shiprocket's internal ID
+  shiprocketShipmentId: { type: String },   // Needed to cancel/track shipments
+  awbCode: { type: String },                // The Tracking Number (e.g. 789456123)
+  courierCompanyName: { type: String },     // <--- NEW: e.g. "Delhivery Surface", "BlueDart"
+  
 }, {
   timestamps: true,
 });

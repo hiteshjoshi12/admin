@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   Package, MapPin, CreditCard, Calendar, 
-  ArrowLeft, CheckCircle, XCircle, Clock, Truck 
+  ArrowLeft, CheckCircle, Clock, Truck, User 
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import config from '../config/config';
+import { API_BASE_URL } from '../util/config';
 
 export default function OrderDetails() {
   const { id } = useParams();
@@ -20,11 +20,10 @@ export default function OrderDetails() {
 
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`${config.API_BASE_URL}/api/orders/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
-          credentials: 'include',
         });
 
         if (!res.ok) throw new Error('Order not found');
@@ -43,100 +42,130 @@ export default function OrderDetails() {
     }
   }, [id, userInfo]);
 
+  // --- HELPER: CALCULATE STEP ---
+  const getStepStatus = () => {
+    if (!order) return 0;
+    const status = order.orderStatus;
+    if (order.isDelivered) return 4;
+    if (status === 'Out for Delivery') return 3;
+    if (status === 'Ready to Ship' || status === 'Shipped' || order.awbCode) return 2;
+    if (status === 'Processing') return 1;
+    return 0; // Placed
+  };
+
+  const activeStep = getStepStatus();
+
+  // --- HELPER: SAFE PRICE ---
+  const safePrice = (price) => {
+    return price ? price.toLocaleString() : '0';
+  };
+
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center pt-20">
+    <div className="min-h-screen flex items-center justify-center pt-20 bg-[#F9F8F6]">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1C1917]"></div>
     </div>
   );
 
   if (error || !order) return (
-    <div className="min-h-screen flex flex-col items-center justify-center pt-20">
+    <div className="min-h-screen flex flex-col items-center justify-center pt-20 bg-[#F9F8F6]">
       <h2 className="text-2xl font-serif text-red-500 mb-4">Error Loading Order</h2>
       <p className="text-gray-500 mb-6">{error || "Order data is missing"}</p>
       <Link to="/myorders" className="underline hover:text-[#FF2865]">Back to My Orders</Link>
     </div>
   );
 
-  // --- SAFE PRICE HELPERS ---
-  const safePrice = (price) => {
-    return price ? price.toLocaleString() : '0';
-  };
-
   return (
-    <div className="bg-[#F9F8F6] min-h-screen pt-30 pb-12">
-      <div className="max-w-4xl mx-auto px-6">
+    <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12">
+      <div className="max-w-5xl mx-auto px-4 md:px-6">
         
-        {/* Header */}
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <Link to="/myorders" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#1C1917] mb-2 transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back to Orders
             </Link>
-            <h1 className="text-2xl md:text-3xl font-serif text-[#1C1917]">
-              Order <span className="text-gray-400">#{order._id}</span>
+            <h1 className="text-2xl md:text-3xl font-serif text-[#1C1917] flex items-center gap-3">
+              Order <span className="text-gray-400 font-mono text-xl">#{order._id.slice(-6).toUpperCase()}</span>
             </h1>
           </div>
           <div className="text-right">
              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Placed On</p>
-             <p className="text-sm font-medium text-[#1C1917]">
-               {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
+             <p className="text-sm font-medium text-[#1C1917] flex items-center gap-2 justify-end">
+               <Calendar className="w-4 h-4" />
+               {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}
              </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* LEFT COLUMN */}
+          {/* LEFT COLUMN (Timeline & Items) */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Status Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               {/* Delivery Status */}
-               <div className={`p-6 rounded-2xl border flex items-start gap-4 ${order.isDelivered ? 'bg-green-50 border-green-100' : 'bg-white border-gray-100'}`}>
-                 <div className={`p-3 rounded-full ${order.isDelivered ? 'bg-green-100 text-green-600' : 'bg-gray-50 text-gray-400'}`}>
-                   {order.isDelivered ? <CheckCircle className="w-6 h-6" /> : <Truck className="w-6 h-6" />}
-                 </div>
-                 <div>
-                   <h3 className="font-bold text-[#1C1917] mb-1">Delivery Status</h3>
-                   {order.isDelivered ? (
-                     <div>
-                       <p className="text-green-700 text-sm font-medium">Delivered</p>
-                     </div>
-                   ) : (
-                     <p className="text-gray-500 text-sm">On its way</p>
-                   )}
-                 </div>
+            {/* 1. TRACKING TIMELINE CARD */}
+            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+               <div className="flex justify-between items-start mb-8 border-b border-gray-100 pb-4">
+                 <h3 className="font-bold text-[#1C1917] flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-gray-400" /> Order Tracking
+                 </h3>
+                 {order.awbCode && (
+                   <div className="text-right">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                        {order.courierCompanyName || 'Courier'} Tracking (AWB)
+                      </p>
+                      <p className="font-mono text-blue-600 font-bold">{order.awbCode}</p>
+                   </div>
+                 )}
                </div>
 
-               {/* Payment Status */}
-               <div className={`p-6 rounded-2xl border flex items-start gap-4 ${order.isPaid ? 'bg-green-50 border-green-100' : 'bg-yellow-50 border-yellow-100'}`}>
-                 <div className={`p-3 rounded-full ${order.isPaid ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                   {order.isPaid ? <CheckCircle className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
-                 </div>
-                 <div>
-                   <h3 className="font-bold text-[#1C1917] mb-1">Payment Status</h3>
-                   {order.isPaid ? (
-                     <div>
-                       <p className="text-green-700 text-sm font-medium">Paid</p>
-                     </div>
-                   ) : (
-                     <p className="text-yellow-700 text-sm font-medium">Pending</p>
-                   )}
-                 </div>
+               <div className="relative">
+                  {/* Connector Line */}
+                  <div className="absolute top-0 left-6 h-full w-0.5 bg-gray-100 md:h-0.5 md:w-full md:top-6 md:left-0 z-0"></div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+                    <TimelineStep 
+                        icon={Clock} 
+                        label="Placed" 
+                        date={new Date(order.createdAt).toLocaleDateString()} 
+                        isActive={activeStep >= 0}
+                        isCompleted={activeStep > 0} 
+                    />
+                    <TimelineStep 
+                        icon={Package} 
+                        label="Processing" 
+                        isActive={activeStep >= 1}
+                        isCompleted={activeStep > 1}
+                    />
+                    <TimelineStep 
+                        icon={Truck} 
+                        label="Shipped" 
+                        subLabel={order.awbCode ? 'In Transit' : ''}
+                        link={order.awbCode ? `https://shiprocket.co/tracking/${order.awbCode}` : null}
+                        isActive={activeStep >= 2}
+                        isCompleted={activeStep > 2}
+                    />
+                    <TimelineStep 
+                        icon={CheckCircle} 
+                        label="Delivered" 
+                        date={order.isDelivered ? new Date(order.deliveredAt).toLocaleDateString() : null}
+                        isActive={activeStep >= 4}
+                        isCompleted={activeStep >= 4}
+                    />
+                  </div>
                </div>
             </div>
 
-            {/* Items */}
+            {/* 2. ORDER ITEMS LIST */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
                 <h3 className="font-bold text-[#1C1917] flex items-center gap-2">
-                  <Package className="w-5 h-5 text-gray-400" /> Order Items
+                  <Package className="w-5 h-5 text-gray-400" /> Items in Order
                 </h3>
               </div>
               <div className="divide-y divide-gray-50">
                 {order.orderItems?.map((item, index) => (
                   <div key={index} className="p-6 flex gap-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-grow">
@@ -153,31 +182,15 @@ export default function OrderDetails() {
                 ))}
               </div>
             </div>
-
           </div>
 
-          {/* RIGHT COLUMN */}
+          {/* RIGHT COLUMN (Summary & Address) */}
           <div className="space-y-6">
             
-            {/* Address */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="font-bold text-[#1C1917] mb-4 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-gray-400" /> Shipping Address
-              </h3>
-              {order.shippingAddress ? (
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {order.shippingAddress.address}<br />
-                  {order.shippingAddress.city}, {order.shippingAddress.postalCode}<br />
-                  {order.shippingAddress.country}<br />
-                  <span className="text-gray-400 text-xs mt-2 block">Phone: {order.shippingAddress.phoneNumber}</span>
-                </p>
-              ) : <p className="text-sm text-gray-400">No address details</p>}
-            </div>
-
-            {/* Summary */}
+            {/* PAYMENT SUMMARY */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                <h3 className="font-bold text-[#1C1917] mb-4 flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-gray-400" /> Payment Summary
+                <CreditCard className="w-5 h-5 text-gray-400" /> Payment
               </h3>
               
               <div className="space-y-3 text-sm border-b border-gray-50 pb-4 mb-4">
@@ -185,9 +198,18 @@ export default function OrderDetails() {
                   <span>Method</span>
                   <span className="font-bold uppercase">{order.paymentMethod || 'N/A'}</span>
                 </div>
+                
+                {/* Payment Status Badge */}
+                <div className="flex justify-between items-center py-2">
+                    <span>Status</span>
+                    <span className={`text-xs px-2 py-1 rounded-full border ${order.isPaid ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>
+                        {order.isPaid ? 'PAID' : 'PENDING'}
+                    </span>
+                </div>
+
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>₹{safePrice(order.itemsPrice)}</span>
+                  <span>₹{safePrice(order.itemsPrice || order.itemPrice)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
@@ -205,7 +227,28 @@ export default function OrderDetails() {
               </div>
             </div>
 
-            {/* Need Help? */}
+            {/* SHIPPING ADDRESS */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              <h3 className="font-bold text-[#1C1917] mb-4 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-gray-400" /> Delivery To
+              </h3>
+              {order.shippingAddress ? (
+                <div className="text-sm text-gray-600 leading-relaxed">
+                  <p className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                    <User className="w-3 h-3" /> {order.user?.name || 'Guest'}
+                  </p>
+                  <p>{order.shippingAddress.address}</p>
+                  <p>{order.shippingAddress.city}, {order.shippingAddress.postalCode}</p>
+                  <p>{order.shippingAddress.state}, {order.shippingAddress.country}</p>
+                  <div className="mt-3 pt-3 border-t border-gray-50">
+                     <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Phone</p>
+                     <p className="font-medium text-[#1C1917]">{order.shippingAddress.phoneNumber}</p>
+                  </div>
+                </div>
+              ) : <p className="text-sm text-gray-400">No address details</p>}
+            </div>
+
+            {/* SUPPORT */}
             <div className="bg-[#1C1917] text-white p-6 rounded-2xl text-center">
               <h4 className="font-serif text-lg mb-2">Need Help?</h4>
               <p className="text-xs text-gray-400 mb-4">Have an issue with this order?</p>
@@ -216,6 +259,32 @@ export default function OrderDetails() {
 
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// --- TIMELINE STEP COMPONENT ---
+function TimelineStep({ icon: Icon, label, subLabel, date, isActive, isCompleted, link }) {
+  return (
+    <div className={`flex flex-row md:flex-col items-center gap-4 md:gap-3 text-left md:text-center ${isActive ? 'opacity-100' : 'opacity-40 grayscale'}`}>
+      <div 
+        className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 transition-all duration-500 relative z-10
+        ${isActive ? 'bg-[#1C1917] border-[#1C1917] text-white' : 'bg-white border-gray-200 text-gray-400'}
+        ${isCompleted ? 'bg-green-500 border-green-500 text-white' : ''}
+        `}
+      >
+        {isCompleted ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+      </div>
+      <div>
+        <p className={`font-bold text-sm ${isActive ? 'text-[#1C1917]' : 'text-gray-500'}`}>{label}</p>
+        {subLabel && <p className="text-xs text-gray-500 mt-0.5">{subLabel}</p>}
+        {date && <p className="text-xs text-gray-400 mt-0.5">{date}</p>}
+        {link && (
+            <a href={link} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-[#FF2865] underline mt-1 block hover:text-[#1C1917]">
+                Track Package
+            </a>
+        )}
       </div>
     </div>
   );

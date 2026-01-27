@@ -26,7 +26,6 @@ const addOrderItems = async (req, res) => {
 
   try {
     // 1. EXTRACT PRODUCT IDs & FETCH ALL PRODUCTS IN ONE GO
-    // This reduces DB queries from (2 * N) to just 1 read query.
     const productIds = orderItems.map((item) => item.product || item.id || item._id);
     const dbProducts = await Product.find({ _id: { $in: productIds } });
 
@@ -71,7 +70,6 @@ const addOrderItems = async (req, res) => {
     }
 
     // 3. PERSIST CHANGES TO DATABASE
-    // If we reached here, ALL items are valid. Now we save the stock updates.
     await Promise.all(productsToUpdate.map((product) => product.save()));
 
     // 4. CREATE THE ORDER
@@ -97,7 +95,6 @@ const addOrderItems = async (req, res) => {
     res.status(201).json(createdOrder);
 
   } catch (error) {
-    // If validation failed, no stock was saved, so data remains consistent.
     const status = res.statusCode === 200 ? 500 : res.statusCode;
     res.status(status).json({ message: error.message || 'Order creation failed' });
   }
@@ -121,7 +118,7 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// @desc    Update order to paid (Trigger Shiprocket)
+// @desc    Update order to paid
 // @route   PUT /api/orders/:id/pay
 // @access  Private
 const updateOrderToPaid = async (req, res) => {
@@ -140,28 +137,14 @@ const updateOrderToPaid = async (req, res) => {
         email_address: req.body.email_address,
       };
 
-      // Optional: Save specific Razorpay fields if provided
+      // Save specific Razorpay fields if provided
       if (req.body.razorpayOrderId) order.razorpayOrderId = req.body.razorpayOrderId;
       if (req.body.razorpayPaymentId) order.razorpayPaymentId = req.body.razorpayPaymentId;
       if (req.body.razorpaySignature) order.razorpaySignature = req.body.razorpaySignature;
 
-      // --- SHIPROCKET INTEGRATION ---
-      try {
-        console.log(`Syncing Order ${order._id} with Shiprocket...`);
-        const shippingData = await createShiprocketOrder(order);
-        
-        if (shippingData) {
-          order.shiprocketOrderId = shippingData.shiprocketOrderId;
-          order.shiprocketShipmentId = shippingData.shiprocketShipmentId;
-          order.awbCode = shippingData.awbCode;
-          order.orderStatus = "Ready to Ship";
-          console.log("Shiprocket Sync Successful");
-        }
-      } catch (shipError) {
-        // Log error but DO NOT fail the request. The user has paid money; we must record that.
-        // Admin can manually sync shipping later.
-        console.error("Shiprocket Sync Failed:", shipError.message);
-      }
+      // NOTE: We do NOT auto-ship here anymore. 
+      // Admin must click "Ship via Shiprocket" in the dashboard.
+      // This is safer to prevent accidental labels.
 
       const updatedOrder = await order.save();
       res.json(updatedOrder);
@@ -170,9 +153,84 @@ const updateOrderToPaid = async (req, res) => {
       throw new Error('Order not found');
     }
   } catch (error) {
-     console.error(error);
-     res.status(500).json({ message: 'Payment update failed' });
+      console.error(error);
+      res.status(500).json({ message: 'Payment update failed' });
   }
+};
+
+// --- NEW FUNCTION: SHIP ORDER (The "Ship via Shiprocket" Button) ---
+// @desc    Generate Shiprocket Label & Update Order
+// @route   PUT /api/orders/:id/ship
+// @access  Private/Admin
+const shipOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+        res.status(404);
+        throw new Error('Order not found');
+    }
+
+    // Call your util function (We will build this util next)
+    console.log(`Generating Shiprocket Label for ${order._id}...`);
+    const shippingData = await createShiprocketOrder(order);
+    
+    if (shippingData) {
+      order.shiprocketOrderId = shippingData.shiprocketOrderId;
+      order.shiprocketShipmentId = shippingData.shiprocketShipmentId;
+      order.awbCode = shippingData.awbCode;
+      
+      // Save the courier name (e.g., "BlueDart") so frontend can show it
+      order.courierCompanyName = shippingData.courierCompanyName || "Shiprocket";
+      
+      // Update Status
+      order.orderStatus = "Ready to Ship"; 
+      
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+        res.status(400);
+        throw new Error('Shiprocket generation failed or returned no data');
+    }
+
+  } catch (error) {
+    console.error("Shipping Error:", error);
+    res.status(500).json({ message: error.message || 'Shipping failed' });
+  }
+};
+
+// --- NEW FUNCTION: MANUAL STATUS UPDATE (The Dropdown) ---
+// @desc    Manually update order status
+// @route   PUT /api/orders/:id/status
+// @access  Private/Admin
+const updateOrderStatus = async (req, res) => {
+    const { status } = req.body; // e.g., "Shipped", "Cancelled"
+  
+    try {
+      const order = await Order.findById(req.params.id);
+  
+      if (order) {
+        order.orderStatus = status;
+        
+        // Auto-sync isDelivered flag
+        if (status === 'Delivered') {
+            order.isDelivered = true;
+            order.deliveredAt = Date.now();
+        } else if (status !== 'Delivered' && order.isDelivered) {
+            // Optional: If Admin mistakenly marked delivered, unmark it
+            order.isDelivered = false;
+            order.deliveredAt = null;
+        }
+  
+        const updatedOrder = await order.save();
+        res.json(updatedOrder);
+      } else {
+        res.status(404);
+        throw new Error('Order not found');
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Status update failed' });
+    }
 };
 
 // @desc    Get logged in user orders
@@ -199,7 +257,7 @@ const getOrders = async (req, res) => {
   }
 };
 
-// @desc    Update order to delivered (Admin)
+// @desc    Update order to delivered (Legacy/Manual Button)
 // @route   PUT /api/orders/:id/deliver
 // @access  Private/Admin
 const updateOrderToDelivered = async (req, res) => {
@@ -242,7 +300,10 @@ const trackOrderPublic = async (req, res) => {
         isDelivered: order.isDelivered,
         deliveredAt: order.deliveredAt,
         awbCode: order.awbCode, 
-        courierName: "Shiprocket",
+        
+        // UPDATED: Use the stored courier name or fallback
+        courierName: order.courierCompanyName || "Shiprocket",
+        
         orderItems: order.orderItems, 
         totalPrice: order.totalPrice
       });
@@ -250,12 +311,10 @@ const trackOrderPublic = async (req, res) => {
       res.status(404).json({ message: 'Order details not found. Please check your Order ID and Email.' });
     }
   } catch (error) {
-    console.error(error); // Helpful for debugging
+    console.error(error); 
     res.status(404).json({ message: 'Order details not found.' });
   }
 };
-
-
 
 module.exports = {
   addOrderItems,
@@ -264,5 +323,7 @@ module.exports = {
   updateOrderToDelivered,
   getMyOrders,
   getOrders,
-  trackOrderPublic
+  trackOrderPublic,
+  shipOrder,         // <--- New
+  updateOrderStatus  // <--- New
 };

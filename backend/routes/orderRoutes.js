@@ -7,7 +7,9 @@ const {
   updateOrderToDelivered, 
   getMyOrders, 
   getOrders, 
-  trackOrderPublic
+  trackOrderPublic,
+  shipOrder,
+  updateOrderStatus
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -40,4 +42,13 @@ router.route('/:id/deliver').put(protect, admin, updateOrderToDelivered);
 
 router.route('/:id').get(protect, getOrderById);
 
+// Add these routes:
+router.put('/:id/ship', protect, admin, shipOrder);
+router.put('/:id/status', protect, admin, updateOrderStatus);
+
 module.exports = router;
+
+
+
+
+
