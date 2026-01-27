@@ -1,16 +1,15 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const sendEmail = require('../utils/sendEmail');
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 // --- HELPER: GENERATE TOKEN ---
-// (Normally in utils, but fine to keep here if you don't have a separate file)
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 
 // --------------------------------------------------------------------------
 // AUTHENTICATION CONTROLLERS
@@ -25,7 +24,7 @@ const registerUser = async (req, res) => {
   try {
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const user = await User.create({
@@ -36,15 +35,16 @@ const registerUser = async (req, res) => {
 
     // Merge Local Cart if exists
     if (user && localCart && localCart.length > 0) {
-      const dbCart = localCart.map(item => ({
-        productId: item.id,
+      // Map local cart items to schema structure
+      const dbCart = localCart.map((item) => ({
+        productId: item.id || item.productId, // Handle both id formats
         name: item.name,
         image: item.image,
         price: item.price,
         size: item.size,
-        quantity: item.quantity
+        quantity: item.quantity,
       }));
-      
+
       user.cart = dbCart;
       await user.save();
     }
@@ -59,7 +59,7 @@ const registerUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      res.status(400).json({ message: 'Invalid user data' });
+      res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -76,25 +76,30 @@ const authUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
-      // Merge Local Cart if exists
+      // Merge Local Cart Logic
       if (localCart && localCart.length > 0) {
         let dbCart = user.cart || [];
-        
-        localCart.forEach(localItem => {
+
+        localCart.forEach((localItem) => {
+          // Check if item exists in DB cart (matching ID and Size)
           const existingItemIndex = dbCart.findIndex(
-            dbItem => dbItem.productId.toString() === localItem.id && dbItem.size === localItem.size
+            (dbItem) =>
+              dbItem.productId.toString() === (localItem.id || localItem.productId) &&
+              dbItem.size === localItem.size
           );
 
           if (existingItemIndex > -1) {
+            // Item exists: update quantity
             dbCart[existingItemIndex].quantity += localItem.quantity;
           } else {
+            // Item new: push to array
             dbCart.push({
-              productId: localItem.id,
+              productId: localItem.id || localItem.productId,
               name: localItem.name,
               image: localItem.image,
               price: localItem.price,
               size: localItem.size,
-              quantity: localItem.quantity
+              quantity: localItem.quantity,
             });
           }
         });
@@ -110,10 +115,10 @@ const authUser = async (req, res) => {
         isAdmin: user.isAdmin,
         cart: user.cart,
         token: generateToken(user._id),
-        addresses: user.addresses, // Send addresses on login
+        addresses: user.addresses,
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -133,7 +138,6 @@ const saveAddress = async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
-    // Check if this is the first address being added
     const isFirstAddress = user.addresses.length === 0;
 
     const newAddress = {
@@ -142,7 +146,7 @@ const saveAddress = async (req, res) => {
       postalCode,
       country,
       phoneNumber,
-      isPrimary: isFirstAddress // True if first, else False
+      isPrimary: isFirstAddress,
     };
 
     user.addresses.push(newAddress);
@@ -155,11 +159,11 @@ const saveAddress = async (req, res) => {
       isAdmin: user.isAdmin,
       cart: user.cart,
       addresses: user.addresses,
-      token: req.headers.authorization.split(' ')[1] 
+      token: req.headers.authorization.split(" ")[1],
     });
   } else {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 };
 
@@ -176,9 +180,8 @@ const updateAddress = async (req, res) => {
     const addressToUpdate = user.addresses.id(addressId);
 
     if (addressToUpdate) {
-      // If setting as primary, unset previous primary
       if (isPrimary) {
-        user.addresses.forEach(addr => addr.isPrimary = false);
+        user.addresses.forEach((addr) => (addr.isPrimary = false));
       }
 
       addressToUpdate.address = address || addressToUpdate.address;
@@ -186,14 +189,13 @@ const updateAddress = async (req, res) => {
       addressToUpdate.postalCode = postalCode || addressToUpdate.postalCode;
       addressToUpdate.phoneNumber = phoneNumber || addressToUpdate.phoneNumber;
       addressToUpdate.country = country || addressToUpdate.country;
-      
-      // Only update isPrimary if it's passed in body
-      if (typeof isPrimary !== 'undefined') {
-         addressToUpdate.isPrimary = isPrimary;
+
+      if (typeof isPrimary !== "undefined") {
+        addressToUpdate.isPrimary = isPrimary;
       }
 
       await user.save();
-      
+
       res.json({
         _id: user._id,
         name: user.name,
@@ -201,15 +203,15 @@ const updateAddress = async (req, res) => {
         isAdmin: user.isAdmin,
         cart: user.cart,
         addresses: user.addresses,
-        token: req.headers.authorization.split(' ')[1]
+        token: req.headers.authorization.split(" ")[1],
       });
     } else {
       res.status(404);
-      throw new Error('Address not found');
+      throw new Error("Address not found");
     }
   } else {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 };
 
@@ -227,36 +229,35 @@ const deleteAddress = async (req, res) => {
     await user.save();
 
     res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        cart: user.cart,
-        addresses: user.addresses,
-        token: req.headers.authorization.split(' ')[1]
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      cart: user.cart,
+      addresses: user.addresses,
+      token: req.headers.authorization.split(" ")[1],
     });
   } else {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 };
 
-// ... existing imports ...
-
-// @desc    Get all users
+// @desc    Get all users (Admin)
 // @route   GET /api/users
 // @access  Private/Admin
 const getUsers = async (req, res) => {
   try {
-    // Fetch all users but DO NOT return the password field
-    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
+    const users = await User.find({})
+      .select("-password")
+      .sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-// @desc    Delete user
+// @desc    Delete user (Admin)
 // @route   DELETE /api/users/:id
 // @access  Private/Admin
 const deleteUser = async (req, res) => {
@@ -266,20 +267,18 @@ const deleteUser = async (req, res) => {
     if (user) {
       if (user.isAdmin) {
         res.status(400);
-        throw new Error('Cannot delete admin user');
+        throw new Error("Cannot delete admin user");
       }
       await user.deleteOne();
-      res.json({ message: 'User removed' });
+      res.json({ message: "User removed" });
     } else {
       res.status(404);
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 // @desc    Forgot Password
 // @route   POST /api/users/forgotpassword
@@ -287,16 +286,14 @@ const deleteUser = async (req, res) => {
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
-  console.log("Attempting to send email...");
-console.log("User:", process.env.EMAIL_USERNAME);
-console.log("Pass exists?", !!process.env.EMAIL_PASSWORD);
+  // REMOVED CONSOLE LOGS FOR SECURITY IN PRODUCTION
 
   try {
     const user = await User.findOne({ email });
 
     if (!user) {
       res.status(404);
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Get Reset Token
@@ -304,26 +301,24 @@ console.log("Pass exists?", !!process.env.EMAIL_PASSWORD);
 
     await user.save({ validateBeforeSave: false });
 
-    // Create Reset URL (Point to Frontend Route)
-    // NOTE: Make sure your frontend runs on localhost:5173 or your domain
     const resetUrl = `${frontendUrl}/resetpassword/${resetToken}`;
     const message = `You have requested a password reset. Please go to this link to create a new password: \n\n ${resetUrl}`;
 
     try {
       await sendEmail({
         email: user.email,
-        subject: 'Password Reset Request',
+        subject: "Password Reset Request",
         message,
       });
 
-      res.status(200).json({ success: true, data: 'Email sent' });
+      res.status(200).json({ success: true, data: "Email sent" });
     } catch (error) {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save({ validateBeforeSave: false });
-      
+
       res.status(500);
-      throw new Error('Email could not be sent');
+      throw new Error("Email could not be sent");
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -334,37 +329,55 @@ console.log("Pass exists?", !!process.env.EMAIL_PASSWORD);
 // @route   PUT /api/users/resetpassword/:resetToken
 // @access  Public
 const resetPassword = async (req, res) => {
-  // Get hashed token
   const resetPasswordToken = crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(req.params.resetToken)
-    .digest('hex');
+    .digest("hex");
 
   try {
     const user = await User.findOne({
       resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() }, // Check if not expired
+      resetPasswordExpire: { $gt: Date.now() },
     });
 
     if (!user) {
       res.status(400);
-      throw new Error('Invalid Token');
+      throw new Error("Invalid or Expired Token");
     }
 
-    // Set new password
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
-    await user.save(); // This triggers the pre-save hook to hash password
+    await user.save();
 
-    res.status(201).json({ success: true, message: 'Password Updated Success' });
+    res.status(201).json({ success: true, message: "Password Updated Success" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+// @desc    Sync User Cart
+// @route   PUT /api/users/cart
+// @access  Private
+const syncCart = async (req, res) => {
+  const { cart } = req.body;
+  
+  try {
+    const user = await User.findById(req.user._id);
 
+    if (user) {
+      user.cart = cart;
+      await user.save();
+      res.json(user.cart);
+    } else {
+      res.status(404);
+      throw new Error("User not found");
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   registerUser,
@@ -375,5 +388,6 @@ module.exports = {
   getUsers,
   deleteUser,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  syncCart,
 };

@@ -1,16 +1,31 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
 
+// --- HELPER: RECALCULATE RATINGS ---
+// We keep this internal function to avoid code duplication
+const updateProductRating = async (productId) => {
+  const product = await Product.findById(productId);
+  if (!product) return;
+
+  const allApproved = await Review.find({ product: productId, isApproved: true });
+  
+  product.numReviews = allApproved.length;
+  product.rating = allApproved.length > 0 
+    ? allApproved.reduce((acc, item) => item.rating + acc, 0) / allApproved.length 
+    : 0;
+
+  await product.save();
+};
+
 // @desc    Get all reviews (Admin Dashboard)
 // @route   GET /api/reviews/admin/all
 // @access  Private/Admin
 const getAllReviews = async (req, res) => {
   try {
-    // Populate product name so Admin knows what item is being reviewed
     const reviews = await Review.find({})
-      .populate('product', 'name image')
+      .populate('product', 'name image') // Useful for admin to see context
       .populate('user', 'name')
-      .sort({ isApproved: 1, createdAt: -1 }); // Pending first, then newest
+      .sort({ isApproved: 1, createdAt: -1 }); // Pending at top
 
     res.json(reviews);
   } catch (error) {
@@ -18,13 +33,14 @@ const getAllReviews = async (req, res) => {
   }
 };
 
-// @desc    Get all approved reviews for a specific product (Public)
+// @desc    Get all approved reviews for a specific product
 // @route   GET /api/reviews/:productId
+// @access  Public
 const getProductReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ 
       product: req.params.productId,
-      isApproved: true 
+      isApproved: true // SECURITY: Only show approved
     }).sort({ createdAt: -1 });
 
     res.json(reviews);
@@ -35,54 +51,64 @@ const getProductReviews = async (req, res) => {
 
 // @desc    Create a new review
 // @route   POST /api/reviews/:productId
+// @access  Private
 const createReview = async (req, res) => {
   const { rating, comment } = req.body;
+  const { productId } = req.params;
+
   try {
+    // 1. Check if product exists first
+    const product = await Product.findById(productId);
+    if (!product) {
+       res.status(404);
+       throw new Error('Product not found');
+    }
+
+    // 2. Check for duplicates
     const alreadyReviewed = await Review.findOne({
-      product: req.params.productId,
+      product: productId,
       user: req.user._id
     });
 
     if (alreadyReviewed) {
       res.status(400);
-      throw new Error('Product already reviewed');
+      throw new Error('You have already reviewed this product');
     }
 
+    // 3. Create Review (Pending Approval)
     await Review.create({
-      product: req.params.productId,
+      product: productId,
       user: req.user._id,
       name: req.user.name,
       rating: Number(rating),
       comment,
-      isApproved: false 
+      isApproved: false // Default to false
     });
 
     res.status(201).json({ message: 'Review submitted for moderation' });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    // Handle 400 vs 500 errors gracefully
+    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    res.status(statusCode).json({ message: error.message });
   }
 };
 
 // @desc    Approve a review
 // @route   PUT /api/reviews/:reviewId/approve
+// @access  Private/Admin
 const approveReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.reviewId);
-    if (!review) throw new Error('Review not found');
+    if (!review) {
+        res.status(404);
+        throw new Error('Review not found');
+    }
 
     review.isApproved = true;
     await review.save();
 
-    // Recalculate Product Rating
-    const product = await Product.findById(review.product);
-    if (product) {
-        const allApproved = await Review.find({ product: product._id, isApproved: true });
-        product.numReviews = allApproved.length;
-        product.rating = allApproved.length > 0 
-            ? allApproved.reduce((acc, item) => item.rating + acc, 0) / allApproved.length 
-            : 0;
-        await product.save();
-    }
+    // Use Helper
+    await updateProductRating(review.product);
 
     res.json({ message: 'Review Approved' });
   } catch (error) {
@@ -97,25 +123,16 @@ const deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.reviewId);
     if (!review) {
-        res.status(404); 
+        res.status(404);
         throw new Error('Review not found');
     }
     
-    // Grab product ID before deleting review to update stats later
-    const productId = review.product;
+    const productId = review.product; // Capture ID before delete
 
     await review.deleteOne();
 
-    // Recalculate stats (in case we deleted an approved review)
-    const product = await Product.findById(productId);
-    if (product) {
-        const allApproved = await Review.find({ product: productId, isApproved: true });
-        product.numReviews = allApproved.length;
-        product.rating = allApproved.length > 0 
-            ? allApproved.reduce((acc, item) => item.rating + acc, 0) / allApproved.length 
-            : 0;
-        await product.save();
-    }
+    // Use Helper (Recalculate just in case an approved review was deleted)
+    await updateProductRating(productId);
 
     res.json({ message: 'Review Removed' });
   } catch (error) {

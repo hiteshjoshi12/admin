@@ -5,7 +5,6 @@ const Product = require('../models/Product');
 // @access  Public
 const getProducts = async (req, res) => {
   try {
-    // UPDATED: Allow dynamic page size (defaults to 12 if not specified)
     const pageSize = Number(req.query.pageSize) || 12;
     const page = Number(req.query.pageNumber) || 1;
 
@@ -18,23 +17,28 @@ const getProducts = async (req, res) => {
     }
 
     // 2. Category Filter
-    if (req.query.category) {
-      const categories = req.query.category.split(',');
+    if (req.query.category && req.query.category !== 'all') {
+      const categories = req.query.category.split(',').filter(c => c.trim() !== '');
       if (categories.length > 0) {
         query.category = { $in: categories };
       }
     }
 
-    // 3. Price Filter
+    // 3. Price Filter (Enhanced Safety)
     if (req.query.priceRange) {
-      if (req.query.priceRange === 'under-2500') query.price = { $lt: 2500 };
-      else if (req.query.priceRange === '2500-5000') query.price = { $gte: 2500, $lte: 5000 };
-      else if (req.query.priceRange === 'above-5000') query.price = { $gt: 5000 };
+      const range = req.query.priceRange;
+      if (range === 'under-2500') {
+        query.price = { $lt: 2500 };
+      } else if (range === '2500-5000') {
+        query.price = { $gte: 2500, $lte: 5000 };
+      } else if (range === 'above-5000') {
+        query.price = { $gt: 5000 };
+      }
     }
 
-    // 4. Size Filter
+    // 4. Size Filter (Stock Check)
     if (req.query.size) {
-      const sizes = req.query.size.split(',').map(Number);
+      const sizes = req.query.size.split(',').map(s => Number(s.trim())).filter(n => !isNaN(n));
       if (sizes.length > 0) {
         query.stock = { 
           $elemMatch: { 
@@ -46,9 +50,10 @@ const getProducts = async (req, res) => {
     }
 
     // --- SORTING ---
-    let sort = { createdAt: -1 }; // Default: Newest
+    let sort = { createdAt: -1 }; // Default: Newest first
     if (req.query.sort === 'price-low') sort = { price: 1 };
     if (req.query.sort === 'price-high') sort = { price: -1 };
+    if (req.query.sort === 'best-selling') sort = { isBestSeller: -1, totalStock: -1 }; // Push Best Sellers top
 
     // --- EXECUTE DB QUERY ---
     const count = await Product.countDocuments(query);
@@ -65,7 +70,7 @@ const getProducts = async (req, res) => {
     });
     
   } catch (error) {
-    console.error(error);
+    console.error("Fetch Products Error:", error);
     res.status(500).json({ message: 'Server Error' });
   }
 };
@@ -82,6 +87,10 @@ const getProductById = async (req, res) => {
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
+    // Handle invalid Object ID format specifically
+    if(error.kind === 'ObjectId') {
+        return res.status(404).json({ message: 'Product not found' });
+    }
     res.status(500).json({ message: 'Server Error' });
   }
 };
@@ -122,7 +131,7 @@ const createProduct = async (req, res) => {
       name,
       price,
       originalPrice,
-      user: req.user._id, // Assuming authMiddleware adds user to req
+      user: req.user._id, 
       image,
       images,
       category,
@@ -163,8 +172,10 @@ const updateProduct = async (req, res) => {
       product.images = images || product.images;
       product.category = category || product.category;
       product.stock = stock || product.stock;
-      product.isNewArrival = isNewArrival !== undefined ? isNewArrival : product.isNewArrival;
-      product.isBestSeller = isBestSeller !== undefined ? isBestSeller : product.isBestSeller;
+      
+      // Explicit boolean check (so false doesn't get ignored)
+      if (typeof isNewArrival !== 'undefined') product.isNewArrival = isNewArrival;
+      if (typeof isBestSeller !== 'undefined') product.isBestSeller = isBestSeller;
 
       // Recalculate total stock if stock array is updated
       if (stock) {

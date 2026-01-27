@@ -130,9 +130,29 @@ const updateCoupon = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getCoupons, createCoupon, toggleCouponStatus, deleteCoupon, verifyCoupon,
-  updateCoupon // <--- Export
+// @desc    Get active coupons for storefront
+// @route   GET /api/coupons/active
+// @access  Public
+const getStorefrontCoupons = async (req, res) => {
+  try {
+    // Only fetch valid, active coupons
+    const coupons = await Coupon.find({ 
+      isActive: true,
+      expirationDate: { $gte: new Date() } // Not expired
+    }).sort({ createdAt: -1 });
+    
+    res.json(coupons);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
 };
+
+// Don't forget to export it!
+module.exports = { 
+  getCoupons, createCoupon, toggleCouponStatus, deleteCoupon, verifyCoupon, updateCoupon,
+  getStorefrontCoupons // <--- Export this
+};
+
+
 
 
