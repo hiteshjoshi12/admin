@@ -232,7 +232,7 @@ export default function ProductDetail() {
               {/* Button Logic */}
               {dbStock === 0 ? (
                  <button disabled className="flex-1 bg-gray-200 text-gray-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
-                   Out of Stock
+                   Select Size
                  </button>
               ) : remainingStock === 0 ? (
                  <button disabled className="flex-1 bg-orange-100 text-orange-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
