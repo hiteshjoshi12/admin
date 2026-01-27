@@ -63,7 +63,7 @@ export default function OrderDetails() {
   };
 
   return (
-    <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12">
+    <div className="bg-[#F9F8F6] min-h-screen pt-30 pb-12">
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Header */}
@@ -73,7 +73,7 @@ export default function OrderDetails() {
               <ArrowLeft className="w-4 h-4" /> Back to Orders
             </Link>
             <h1 className="text-2xl md:text-3xl font-serif text-[#1C1917]">
-              Order <span className="text-gray-400">#{order._id?.substring(0, 10)}</span>
+              Order <span className="text-gray-400">#{order._id}</span>
             </h1>
           </div>
           <div className="text-right">

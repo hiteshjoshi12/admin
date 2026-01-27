@@ -72,7 +72,7 @@ export default function MyOrders() {
                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 pb-4 border-b border-gray-50">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Order ID</p>
-                    <p className="font-mono text-sm text-[#1C1917]">#{order._id.substring(0, 10)}...</p>
+                    <p className="font-mono text-sm text-[#1C1917]">#{order._id}</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Date</p>

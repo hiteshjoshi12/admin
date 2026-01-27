@@ -74,7 +74,7 @@ export default function OrderDetails() {
         
         <div className="flex-1">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex flex-col md:flex-row md:items-center gap-3">
-            <span>Order #{order._id.substring(0, 8).toUpperCase()}</span>
+            <span>Order #{order._id}</span>
             
             <div className="flex flex-wrap gap-2">
                 <span className={`text-xs px-3 py-1 rounded-full border ${order.isPaid ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>

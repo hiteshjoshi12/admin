@@ -148,7 +148,7 @@ export default function Orders() {
                 <div className="flex justify-between items-start mb-3 border-b border-gray-100 pb-3">
                    <div>
                       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Order ID</p>
-                      <p className="font-mono text-sm font-bold text-gray-800">#{order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                      <p className="font-mono text-sm font-bold text-gray-800">#{order._id}</p>
                    </div>
                    <div className="text-right">
                       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total</p>
