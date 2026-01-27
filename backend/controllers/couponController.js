@@ -140,7 +140,6 @@ const getStorefrontCoupons = async (req, res) => {
       isActive: true,
       expirationDate: { $gte: new Date() } // Not expired
     }).sort({ createdAt: -1 });
-    
     res.json(coupons);
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });

@@ -9,7 +9,10 @@ const {
   getOrders, 
   trackOrderPublic,
   shipOrder,
-  updateOrderStatus
+  updateOrderStatus,
+  initiateRazorpayPayment, 
+  verifyRazorpayPayment,
+  handleRazorpayWebhook
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -28,6 +31,8 @@ router.route('/myorders').get(protect, getMyOrders);
 // Public Tracking Route
 router.post('/track', trackOrderPublic);
 
+router.post('/webhook', handleRazorpayWebhook);
+
 // Route: /api/orders/:id
 // GET: Get Single Order Details
 router.route('/:id').get(protect, getOrderById);
@@ -45,6 +50,10 @@ router.route('/:id').get(protect, getOrderById);
 // Add these routes:
 router.put('/:id/ship', protect, admin, shipOrder);
 router.put('/:id/status', protect, admin, updateOrderStatus);
+
+// Add these routes:
+router.post('/:id/pay/initiate', protect, initiateRazorpayPayment);
+router.put('/:id/pay/verify', protect, verifyRazorpayPayment);
 
 module.exports = router;
 

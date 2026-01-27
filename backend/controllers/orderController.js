@@ -1,6 +1,8 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { createShiprocketOrder } = require('../utils/shiprocket');
+const crypto = require('crypto'); // Built-in Node module
+const razorpay = require('../utils/razorpay');
 
 // @desc    Create new order (With Atomic Stock Validation)
 // @route   POST /api/orders
@@ -316,6 +318,174 @@ const trackOrderPublic = async (req, res) => {
   }
 };
 
+
+// --- NEW: INITIATE RAZORPAY PAYMENT ---
+// @desc    Create Razorpay Order ID for frontend
+// @route   POST /api/orders/:id/pay/initiate
+// @access  Private
+// @desc    Create Razorpay Order ID (Robust)
+const initiateRazorpayPayment = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      res.status(404);
+      throw new Error('Order not found');
+    }
+
+    // 1. ATOMIC LOCK: Prevent double payment attempts
+    if (order.isPaid) {
+        return res.status(400).json({ message: 'Order is already paid.' });
+    }
+
+    // Razorpay works in paise (INR * 100)
+    const options = {
+      amount: Math.round(order.totalPrice * 100), 
+      currency: "INR",
+      receipt: order._id.toString(),
+    };
+
+    const razorpayOrder = await razorpay.orders.create(options);
+
+    // 2. CRITICAL FIX: Save the Razorpay Order ID immediately
+    // This creates a permanent link between MongoDB and Razorpay before payment starts.
+    order.razorpayOrderId = razorpayOrder.id;
+    await order.save(); 
+
+    res.json({
+      id: razorpayOrder.id,
+      currency: razorpayOrder.currency,
+      amount: razorpayOrder.amount,
+    });
+
+  } catch (error) {
+    console.error("Razorpay Init Error:", error);
+    res.status(500).json({ message: 'Failed to initiate payment' });
+  }
+};
+
+// --- UPDATED: VERIFY PAYMENT & MARK PAID ---
+// @desc    Verify Signature & Update Order to Paid
+// @route   PUT /api/orders/:id/pay/verify
+// @access  Private
+const verifyRazorpayPayment = async (req, res) => {
+  const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      res.status(404);
+      throw new Error('Order not found');
+    }
+
+    // 1. GENERATE EXPECTED SIGNATURE
+    // Formula: HMAC_SHA256(order_id + "|" + payment_id, secret)
+    const body = razorpayOrderId + "|" + razorpayPaymentId;
+    
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(body.toString())
+      .digest('hex');
+
+    // 2. COMPARE SIGNATURES
+    if (expectedSignature === razorpaySignature) {
+      // SUCCESS! Payment is authentic.
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      
+      // Save Proof
+      order.paymentResult = {
+        id: razorpayPaymentId,
+        status: 'completed',
+        update_time: Date.now(),
+        email_address: order.user?.email || req.user.email,
+      };
+
+      // Save Razorpay fields (as per your new Model)
+      order.razorpayOrderId = razorpayOrderId;
+      order.razorpayPaymentId = razorpayPaymentId;
+      order.razorpaySignature = razorpaySignature;
+
+      // Status Update
+      order.orderStatus = 'Processing'; // Confirmed paid, ready to process
+
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+      
+    } else {
+      // FRAUD DETECTED
+      res.status(400).json({ message: 'Invalid Payment Signature' });
+    }
+
+  } catch (error) {
+    console.error("Verification Error:", error);
+    res.status(500).json({ message: 'Payment verification failed' });
+  }
+};
+
+
+
+
+// @desc    Handle Razorpay Webhooks (The Safety Net)
+// @route   POST /api/orders/webhook
+// @access  Public (Verified by Signature)
+const handleRazorpayWebhook = async (req, res) => {
+  // You set this secret in the Razorpay Dashboard -> Settings -> Webhooks
+  const secret = process.env.RAZORPAY_WEBHOOK_SECRET; 
+
+  // 1. Validate the Webhook Signature (Security Critical)
+  const shasum = crypto.createHmac('sha256', secret);
+  shasum.update(JSON.stringify(req.body));
+  const digest = shasum.digest('hex');
+
+  if (digest === req.headers['x-razorpay-signature']) {
+    console.log('Webhook Signature Verified');
+    
+    // 2. Check the event type
+    const event = req.body.event;
+    
+    if (event === 'payment.captured') {
+        const payment = req.body.payload.payment.entity;
+        const razorpayOrderId = payment.order_id; // The ID we saved in Step 1
+
+        // 3. Find the order using the Razorpay Order ID
+        const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
+
+        if (order) {
+            // 4. Update status (Idempotent: only if not already paid)
+            if (!order.isPaid) {
+                order.isPaid = true;
+                order.paidAt = Date.now();
+                order.paymentResult = {
+                    id: payment.id,
+                    status: payment.status,
+                    update_time: Date.now(),
+                    email_address: payment.email,
+                };
+                order.razorpayPaymentId = payment.id;
+                order.orderStatus = 'Processing';
+                
+                await order.save();
+                console.log(`Order ${order._id} marked Paid via Webhook`);
+            } else {
+                console.log(`Order ${order._id} was already paid.`);
+            }
+        } else {
+            console.error('Webhook received for unknown order:', razorpayOrderId);
+        }
+    }
+
+    // Always return 200 OK to Razorpay
+    res.json({ status: 'ok' });
+  } else {
+    // Invalid signature = Hacking attempt
+    res.status(400).json({ message: 'Invalid Signature' });
+  }
+};
+
+
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -325,5 +495,8 @@ module.exports = {
   getOrders,
   trackOrderPublic,
   shipOrder,         // <--- New
-  updateOrderStatus  // <--- New
+  updateOrderStatus,  // <--- New
+  initiateRazorpayPayment,
+  verifyRazorpayPayment,
+  handleRazorpayWebhook
 };
