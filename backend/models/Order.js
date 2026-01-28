@@ -1,11 +1,17 @@
 const mongoose = require('mongoose');
 
 const orderSchema = mongoose.Schema({
+  // 🚨 CHANGE: Made User Optional + Added Guest Info
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
+    required: false, // <--- Was true, now false
     ref: 'User',
   },
+  guestInfo: {  // <--- NEW FIELD FOR GUESTS
+    name: { type: String },
+    email: { type: String }
+  },
+
   orderItems: [
     {
       name: { type: String, required: true },
@@ -24,7 +30,7 @@ const orderSchema = mongoose.Schema({
     address: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String, required: true },
-    state: { type: String, required: true }, // Required for Shiprocket
+    state: { type: String, required: true }, 
     country: { type: String, required: true },
     phoneNumber: { type: String, required: true },
   },
@@ -52,7 +58,6 @@ const orderSchema = mongoose.Schema({
   orderStatus: { 
     type: String, 
     required: true, 
-    // ENUM: Prevents typos like "shipped" vs "Shipped"
     enum: ['Processing', 'Ready to Ship', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'],
     default: 'Processing', 
   },
@@ -61,10 +66,10 @@ const orderSchema = mongoose.Schema({
   deliveredAt: { type: Date },
 
   // --- SHIPROCKET DATA ---
-  shiprocketOrderId: { type: String },      // Shiprocket's internal ID
-  shiprocketShipmentId: { type: String },   // Needed to cancel/track shipments
-  awbCode: { type: String },                // The Tracking Number (e.g. 789456123)
-  courierCompanyName: { type: String },     // <--- NEW: e.g. "Delhivery Surface", "BlueDart"
+  shiprocketOrderId: { type: String },      
+  shiprocketShipmentId: { type: String },   
+  awbCode: { type: String },                
+  courierCompanyName: { type: String },     
   
 }, {
   timestamps: true,

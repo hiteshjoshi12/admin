@@ -56,9 +56,29 @@ export default function Profile() {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this address?")) {
-      dispatch(deleteAddressFromProfile(id));
-    }
+    toast((t) => (
+      <div className="flex flex-col gap-2">
+        <span className="font-semibold text-sm">Delete this address?</span>
+        <span className="text-xs text-gray-500">This action cannot be undone.</span>
+        <div className="flex gap-2 mt-2">
+          <button 
+            onClick={() => {
+              dispatch(deleteAddressFromProfile(id));
+              toast.dismiss(t.id);
+            }}
+            className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold hover:bg-red-700"
+          >
+            Delete
+          </button>
+          <button 
+            onClick={() => toast.dismiss(t.id)}
+            className="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-bold hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 4000, icon: '🗑️' });
   };
 
   const handleSetPrimary = (addr) => {

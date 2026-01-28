@@ -1,22 +1,28 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import config from '../config/config';
+
 // ASYNC THUNK: Create Order
 export const createOrder = createAsyncThunk(
   'order/create',
   async (orderData, { getState, rejectWithValue }) => {
     try {
       // 1. Get User Token from State
-      const {
-        auth: { userInfo },
-      } = getState();
+      const { auth } = getState();
+      
+      // 2. Prepare Headers
+      const headers = {
+        'Content-Type': 'application/json',
+      };
 
-      // 2. Make API Call
+      // 🚨 CRITICAL FIX: Only add Authorization header if user is logged in
+      if (auth.userInfo && auth.userInfo.token) {
+        headers['Authorization'] = `Bearer ${auth.userInfo.token}`;
+      }
+
+      // 3. Make API Call
       const response = await fetch(`${config.API_BASE_URL}/api/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`, // Secure Route
-        },
+        headers: headers, // Use the dynamic headers object
         credentials: 'include',
         body: JSON.stringify(orderData),
       });
@@ -54,6 +60,7 @@ const orderSlice = createSlice({
     builder
       .addCase(createOrder.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.loading = false;

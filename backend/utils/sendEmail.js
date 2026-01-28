@@ -32,7 +32,7 @@ const sendEmail = async (options) => {
     ` : '';
 
     const mailOptions = {
-      from: `"BeadsNBloom Security" <${process.env.EMAIL_USERNAME}>`,
+      from: `"BeadsNBloom Security" <Connect@beadsandbloom.com>`,
       to: options.email,
       subject: options.subject,
       html: `
@@ -91,7 +91,7 @@ const sendOrderConfirmation = async (order) => {
     `).join('');
 
     const mailOptions = {
-      from: `"BeadsNBloom Orders" <${process.env.EMAIL_USERNAME}>`,
+      from: `"BeadsNBloom Orders" <Connect@beadsandbloom.com>`,
       to: order.user?.email || order.paymentResult?.email_address,
       subject: `Order Confirmed! #${order._id.toString().slice(-6).toUpperCase()}`,
       html: `
@@ -147,4 +147,74 @@ const sendOrderConfirmation = async (order) => {
   }
 };
 
-module.exports = { sendEmail, sendOrderConfirmation };
+
+// ... existing imports and functions ...
+
+// --- 4. ORDER STATUS UPDATE EMAIL (Shipped/Delivered) ---
+const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
+  try {
+    const transporter = createTransporter();
+    
+    // Dynamic Subject & Message based on status
+    let subject = `Update on Order #${order._id.toString().slice(-6).toUpperCase()}`;
+    let heading = "Order Update";
+    let message = `There is an update on your order.`;
+
+    if (status === 'Shipped') {
+        subject = `Your Order has been Shipped! 🚚`;
+        heading = "On Its Way!";
+        message = `Good news! Your order has been packed and handed over to our courier partner. It is now on its way to you.`;
+    } else if (status === 'Delivered') {
+        subject = `Order Delivered! 🎉`;
+        heading = "Delivered!";
+        message = `Your order has been successfully delivered. We hope you love your purchase!`;
+    } else if (status === 'Ready to Ship') {
+        subject = `We are packing your order! 📦`;
+        heading = "Getting Ready";
+        message = `We have received your order and are currently packing it. You will receive a tracking link soon.`;
+    }
+
+    // Tracking Button Logic
+    const trackingHtml = trackingUrl ? `
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${trackingUrl}" style="background-color: #1C1917; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block;">
+          Track Your Package
+        </a>
+      </div>
+    ` : '';
+
+    const mailOptions = {
+      from: `"BeadsNBloom Updates" <Connect@beadsandbloom.com>`,
+      to: order.user?.email || order.paymentResult?.email_address,
+      subject: subject,
+      html: `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #333; line-height: 1.6; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
+          <div style="background-color: #1C1917; padding: 20px; text-align: center;">
+            <h2 style="color: #ffffff; margin: 0; font-family: serif; letter-spacing: 1px;">BeadsNBloom</h2>
+          </div>
+          <div style="padding: 30px 20px; text-align: center;">
+            <h2 style="color: #1C1917; margin-top: 0;">${heading}</h2>
+            <p style="font-size: 15px; color: #555;">${message}</p>
+            ${trackingHtml}
+            <div style="margin-top: 30px; background-color: #f8f8f8; padding: 15px; border-radius: 8px; text-align: left;">
+                <p style="margin: 0; font-size: 12px; text-transform: uppercase; color: #888;">Order ID</p>
+                <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 16px; color: #1C1917;">${order._id}</p>
+            </div>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Status Email (${status}) sent to: ${mailOptions.to}`);
+  } catch (error) {
+    console.error("❌ Email Sending Failed:", error.message);
+  }
+};
+
+// --- UPDATE EXPORTS ---
+module.exports = { 
+    sendEmail, 
+    sendOrderConfirmation, 
+    sendOrderStatusEmail // <--- Add this
+};

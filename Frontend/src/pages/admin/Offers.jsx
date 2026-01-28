@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2, Edit, Tag, X } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
+import { toast } from 'react-hot-toast'; // Import Toast
+import { confirmAction } from '../../util/toastUtils'; // Import Standard Confirm Helper
 
 export default function Offers() {
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editId, setEditId] = useState(null); // <--- NEW: Track ID being edited
+  const [editId, setEditId] = useState(null);
   
   const [formData, setFormData] = useState({
     code: '',
@@ -29,6 +31,7 @@ export default function Offers() {
       setCoupons(data);
     } catch (error) {
       console.error("Failed to fetch coupons");
+      toast.error("Failed to load offers");
     } finally {
       setLoading(false);
     }
@@ -49,24 +52,39 @@ export default function Offers() {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${userInfo.token}` },
       });
+      
+      toast.success("Coupon status updated!");
     } catch (error) {
-      alert("Failed to update status");
-      fetchCoupons();
+      toast.error("Failed to update status");
+      fetchCoupons(); // Revert on error
     }
   };
 
-  // --- DELETE ---
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this coupon?")) return;
-    try {
-      await fetch(`${API_BASE_URL}/api/coupons/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${userInfo.token}` },
-      });
-      setCoupons(coupons.filter(c => c._id !== id));
-    } catch (error) {
-      alert("Failed to delete");
-    }
+  // --- DELETE (UPDATED) ---
+  const handleDelete = (id) => {
+    confirmAction({
+      title: "Delete Coupon?",
+      message: "This offer will be permanently removed.",
+      confirmText: "Delete",
+      onConfirm: async () => {
+        const toastId = toast.loading("Deleting...");
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/coupons/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+
+          if (res.ok) {
+            setCoupons(coupons.filter(c => c._id !== id));
+            toast.success("Coupon deleted successfully", { id: toastId });
+          } else {
+            toast.error("Failed to delete coupon", { id: toastId });
+          }
+        } catch (error) {
+          toast.error("Server error occurred", { id: toastId });
+        }
+      }
+    });
   };
 
   // --- OPEN EDIT MODAL ---
@@ -77,7 +95,6 @@ export default function Offers() {
       discountType: coupon.discountType,
       discountAmount: coupon.discountAmount,
       description: coupon.description,
-      // Format date to YYYY-MM-DD for input type="date"
       expirationDate: new Date(coupon.expirationDate).toISOString().split('T')[0]
     });
     setShowModal(true);
@@ -86,11 +103,12 @@ export default function Offers() {
   // --- SUBMIT (CREATE OR UPDATE) ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const toastId = toast.loading(editId ? "Updating..." : "Creating...");
     
     // Determine URL and Method
     const url = editId 
-      ? `${API_BASE_URL}/api/coupons/${editId}` // Update URL (You need to add PUT route in backend)
-      : `${API_BASE_URL}/api/coupons`;           // Create URL
+      ? `${API_BASE_URL}/api/coupons/${editId}` 
+      : `${API_BASE_URL}/api/coupons`;
     
     const method = editId ? 'PUT' : 'POST';
 
@@ -106,16 +124,16 @@ export default function Offers() {
       
       if (res.ok) {
         setShowModal(false);
-        setEditId(null); // Reset Edit Mode
+        setEditId(null);
         setFormData({ code: '', discountType: 'percentage', discountAmount: '', description: '', expirationDate: '' });
         fetchCoupons();
-        alert(editId ? "Coupon Updated!" : "Coupon Created!");
+        toast.success(editId ? "Coupon Updated!" : "Coupon Created!", { id: toastId });
       } else {
         const err = await res.json();
-        alert(err.message);
+        toast.error(err.message || "Operation failed", { id: toastId });
       }
     } catch (error) {
-      alert("Operation failed");
+      toast.error("Server error occurred", { id: toastId });
     }
   };
 
@@ -189,7 +207,7 @@ export default function Offers() {
                    </div>
                    <div className="flex gap-2">
                       <button 
-                        onClick={() => handleEdit(coupon)} // <--- CONNECTED EDIT BUTTON
+                        onClick={() => handleEdit(coupon)}
                         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                          <Edit className="w-4 h-4" />

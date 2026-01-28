@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Star, Check, Trash2, MessageSquare, AlertCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
+import { toast } from 'react-hot-toast'; // Import Toast
+import { confirmAction } from '../../util/toastUtils'; // Import Standard Confirm Helper
 
 export default function Reviews() {
   const [reviews, setReviews] = useState([]);
@@ -24,13 +26,15 @@ export default function Reviews() {
       setReviews(data);
     } catch (error) {
       console.error("Failed to load reviews");
+      toast.error("Failed to load reviews");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- ACTIONS ---
+  // --- APPROVE REVIEW ---
   const handleApprove = async (id) => {
+    const toastId = toast.loading("Approving review...");
     try {
       const res = await fetch(`${API_BASE_URL}/api/reviews/${id}/approve`, {
         method: 'PUT',
@@ -38,25 +42,39 @@ export default function Reviews() {
       });
       if (res.ok) {
         setReviews(reviews.map(r => r._id === id ? { ...r, isApproved: true } : r));
+        toast.success("Review Approved!", { id: toastId });
+      } else {
+        toast.error("Failed to approve", { id: toastId });
       }
     } catch (error) {
-      alert("Failed to approve");
+      toast.error("Server error occurred", { id: toastId });
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this review permanently?")) return;
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/reviews/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${userInfo.token}` },
-      });
-      if (res.ok) {
-        setReviews(reviews.filter(r => r._id !== id));
+  // --- DELETE REVIEW (UPDATED) ---
+  const handleDelete = (id) => {
+    confirmAction({
+      title: "Delete this Review?",
+      message: "This action cannot be undone. The review will be permanently removed.",
+      confirmText: "Delete Review",
+      onConfirm: async () => {
+        const toastId = toast.loading("Deleting...");
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/reviews/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+          if (res.ok) {
+            setReviews(reviews.filter(r => r._id !== id));
+            toast.success("Review deleted successfully", { id: toastId });
+          } else {
+            toast.error("Failed to delete", { id: toastId });
+          }
+        } catch (error) {
+          toast.error("Server error occurred", { id: toastId });
+        }
       }
-    } catch (error) {
-      alert("Failed to delete");
-    }
+    });
   };
 
   // --- FILTERING ---

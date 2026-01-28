@@ -1,39 +1,50 @@
 const axios = require('axios');
 
-// 1. Authenticate with Shiprocket (Get Token)
+// Cache token to avoid frequent logins
+let shiprocketToken = null;
+
 const getShiprocketToken = async () => {
   try {
     const res = await axios.post('https://apiv2.shiprocket.in/v1/external/auth/login', {
       email: process.env.SHIPROCKET_EMAIL,
       password: process.env.SHIPROCKET_PASSWORD,
     });
-    return res.data.token;
+    shiprocketToken = res.data.token;
+    return shiprocketToken;
   } catch (error) {
     console.error("Shiprocket Auth Failed:", error.message);
     throw new Error('Shiprocket Authentication Failed');
   }
 };
 
-// 2. Create Order in Shiprocket
 const createShiprocketOrder = async (mongoOrder) => {
   try {
-    const token = await getShiprocketToken();
+    if (!shiprocketToken) await getShiprocketToken();
     
-    // Map your Mongo Order to Shiprocket's expected JSON format
+    // 1. Format Date correctly (YYYY-MM-DD HH:MM:SS)
+    const orderDate = new Date(mongoOrder.createdAt).toISOString().slice(0, 19).replace('T', ' ');
+
+    // 2. SAFE PAYMENT CHECK (Handles 'cod', 'COD', 'Cod')
+    const isCod = mongoOrder.paymentMethod && mongoOrder.paymentMethod.toLowerCase() === "cod";
+
     const orderData = {
       order_id: mongoOrder._id.toString(),
-      order_date: new Date().toISOString().split('T')[0] + " " + new Date().toTimeString().split(' ')[0],
-      pickup_location: "Primary", // Must match the name of your pickup location in Shiprocket Dashboard
-      billing_customer_name: "Customer", // Ideally fetch User's name
+      order_date: orderDate,
+      
+      // --- FIX #1: MATCHES YOUR SCREENSHOT NICKNAME ---
+      pickup_location: "Home", 
+      
+      billing_customer_name: mongoOrder.user?.name || "Customer",
       billing_last_name: "",
       billing_address: mongoOrder.shippingAddress.address,
       billing_city: mongoOrder.shippingAddress.city,
       billing_pincode: mongoOrder.shippingAddress.postalCode,
       billing_state: mongoOrder.shippingAddress.state,
       billing_country: "India",
-      billing_email: "customer@example.com", // Fetch from User model
+      billing_email: mongoOrder.user?.email || "customer@example.com",
       billing_phone: mongoOrder.shippingAddress.phoneNumber,
       shipping_is_billing: true,
+      
       order_items: mongoOrder.orderItems.map(item => ({
         name: item.name,
         sku: item.product.toString(),
@@ -43,32 +54,40 @@ const createShiprocketOrder = async (mongoOrder) => {
         tax: "",
         hsn: "" 
       })),
-      payment_method: mongoOrder.paymentMethod === "COD" ? "COD" : "Prepaid",
-      sub_total: mongoOrder.itemPrice,
-      length: 30, // Default dimensions (cm) - Add to Product model later for accuracy
-      breadth: 15,
+      
+      // --- FIX #2: SAFE CHECK ---
+      payment_method: isCod ? "COD" : "Prepaid",
+      sub_total: mongoOrder.totalPrice, // Use totalPrice instead of itemPrice to capture tax/shipping
+      length: 10,
+      breadth: 10,
       height: 10,
-      weight: 0.5 // Default weight (kg)
+      weight: 0.5 
     };
 
-    const res = await axios.post('https://apiv2.shiprocket.in/v1/external/orders/create/ad-hoc', orderData, {
+    // --- FIX #3: CORRECT URL SPELLING (adhoc, not ad-hoc) ---
+    const res = await axios.post('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', orderData, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${shiprocketToken}`
       }
     });
 
-    console.log("Shiprocket Order Created:", res.data.order_id);
+    console.log("✅ Shiprocket Order Created:", res.data.order_id);
+    
     return {
       shiprocketOrderId: res.data.order_id,
       shiprocketShipmentId: res.data.shipment_id,
-      awbCode: res.data.awb_code
+      awbCode: res.data.awb_code,
+      courierCompanyName: res.data.courier_name // Capturing courier name for your frontend
     };
 
   } catch (error) {
-    // We log the error but we DO NOT crash the app. 
-    // The user has paid; we can fix shipping manually if this API fails.
-    console.error("Shiprocket Create Order Error:", error.response ? error.response.data : error.message);
+    if (error.response?.status === 401) {
+        console.log("🔄 Token expired, retrying...");
+        await getShiprocketToken();
+        return createShiprocketOrder(mongoOrder);
+    }
+    console.error("Shiprocket Create Order Error:", error.response?.data || error.message);
     return null; 
   }
 };

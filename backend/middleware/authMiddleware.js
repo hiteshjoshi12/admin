@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const asyncHandler = require('express-async-handler');
 
 const protect = async (req, res, next) => {
   let token;
@@ -40,4 +41,20 @@ const admin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin };
+
+const optionalProtect = asyncHandler(async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+    } catch (error) {
+      console.error("Optional Auth Error:", error.message);
+      // Don't crash! Just proceed as guest (req.user remains undefined)
+    }
+  }
+  next();
+});
+
+module.exports = { protect, admin, optionalProtect };

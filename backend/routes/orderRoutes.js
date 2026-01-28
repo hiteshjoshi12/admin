@@ -12,52 +12,39 @@ const {
   updateOrderStatus,
   initiateRazorpayPayment, 
   verifyRazorpayPayment,
-  handleRazorpayWebhook
+  handleRazorpayWebhook,
+  handleShiprocketWebhook
 } = require('../controllers/orderController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, optionalProtect, } = require('../middleware/authMiddleware');
 
-// Route: /api/orders
-// POST: Create Order (User)
-// GET: Get All Orders (Admin)
+// 1. Create & Get All
 router.route('/')
-  .post(protect, addOrderItems)
+  .post(optionalProtect, addOrderItems) // <--- CHANGED THIS
   .get(protect, admin, getOrders);
 
-// Route: /api/orders/myorders
-// GET: Get Logged In User's Orders
+// 2. User Specific (Must remain protected)
 router.route('/myorders').get(protect, getMyOrders);
 
-
-// Public Tracking Route
+// 3. Public Webhooks & Tracking
 router.post('/track', trackOrderPublic);
-
 router.post('/webhook', handleRazorpayWebhook);
+router.post('/shiprocket-webhook', handleShiprocketWebhook);
 
-// Route: /api/orders/:id
-// GET: Get Single Order Details
-router.route('/:id').get(protect, getOrderById);
+// 4. Single Order Operations
+// 🚨 REMOVED 'protect' from getOrderById so Guests can view their order status/receipt
+router.route('/:id').get(getOrderById); 
 
-// Route: /api/orders/:id/pay
-// PUT: Mark Order as Paid (After Razorpay success)
-router.route('/:id/pay').put(protect, updateOrderToPaid);
-
-// Route: /api/orders/:id/deliver
-// PUT: Mark Order as Delivered (Admin Only)
+// Legacy manual payment update (keep protected if used by admin/user dashboard only)
+router.route('/:id/pay').put(protect, updateOrderToPaid); 
 router.route('/:id/deliver').put(protect, admin, updateOrderToDelivered);
 
-router.route('/:id').get(protect, getOrderById);
-
-// Add these routes:
+// 5. Admin Shipping Operations
 router.put('/:id/ship', protect, admin, shipOrder);
 router.put('/:id/status', protect, admin, updateOrderStatus);
 
-// Add these routes:
-router.post('/:id/pay/initiate', protect, initiateRazorpayPayment);
-router.put('/:id/pay/verify', protect, verifyRazorpayPayment);
+// 6. Payment Flow (Razorpay)
+// 🚨 REMOVED 'protect' so Guests can pay
+router.post('/:id/pay/initiate', initiateRazorpayPayment); 
+router.put('/:id/pay/verify', verifyRazorpayPayment); 
 
 module.exports = router;
-
-
-
-
-

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'; // Added Eye/EyeOff Icons
-import { setCart } from '../redux/cartSlice';
+import { ArrowRight, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'react-hot-toast'; // 1. Import Toast
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../redux/authSlice';
+import { setCart } from '../redux/cartSlice';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -15,45 +16,46 @@ export default function Signup() {
     window.scrollTo(0, 0);
   }, []);
 
-  // 1. Get the current guest cart items
   const { items: localCart } = useSelector((state) => state.cart);
 
-  // --- STATE ---
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false); // <--- NEW STATE
+  const [showPassword, setShowPassword] = useState(false);
   
-  // Get Auth State
   const { loading, error, userInfo } = useSelector((state) => state.auth);
 
-  // Redirect if logged in
   useEffect(() => {
     if (userInfo) {
-      navigate('/shop');
+      navigate('/');
     }
   }, [userInfo, navigate]);
 
-  // --- HANDLERS ---
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // 2. Dispatch register with localCart
-    dispatch(register({
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      localCart 
-    })).then((res) => {
-       // 3. If registration succeeded and backend returned a cart, update Redux
-       if(res.payload && res.payload.cart) {
-           dispatch(setCart(res.payload.cart));
-       }
-    });
-  };
+    try {
+      const result = await dispatch(register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        localCart 
+      })).unwrap();
 
+      toast.success("Account created successfully!");
+
+      if(result.cart) {
+         dispatch(setCart(result.cart));
+      }
+      
+    } catch (err) {
+      // 🚨 FIX: Extract the message string safely
+      const errorMessage = typeof err === 'string' ? err : err?.message || "Registration failed";
+      toast.error(errorMessage);
+    }
+  };
   return (
     <div className="min-h-screen flex bg-white pt-24">
       
@@ -68,13 +70,6 @@ export default function Signup() {
               Already a member? <Link to="/login" className="text-[#FF2865] font-bold hover:underline">Sign in</Link>
             </p>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 text-red-500 p-4 rounded-xl mb-6 text-sm border border-red-100 text-center">
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             
@@ -115,7 +110,7 @@ export default function Signup() {
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input 
-                  type={showPassword ? "text" : "password"} // <--- TOGGLE TYPE
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -123,17 +118,12 @@ export default function Signup() {
                   className="w-full bg-[#F9F8F6] border-0 rounded-xl px-12 py-4 text-[#1C1917] focus:ring-2 focus:ring-[#FF2865]/20 focus:bg-white transition-all outline-none" 
                   placeholder="••••••••"
                 />
-                {/* --- EYE ICON TOGGLE --- */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1C1917] focus:outline-none"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>

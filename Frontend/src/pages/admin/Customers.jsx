@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Mail, Trash2, Search, MapPin, Shield, Calendar } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
+import { toast } from 'react-hot-toast'; // Import Toast
+import { confirmAction } from '../../util/toastUtils'; // Import Standard Confirm Helper
 
 export default function Customers() {
   const [users, setUsers] = useState([]);
@@ -20,6 +22,7 @@ export default function Customers() {
       setUsers(data);
     } catch (error) {
       console.error("Failed to fetch users", error);
+      toast.error("Failed to load customers");
     } finally {
       setLoading(false);
     }
@@ -29,26 +32,33 @@ export default function Customers() {
     fetchUsers();
   }, [userInfo]);
 
-  // --- DELETE HANDLER ---
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        });
+  // --- DELETE HANDLER (UPDATED) ---
+  const handleDelete = (id) => {
+    confirmAction({
+      title: "Delete this User?",
+      message: "This action cannot be undone. The user will be permanently removed.",
+      confirmText: "Delete User",
+      onConfirm: async () => {
+        const toastId = toast.loading("Deleting user...");
+        
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/users/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
 
-        if (res.ok) {
-          setUsers(users.filter((user) => user._id !== id));
-          alert("User deleted successfully");
-        } else {
-          const data = await res.json();
-          alert(data.message || "Failed to delete");
+          if (res.ok) {
+            setUsers(users.filter((user) => user._id !== id));
+            toast.success("User deleted successfully", { id: toastId });
+          } else {
+            const data = await res.json();
+            toast.error(data.message || "Failed to delete", { id: toastId });
+          }
+        } catch (error) {
+          toast.error("Server error occurred", { id: toastId });
         }
-      } catch (error) {
-        alert("Server error");
       }
-    }
+    });
   };
 
   // --- FILTERING ---
@@ -106,39 +116,39 @@ export default function Customers() {
                   {/* Name & Avatar */}
                   <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                         <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
-                            {user.name.charAt(0).toUpperCase()}
-                         </div>
-                         <div>
-                            <p className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                              {user.name} 
-                              {user.isAdmin && <Shield className="w-3 h-3 text-[#FF2865] fill-current" />}
-                            </p>
-                            <span className="text-xs text-gray-400">ID: {user._id.substring(0,6)}...</span>
-                         </div>
+                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                             {user.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                             <p className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                               {user.name} 
+                               {user.isAdmin && <Shield className="w-3 h-3 text-[#FF2865] fill-current" />}
+                             </p>
+                             <span className="text-xs text-gray-400">ID: {user._id.substring(0,6)}...</span>
+                          </div>
                       </div>
                   </td>
 
                   {/* Email */}
                   <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                         <Mail className="w-4 h-4 text-gray-400" />
-                         {user.email}
+                          <Mail className="w-4 h-4 text-gray-400" />
+                          {user.email}
                       </div>
                   </td>
 
                   {/* Location */}
                   <td className="px-6 py-4">
                       {user.addresses && user.addresses.length > 0 ? (
-                         <div className="flex items-start gap-2 text-sm text-gray-600 max-w-[200px]">
-                            <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <span className="line-clamp-2">
-                              {user.addresses.find(a => a.isPrimary)?.city || user.addresses[0].city}, 
-                              {' '}{user.addresses.find(a => a.isPrimary)?.postalCode || user.addresses[0].postalCode}
-                            </span>
-                         </div>
+                          <div className="flex items-start gap-2 text-sm text-gray-600 max-w-[200px]">
+                             <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                             <span className="line-clamp-2">
+                               {user.addresses.find(a => a.isPrimary)?.city || user.addresses[0].city}, 
+                               {' '}{user.addresses.find(a => a.isPrimary)?.postalCode || user.addresses[0].postalCode}
+                             </span>
+                          </div>
                       ) : (
-                         <span className="text-xs text-gray-400 italic">No address saved</span>
+                          <span className="text-xs text-gray-400 italic">No address saved</span>
                       )}
                   </td>
 
@@ -165,9 +175,9 @@ export default function Customers() {
               
               {filteredUsers.length === 0 && (
                 <tr>
-                   <td colSpan="5" className="text-center py-12 text-gray-400 italic">
-                      No customers found matching "{searchTerm}"
-                   </td>
+                    <td colSpan="5" className="text-center py-12 text-gray-400 italic">
+                       No customers found matching "{searchTerm}"
+                    </td>
                 </tr>
               )}
             </tbody>
@@ -183,49 +193,49 @@ export default function Customers() {
                {/* Card Header: Avatar, Name, Delete */}
                <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                     <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xl">
-                        {user.name.charAt(0).toUpperCase()}
-                     </div>
-                     <div>
-                        <p className="font-bold text-gray-900 flex items-center gap-2">
-                           {user.name}
-                           {user.isAdmin && <Shield className="w-3 h-3 text-[#FF2865] fill-current" />}
-                        </p>
-                        <p className="text-xs text-gray-400 font-mono">ID: ...{user._id.slice(-6)}</p>
-                     </div>
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xl">
+                         {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                         <p className="font-bold text-gray-900 flex items-center gap-2">
+                            {user.name}
+                            {user.isAdmin && <Shield className="w-3 h-3 text-[#FF2865] fill-current" />}
+                         </p>
+                         <p className="text-xs text-gray-400 font-mono">ID: ...{user._id.slice(-6)}</p>
+                      </div>
                   </div>
                   {!user.isAdmin && (
-                     <button 
-                        onClick={() => handleDelete(user._id)}
-                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                     >
-                        <Trash2 className="w-5 h-5" />
-                     </button>
+                      <button 
+                         onClick={() => handleDelete(user._id)}
+                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                         <Trash2 className="w-5 h-5" />
+                      </button>
                   )}
                </div>
 
                {/* Card Details */}
                <div className="space-y-3 text-sm border-t border-gray-100 pt-3">
                   <div className="flex items-center gap-3 text-gray-600">
-                     <Mail className="w-4 h-4 text-gray-400 shrink-0" />
-                     <span className="truncate">{user.email}</span>
+                      <Mail className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span className="truncate">{user.email}</span>
                   </div>
                   
                   <div className="flex items-start gap-3 text-gray-600">
-                     <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                     {user.addresses && user.addresses.length > 0 ? (
-                        <span>
-                           {user.addresses.find(a => a.isPrimary)?.city || user.addresses[0].city}, 
-                           {' '}{user.addresses.find(a => a.isPrimary)?.postalCode || user.addresses[0].postalCode}
-                        </span>
-                     ) : (
-                        <span className="text-gray-400 italic">No address saved</span>
-                     )}
+                      <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                      {user.addresses && user.addresses.length > 0 ? (
+                         <span>
+                            {user.addresses.find(a => a.isPrimary)?.city || user.addresses[0].city}, 
+                            {' '}{user.addresses.find(a => a.isPrimary)?.postalCode || user.addresses[0].postalCode}
+                         </span>
+                      ) : (
+                         <span className="text-gray-400 italic">No address saved</span>
+                      )}
                   </div>
 
                   <div className="flex items-center gap-3 text-gray-600">
-                     <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
-                     <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                      <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
                   </div>
                </div>
             </div>

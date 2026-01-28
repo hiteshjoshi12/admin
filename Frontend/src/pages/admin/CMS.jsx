@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Save, Layout, Instagram, Image as ImageIcon, Plus, Trash2, Star, Grid, Video, PlayCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
+import { confirmAction } from '../../util/toastUtils';
+import toast from 'react-hot-toast';
 
 export default function CMS() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -82,8 +84,18 @@ function HomeCMS({ userInfo }) {
   });
   
   const removeSlide = (index) => {
-    if(window.confirm("Remove slide?")) setData({ ...data, heroSlides: data.heroSlides.filter((_, i) => i !== index) });
-  };
+  confirmAction({
+    title: "Remove Slide?",
+    message: "This slide will be removed from the carousel.",
+    confirmText: "Remove",
+    onConfirm: () => {
+      setData((prev) => ({
+        ...prev,
+        heroSlides: prev.heroSlides.filter((_, i) => i !== index),
+      }));
+    },
+  });
+};
 
   const saveHero = async () => {
     setHeroLoading(true);
@@ -274,14 +286,33 @@ function BestSellersCMS({ userInfo }) {
     setLoading(false);
   };
 
-  const handleRemove = async (position) => {
-    if(!window.confirm("Clear this slot?")) return;
-    await fetch(`${API_BASE_URL}/api/cms/bestsellers/${position}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${userInfo.token}` }
-    });
-    setSlots(prev => prev.filter(p => p.position !== position));
-  };
+  const handleRemove = (position) => {
+  confirmAction({
+    title: "Clear this slot?",
+    message: "This product will be removed from the Best Sellers section.",
+    confirmText: "Clear Slot",
+    onConfirm: async () => {
+      const toastId = toast.loading("Removing...");
+      
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/cms/bestsellers/${position}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${userInfo.token}` }
+        });
+
+        if (res.ok) {
+          setSlots(prev => prev.filter(p => p.position !== position));
+          toast.success("Slot cleared successfully!", { id: toastId });
+        } else {
+          toast.error("Failed to clear slot", { id: toastId });
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Server error occurred", { id: toastId });
+      }
+    }
+  });
+};
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
@@ -354,14 +385,33 @@ function CollectionsCMS({ userInfo }) {
     setNewCol({ name: '', image: '' });
   };
 
-  const handleDelete = async (id) => {
-    if(!window.confirm("Delete collection?")) return;
-    await fetch(`${API_BASE_URL}/api/cms/collections/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${userInfo.token}` }
-    });
-    setCollections(collections.filter(c => c._id !== id));
-  };
+  const handleDelete = (id) => {
+  confirmAction({
+    title: "Delete Collection?",
+    message: "This collection will be permanently removed.",
+    confirmText: "Delete",
+    onConfirm: async () => {
+      const toastId = toast.loading("Deleting...");
+      
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/cms/collections/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${userInfo.token}` }
+        });
+
+        if (res.ok) {
+          setCollections(prev => prev.filter(c => c._id !== id));
+          toast.success("Collection deleted successfully", { id: toastId });
+        } else {
+          toast.error("Failed to delete collection", { id: toastId });
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Server error occurred", { id: toastId });
+      }
+    }
+  });
+};
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -432,14 +482,33 @@ function RunwayCMS({ userInfo }) {
     }
   };
 
-  const handleDelete = async (id) => {
-    if(!window.confirm("Delete this video?")) return;
-    await fetch(`${API_BASE_URL}/api/cms/runway/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${userInfo.token}` }
-    });
-    setVideos(videos.filter(v => v._id !== id));
-  };
+  const handleDelete = (id) => {
+  confirmAction({
+    title: "Delete this Video?",
+    message: "This video will be permanently removed from the Runway section.",
+    confirmText: "Delete",
+    onConfirm: async () => {
+      const toastId = toast.loading("Deleting video...");
+      
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/cms/runway/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${userInfo.token}` }
+        });
+
+        if (res.ok) {
+          setVideos(prev => prev.filter(v => v._id !== id));
+          toast.success("Video deleted successfully", { id: toastId });
+        } else {
+          toast.error("Failed to delete video", { id: toastId });
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Server error occurred", { id: toastId });
+      }
+    }
+  });
+};
 
   return (
     <div className="space-y-8 animate-fade-in">

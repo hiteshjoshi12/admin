@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   Star, Minus, Plus, Truck, RefreshCcw, 
-  ShieldCheck, ShoppingBag, X, ZoomIn, HeartHandshake 
+  ShieldCheck, ShoppingBag, X, ZoomIn, HeartHandshake, Zap 
 } from 'lucide-react';
+import { toast } from 'react-hot-toast'; // 1. IMPORT TOAST
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +21,7 @@ import { ProductDetailSkeleton } from '../components/loaders/SectionLoader';
 export default function ProductDetail() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // 2. IMPORT NAVIGATE
 
   // 1. GET DATA
   const { product: currentProduct, loading, error } = useSelector((state) => state.products);
@@ -40,10 +42,9 @@ export default function ProductDetail() {
   const [activeImage, setActiveImage] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  // --- 1. LOADING STATE ---
+  // --- LOADING STATE ---
   if (loading) return <ProductDetailSkeleton />;
   
-  // Error State
   if (error || !currentProduct) return (
     <div className="min-h-screen flex items-center justify-center flex-col gap-4">
         <p className="text-xl font-serif text-red-500">Product Not Found</p>
@@ -73,24 +74,51 @@ export default function ProductDetail() {
     setQuantity(1); 
   };
 
-  const handleAddToCart = () => {
+  // --- 3. SHARED VALIDATION LOGIC ---
+  const validateSelection = () => {
     if (!selectedSize) {
-      alert("Please select a size first.");
-      return;
+      toast.error("Please select a size first.");
+      return null;
     }
     if (quantity > remainingStock) {
-      alert(`Sorry, you can only add ${remainingStock} more of this size.`);
-      return;
+      toast.error(`Sorry, you can only add ${remainingStock} more of this size.`);
+      return null;
     }
-
-    dispatch(addToCart({
+    return {
       id: currentProduct._id,
       name: currentProduct.name,
       image: currentProduct.images[0], 
       price: currentProduct.price,
       quantity: quantity,
-      size: selectedSize
-    }));
+      size: selectedSize,
+      maxStock: dbStock
+    };
+  };
+
+  // --- ADD TO CART (Stay on page) ---
+  const handleAddToCart = () => {
+    const item = validateSelection();
+    if (item) {
+      dispatch(addToCart(item));
+      toast.success(
+        <div className="flex flex-col">
+          <span className="font-bold">Added to Bag!</span>
+          <span className="text-xs text-gray-500">You can continue shopping.</span>
+        </div>,
+        { icon: '🛍️' }
+      );
+    }
+  };
+
+  // --- BUY NOW (Go to Cart) ---
+  const handleBuyNow = () => {
+    const item = validateSelection();
+    if (item) {
+      dispatch(addToCart(item));
+      // No toast needed here as we are redirecting immediately, 
+      // but strictly speaking, you could show a quick one.
+      navigate('/cart'); 
+    }
   };
 
   // --- IMAGE OPTIMIZATION ---
@@ -112,17 +140,16 @@ export default function ProductDetail() {
         
         {/* LEFT: IMAGE GALLERY */}
         <div className="w-full lg:w-3/5">
-           
            {/* MOBILE VIEW: Horizontal Scroll Snap */}
            <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
              {optimizedImages.map((img, idx) => (
                <div key={idx} className="w-full flex-shrink-0 snap-center">
                  <div className="aspect-[3/4] relative">
                    <img 
-                      src={img} 
-                      alt={`${currentProduct.name} - View ${idx + 1}`} 
-                      className="w-full h-full object-cover" 
-                      onClick={() => openLightbox(idx)}
+                     src={img} 
+                     alt={`${currentProduct.name} - View ${idx + 1}`} 
+                     className="w-full h-full object-cover" 
+                     onClick={() => openLightbox(idx)}
                    />
                    <div className="absolute bottom-4 right-4 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
                      {idx + 1} / {optimizedImages.length}
@@ -145,8 +172,6 @@ export default function ProductDetail() {
                   alt={`${currentProduct.name} - View ${idx + 1}`} 
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                 />
-                
-                {/* Zoom Icon Hint */}
                 <div className="absolute top-4 right-4 bg-white/80 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                   <ZoomIn className="w-4 h-4 text-[#1C1917]" />
                 </div>
@@ -211,43 +236,66 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* Quantity & Cart Section */}
-            <div className="flex gap-4">
-              <div className={`flex items-center border border-gray-200 rounded-lg h-14 w-32 ${!selectedSize || remainingStock === 0 ? 'opacity-50 pointer-events-none' : ''}`}>
-                <button 
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))} 
-                  className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#1C1917]"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="flex-1 text-center font-bold text-[#1C1917]">{quantity}</span>
-                <button 
-                  onClick={() => setQuantity(Math.min(remainingStock, quantity + 1))} 
-                  className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#1C1917]"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+            {/* 4. QUANTITY & BUTTONS SECTION */}
+            <div className="flex flex-col gap-4">
+              
+              {/* Quantity Row */}
+              <div className="flex items-center justify-between">
+                 <span className="text-xs font-bold uppercase tracking-widest text-gray-500">Quantity</span>
+                 <div className={`flex items-center border border-gray-200 rounded-lg h-10 w-32 ${!selectedSize || remainingStock === 0 ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <button 
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))} 
+                      className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#1C1917]"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="flex-1 text-center font-bold text-[#1C1917] text-sm">{quantity}</span>
+                    <button 
+                      onClick={() => setQuantity(Math.min(remainingStock, quantity + 1))} 
+                      className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#1C1917]"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                 </div>
               </div>
 
-              {/* Button Logic */}
+              {/* ACTION BUTTONS */}
               {dbStock === 0 ? (
-                  <button disabled className="flex-1 bg-gray-200 text-gray-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
+                  <button disabled className="w-full bg-gray-200 text-gray-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
                     Select Size
                   </button>
               ) : remainingStock === 0 ? (
-                  <button disabled className="flex-1 bg-orange-100 text-orange-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
+                  <button disabled className="w-full bg-orange-100 text-orange-400 h-14 rounded-lg font-bold uppercase tracking-widest text-xs cursor-not-allowed flex items-center justify-center gap-2">
                     Max Limit Reached
                   </button>
               ) : (
-                <button 
-                  onClick={handleAddToCart} 
-                  disabled={!selectedSize}
-                  className={`flex-1 h-14 rounded-lg font-bold uppercase tracking-widest text-xs transition-all shadow-lg flex items-center justify-center gap-2
-                    ${selectedSize ? 'bg-[#1C1917] text-white hover:bg-[#FF2865]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-                  `}
-                >
-                  <ShoppingBag className="w-4 h-4" /> {selectedSize ? 'Add to Bag' : 'Select Size'}
-                </button>
+                <div className="flex gap-3">
+                  {/* ADD TO CART */}
+                  <button 
+                    onClick={handleAddToCart} 
+                    className={`flex-1 h-14 rounded-lg font-bold uppercase tracking-widest text-xs transition-all shadow-sm border flex items-center justify-center gap-2
+                      ${!selectedSize 
+                        ? 'bg-white border-gray-200 text-gray-400' 
+                        : 'bg-white border-[#1C1917] text-[#1C1917] hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    <ShoppingBag className="w-4 h-4" /> Add to Bag
+                  </button>
+
+                  {/* BUY NOW */}
+                  <button 
+                    onClick={handleBuyNow} 
+                    className={`flex-1 h-14 rounded-lg font-bold uppercase tracking-widest text-xs transition-all shadow-lg flex items-center justify-center gap-2
+                      ${!selectedSize 
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                        : 'bg-[#1C1917] text-white hover:bg-[#FF2865] animate-fade-in'
+                      }
+                    `}
+                  >
+                    <Zap className="w-4 h-4 fill-current" /> Buy Now
+                  </button>
+                </div>
               )}
             </div>
 
@@ -258,7 +306,7 @@ export default function ProductDetail() {
               <InfoRow icon={ShieldCheck} title="Secure Payment" text="100% secure payment processing." />
             </div>
 
-            {/* --- CARE GUIDE SECTION (Added) --- */}
+            {/* Care Guide */}
             <div className="bg-[#F9F8F6] p-6 rounded-xl mt-6 border border-gray-100">
               <div className="flex items-center gap-3 mb-3">
                 <HeartHandshake className="w-5 h-5 text-[#FF2865]" />
@@ -267,9 +315,6 @@ export default function ProductDetail() {
               <ul className="text-sm text-gray-600 leading-relaxed font-light space-y-2 list-disc pl-4 marker:text-gray-400">
                 <li><strong>Avoid Water & Heat:</strong> Keep away from water and direct sunlight to prevent damage.</li>
                 <li><strong>Cleaning:</strong> Clean gently with a soft brush or damp cloth. Spot clean stains with mild detergent.</li>
-                <li><strong>Drying:</strong> Always air dry away from direct heat sources.</li>
-                <li><strong>Storage:</strong> Store in a dust bag with moisture absorbers. Rotate pairs regularly.</li>
-                <li><strong>Leather Care:</strong> Condition leather regularly to keep it soft and prevent cracking.</li>
                 <li className="text-[#FF2865] font-medium">For heavy embroidered juttis, Dry Clean Only.</li>
               </ul>
             </div>
@@ -291,7 +336,7 @@ export default function ProductDetail() {
   );
 }
 
-// --- SUB COMPONENTS ---
+// --- SUB COMPONENTS (UNCHANGED logic, just ensuring they are present) ---
 
 function Lightbox({ images, initialIndex, onClose }) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -375,11 +420,13 @@ function ReviewSection({ productId }) {
       if (!res.ok) throw new Error(data.message || 'Error');
 
       setMessage("Review submitted! It will appear after approval.");
+      toast.success("Review Submitted!"); // Added Toast here too
       setComment('');
       setShowForm(false);
       setError('');
     } catch (err) {
       setError(err.message);
+      toast.error(err.message);
       setMessage('');
     }
   };

@@ -6,6 +6,8 @@ import {
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
+import { toast } from 'react-hot-toast'; // Import Toast
+import { confirmAction } from '../../util/toastUtils'; // Import Standard Confirm Helper
 
 export default function Inventory() {
   const [products, setProducts] = useState([]);
@@ -20,9 +22,10 @@ export default function Inventory() {
       const res = await fetch(`${API_BASE_URL}/api/products?pageNumber=1&pageSize=100`); 
       const data = await res.json();
       setProducts(data.products || []); 
-      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch products", error);
+      toast.error("Failed to load inventory");
+    } finally {
       setLoading(false);
     }
   };
@@ -31,27 +34,35 @@ export default function Inventory() {
     fetchProducts();
   }, []);
 
-  // --- DELETE HANDLER ---
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        });
+  // --- DELETE HANDLER (UPDATED) ---
+  const handleDelete = (id) => {
+    confirmAction({
+      title: "Delete this Product?",
+      message: "It will be permanently removed from your inventory.",
+      confirmText: "Delete Product",
+      onConfirm: async () => {
+        const toastId = toast.loading("Deleting...");
         
-        if (res.ok) {
-          setProducts(products.filter(p => p._id !== id));
-          alert('Product deleted successfully');
-        } else {
-          alert('Failed to delete product');
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`,
+            },
+          });
+          
+          if (res.ok) {
+            setProducts(products.filter(p => p._id !== id));
+            toast.success('Product deleted successfully', { id: toastId });
+          } else {
+            toast.error('Failed to delete product', { id: toastId });
+          }
+        } catch (error) {
+          console.error(error);
+          toast.error('Server error occurred', { id: toastId });
         }
-      } catch (error) {
-        console.error(error);
       }
-    }
+    });
   };
 
   // --- FILTERING ---

@@ -1,35 +1,63 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ArrowLeft, Tag, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion'; // <--- Animation Library
-import confetti from 'canvas-confetti'; // <--- Celebration Library
+import { motion, AnimatePresence } from 'framer-motion'; 
+import confetti from 'canvas-confetti';
+import { toast } from 'react-hot-toast'; 
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from 'react-redux';
 import { updateQuantity, removeFromCart, applyDiscount, removeDiscount } from '../redux/cartSlice';
 import { API_BASE_URL } from '../util/config';
+
 export default function Cart() {
+  const navigate = useNavigate(); // Hook for navigation
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const dispatch = useDispatch();
+  
+  // Get Cart Data
   const { items: cartItems, totalAmount, coupon: appliedCoupon } = useSelector(
     (state) => state.cart
   );
+  
+  // Get Auth Status to decide where to send them
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [couponCode, setCouponCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleUpdateQty = (id, newQty) => {
-    dispatch(updateQuantity({ id, quantity: newQty }));
+  // --- CHECKOUT HANDLER (The Fork in the Road) ---
+  const checkoutHandler = () => {
+    if (userInfo) {
+      navigate('/checkout'); // User is logged in -> Go to Checkout
+    } else {
+      navigate('/login?redirect=checkout'); // Guest -> Go to Login (which has Guest option)
+    }
+  };
+
+  // --- UPDATED QUANTITY HANDLER ---
+  const handleUpdateQty = (id, size, newQty, maxStock) => {
+    if (newQty < 1) return;
+    const limit = maxStock || 10; 
+
+    if (newQty > limit) {
+      toast.error(`Sorry, only ${limit} items available in stock!`);
+      return;
+    }
+
+    dispatch(updateQuantity({ id, size, quantity: newQty }));
     if (appliedCoupon) dispatch(removeDiscount());
   };
 
   const handleRemove = (id, size) => {
     dispatch(removeFromCart({ id, size }));
     if (appliedCoupon) dispatch(removeDiscount());
+    toast.success("Item removed");
   };
 
   const handleApplyCoupon = async () => {
@@ -54,6 +82,7 @@ export default function Cart() {
           })
         );
         setCouponCode('');
+        toast.success("Coupon Applied!");
 
         confetti({
           particleCount: 100,
@@ -63,9 +92,11 @@ export default function Cart() {
         });
       } else {
         setError(data.message);
+        toast.error(data.message);
       }
     } catch (err) {
       setError('Something went wrong');
+      toast.error("Failed to apply coupon");
     } finally {
       setLoading(false);
     }
@@ -73,6 +104,7 @@ export default function Cart() {
 
   const handleRemoveCoupon = () => {
     dispatch(removeDiscount());
+    toast("Coupon removed");
   };
 
   const discountVal = appliedCoupon ? appliedCoupon.discountAmount : 0;
@@ -81,7 +113,7 @@ export default function Cart() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-24">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-24 animate-fade-in">
         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-gray-400">
           <ShoppingBag className="w-8 h-8" />
         </div>
@@ -131,7 +163,7 @@ export default function Cart() {
                   className="bg-white p-3 sm:p-4 md:p-6 rounded-2xl border border-gray-100 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center shadow-sm hover:shadow-md transition-shadow"
                 >
                   {/* Product Image */}
-                  <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden mx-auto sm:mx-0">
+                  <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden mx-auto sm:mx-0 border border-gray-100">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -142,50 +174,60 @@ export default function Cart() {
                   {/* Details */}
                   <div className="flex-grow w-full">
                     <div className="flex justify-between items-start mb-2 gap-3">
-                      <h3 className="font-serif text-base sm:text-lg md:text-xl text-[#1C1917]">
+                      <Link to={`/product/${item.id}`} className="font-serif text-base sm:text-lg md:text-xl text-[#1C1917] hover:text-[#FF2865] transition-colors">
                         {item.name}
-                      </h3>
+                      </Link>
                       <button
                         onClick={() => handleRemove(item.id, item.size)}
-                        className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+                        className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0 p-1"
                       >
                         <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
-                      Size: {item.size}
+                    <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4 flex items-center gap-2">
+                      <span className="bg-gray-100 px-2 py-1 rounded text-xs font-bold uppercase">Size: {item.size}</span>
+                      {item.maxStock && item.quantity >= item.maxStock && (
+                         <span className="text-[10px] text-orange-500 font-bold">Max Stock Reached</span>
+                      )}
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0">
+                      
                       {/* Quantity Control */}
-                      <div className="flex items-center gap-3 bg-[#F9F8F6] rounded-lg p-2">
+                      <div className="flex items-center gap-3 bg-[#F9F8F6] rounded-lg p-2 border border-gray-100">
                         <button
                           onClick={() =>
-                            handleUpdateQty(item.id, item.quantity - 1)
+                            handleUpdateQty(item.id, item.size, item.quantity - 1, item.maxStock)
                           }
                           className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-600 hover:text-[#FF2865] disabled:opacity-50"
                           disabled={item.quantity <= 1}
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="font-bold text-sm w-6 text-center">
+                        
+                        <span className="font-bold text-sm w-6 text-center text-[#1C1917]">
                           {item.quantity}
                         </span>
+                        
                         <button
                           onClick={() =>
-                            handleUpdateQty(item.id, item.quantity + 1)
+                            handleUpdateQty(item.id, item.size, item.quantity + 1, item.maxStock)
                           }
-                          className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-600 hover:text-[#FF2865]"
+                          disabled={item.maxStock && item.quantity >= item.maxStock}
+                          className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-600 hover:text-[#FF2865] disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-300"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
 
                       {/* Price */}
-                      <p className="font-bold text-base sm:text-lg text-[#1C1917]">
-                        ₹{(item.price * item.quantity).toLocaleString()}
-                      </p>
+                      <div className="text-right">
+                          <p className="font-bold text-base sm:text-lg text-[#1C1917]">
+                            ₹{(item.price * item.quantity).toLocaleString()}
+                          </p>
+                          <p className="text-[10px] text-gray-400">₹{item.price} / pair</p>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -194,7 +236,7 @@ export default function Cart() {
 
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 text-xs sm:text-sm text-gray-500 hover:text-[#FF2865] mt-2 sm:mt-4 font-medium"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm text-gray-500 hover:text-[#1C1917] mt-2 sm:mt-4 font-medium transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Continue Shopping
             </Link>
@@ -313,14 +355,14 @@ export default function Cart() {
                 </motion.div>
               )}
 
-              {/* Checkout Button */}
-              <Link
-                to="/checkout"
+              {/* Checkout Button - UPDATED FOR GUEST CHECKOUT */}
+              <button
+                onClick={checkoutHandler}
                 className="w-full bg-[#FF2865] text-white py-4 sm:py-5 rounded-xl font-bold uppercase tracking-[0.18em] sm:tracking-[0.2em] hover:bg-[#1C1917] transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-xs sm:text-sm"
               >
                 Proceed to Checkout
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Link>
+              </button>
 
               {/* Trust Badges */}
               <div className="mt-4 sm:mt-6 flex flex-wrap justify-center gap-3 sm:gap-4 opacity-60 grayscale">

@@ -1,267 +1,145 @@
-// import { createSlice } from '@reduxjs/toolkit';
-
-// const initialState = {
-//   items: [], 
-//   totalQuantity: 0,
-//   totalAmount: 0,
-//   // --- NEW FIELDS FOR CHECKOUT ---
-//   shippingAddress: {}, 
-//   paymentMethod: 'Razorpay',
-//   coupon: null, 
-// };
-
-// const cartSlice = createSlice({
-//   name: 'cart',
-//   initialState,
-//   reducers: {
-//     // 1. ADD ITEM
-//     addToCart: (state, action) => {
-//       const newItem = action.payload;
-//       const existingItem = state.items.find((item) => item.id === newItem.id && item.size === newItem.size);
-      
-//       if (!existingItem) {
-//         state.items.push({
-//           id: newItem.id, // Using the unique _id from MongoDB
-//           name: newItem.name,
-//           image: newItem.image,
-//           price: newItem.price,
-//           quantity: newItem.quantity || 1, 
-//           size: newItem.size,
-//           totalPrice: newItem.price * (newItem.quantity || 1),
-//         });
-//       } else {
-//         existingItem.quantity += newItem.quantity || 1;
-//         existingItem.totalPrice += newItem.price * (newItem.quantity || 1);
-//       }
-      
-//       // Recalculate Totals
-//       state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-//       state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-//     },
-
-//     // 2. REMOVE ITEM
-//    // FIXED REMOVE LOGIC: Checks both ID and Size
-//     removeFromCart: (state, action) => {
-//       const { id, size } = action.payload; // <--- Get both ID and Size
-      
-//       // Keep items that DO NOT match both the ID and the Size
-//       state.items = state.items.filter(item => !(item.id === id && item.size === size));
-      
-//       // Recalculate Totals
-//       state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-//       state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-//     },
-
-//     // 3. UPDATE QUANTITY
-//     updateQuantity: (state, action) => {
-//       const { id, quantity } = action.payload;
-//       const existingItem = state.items.find(item => item.id === id);
-      
-//       if (existingItem && quantity > 0) {
-//         existingItem.quantity = quantity;
-//         existingItem.totalPrice = existingItem.price * quantity;
-//       }
-      
-//       // Recalculate
-//       state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-//       state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-//     },
-    
-//     // 4. SET CART (For Login Merge or Loading from DB)
-//     setCart: (state, action) => {
-//       state.items = action.payload;
-//       // Force recalculate totals based on the new array
-//       state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-//       state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-//     },
-
-//     // 5. CLEAR CART (For Logout or Checkout Success)
-//     clearCart: (state) => {
-//       state.items = [];
-//       state.totalQuantity = 0;
-//       state.totalAmount = 0;
-//       state.shippingAddress = {}; // Optional: clear address on logout
-//     },
-
-//     // --- NEW REDUCERS FOR CHECKOUT ---
-    
-//     // 6. SAVE SHIPPING ADDRESS
-//     saveShippingAddress: (state, action) => {
-//       state.shippingAddress = action.payload;
-//     },
-
-//     // 7. SAVE PAYMENT METHOD
-//     savePaymentMethod: (state, action) => {
-//       state.paymentMethod = action.payload;
-//     },
-//     applyDiscount: (state, action) => {
-//       state.coupon = action.payload; // Payload: { code, discountAmount }
-//     },
-//     removeDiscount: (state) => {
-//       state.coupon = null;
-//     }
-//   },
-// });
-
-// export const { 
-//   addToCart, 
-//   removeFromCart, 
-//   updateQuantity, 
-//   clearCart, 
-//   setCart,
-//   saveShippingAddress, // Exporting new action
-//   savePaymentMethod,
-//   applyDiscount,
-//   removeDiscount,    // Exporting new action
-// } = cartSlice.actions;
-
-// export default cartSlice.reducer;
-
-
-
-
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { API_BASE_URL } from '../util/config'; 
+import { API_BASE_URL } from '../util/config';
+// 🚨 NO IMPORTS from authSlice to prevent crashes
 
-// --- ASYNC THUNK: SYNC CART TO BACKEND ---
+// --- ASYNC THUNK: SYNC CART ---
 export const syncCartToBackend = createAsyncThunk(
   'cart/sync',
   async (cartItems, { getState, rejectWithValue }) => {
     const { auth } = getState();
-    // Only sync if user is logged in
     if (!auth.userInfo) return; 
 
     try {
       await fetch(`${API_BASE_URL}/api/users/cart`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.userInfo.token}`
+          Authorization: `Bearer ${auth.userInfo.token}`,
         },
-        body: JSON.stringify({ cart: cartItems })
+        // Filter garbage data
+        body: JSON.stringify({ cart: cartItems.filter(item => item.quantity > 0) }),
       });
+      return true; // Return success
     } catch (error) {
       return rejectWithValue(error.message);
     }
   }
 );
 
+const calculateTotals = (state) => {
+  state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
+  state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  localStorage.setItem('cartItems', JSON.stringify(state.items));
+  localStorage.setItem('shippingAddress', JSON.stringify(state.shippingAddress));
+};
+
+const itemsFromStorage = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
+
 const initialState = {
-  items: [], 
+  items: itemsFromStorage,
   totalQuantity: 0,
   totalAmount: 0,
-  // --- NEW FIELDS FOR CHECKOUT ---
-  shippingAddress: {}, 
+  shippingAddress: localStorage.getItem('shippingAddress') ? JSON.parse(localStorage.getItem('shippingAddress')) : {},
   paymentMethod: 'Razorpay',
-  coupon: null, 
+  coupon: null,
+  // 🟢 DIRTY FLAG: Defaults to false. 
+  // True = User changed something, needs sync. 
+  // False = Data is fresh from DB or empty, DO NOT SYNC.
+  isDirty: false 
 };
+
+// Init Totals
+const tempState = { ...initialState };
+calculateTotals(tempState);
+initialState.totalQuantity = tempState.totalQuantity;
+initialState.totalAmount = tempState.totalAmount;
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    // 1. ADD ITEM
     addToCart: (state, action) => {
       const newItem = action.payload;
       const existingItem = state.items.find((item) => item.id === newItem.id && item.size === newItem.size);
-      
       if (!existingItem) {
-        state.items.push({
-          id: newItem.id, // Using the unique _id from MongoDB
-          name: newItem.name,
-          image: newItem.image,
-          price: newItem.price,
-          quantity: newItem.quantity || 1, 
-          size: newItem.size,
-          totalPrice: newItem.price * (newItem.quantity || 1),
-        });
+        state.items.push({ ...newItem, quantity: newItem.quantity || 1 });
       } else {
         existingItem.quantity += newItem.quantity || 1;
-        existingItem.totalPrice += newItem.price * (newItem.quantity || 1);
+        existingItem.maxStock = newItem.maxStock; 
       }
-      
-      // Recalculate Totals
-      state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-      state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      state.isDirty = true; // ✅ User Action = Dirty
+      calculateTotals(state);
     },
 
-    // 2. REMOVE ITEM
     removeFromCart: (state, action) => {
-      const { id, size } = action.payload; 
-      
-      // Keep items that DO NOT match both the ID and the Size
-      state.items = state.items.filter(item => !(item.id === id && item.size === size));
-      
-      // Recalculate Totals
-      state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-      state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      const { id, size } = action.payload;
+      state.items = state.items.filter((item) => !(item.id === id && item.size === size));
+      state.isDirty = true; // ✅ User Action = Dirty
+      calculateTotals(state);
     },
 
-    // 3. UPDATE QUANTITY
     updateQuantity: (state, action) => {
-      const { id, quantity } = action.payload;
-      const existingItem = state.items.find(item => item.id === id);
-      
-      if (existingItem && quantity > 0) {
-        existingItem.quantity = quantity;
-        existingItem.totalPrice = existingItem.price * quantity;
+      const { id, size, quantity } = action.payload;
+      const existingItem = state.items.find((item) => item.id === id && item.size === size);
+      if (existingItem) {
+        const limit = existingItem.maxStock > 0 ? existingItem.maxStock : 10;
+        existingItem.quantity = Math.max(0, Math.min(quantity, limit));
       }
-      
-      // Recalculate
-      state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-      state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-    },
-    
-    // 4. SET CART (For Login Merge or Loading from DB)
-    setCart: (state, action) => {
-      state.items = action.payload;
-      // Force recalculate totals based on the new array
-      state.totalQuantity = state.items.reduce((total, item) => total + item.quantity, 0);
-      state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      state.isDirty = true; // ✅ User Action = Dirty
+      calculateTotals(state);
     },
 
-    // 5. CLEAR CART (For Logout or Checkout Success)
+    setCart: (state, action) => {
+      // 1. Clean Data
+      const validItems = action.payload.filter(item => item.quantity > 0);
+      state.items = validItems.map(item => {
+        const mutableItem = { ...item };
+        if (mutableItem.maxStock > 0 && mutableItem.quantity > mutableItem.maxStock) {
+            mutableItem.quantity = mutableItem.maxStock; 
+        }
+        return mutableItem;
+      });
+      // 🛑 DB Load = Clean (Not Dirty). Do NOT sync this back immediately.
+      state.isDirty = false; 
+      calculateTotals(state);
+    },
+
     clearCart: (state) => {
       state.items = [];
       state.totalQuantity = 0;
       state.totalAmount = 0;
-      state.shippingAddress = {}; 
-      state.coupon = null;
+      state.isDirty = false; 
+      localStorage.removeItem('cartItems');
     },
 
-    // --- NEW REDUCERS FOR CHECKOUT ---
-    
-    // 6. SAVE SHIPPING ADDRESS
-    saveShippingAddress: (state, action) => {
-      state.shippingAddress = action.payload;
-    },
-
-    // 7. SAVE PAYMENT METHOD
-    savePaymentMethod: (state, action) => {
-      state.paymentMethod = action.payload;
-    },
-    applyDiscount: (state, action) => {
-      state.coupon = action.payload; // Payload: { code, discountAmount }
-    },
-    removeDiscount: (state) => {
-      state.coupon = null;
-    }
+    saveShippingAddress: (state, action) => { state.shippingAddress = action.payload; },
+    savePaymentMethod: (state, action) => { state.paymentMethod = action.payload; },
+    applyDiscount: (state, action) => { state.coupon = action.payload; },
+    removeDiscount: (state) => { state.coupon = null; },
   },
-  // We don't need extraReducers for syncCartToBackend because we don't update local state on success,
-  // we just assume it worked. The local state is the source of truth here.
+  
+  // 🚨 CRASH FIX: Use String Literals. No Imports needed.
+  extraReducers: (builder) => {
+    builder
+      // When sync is done, we are clean again
+      .addCase(syncCartToBackend.fulfilled, (state) => {
+          state.isDirty = false;
+      })
+      // Match 'auth/login/fulfilled' string manually
+      .addCase('auth/login/fulfilled', (state) => {
+         state.isDirty = false; // Just logged in? Clean. Don't sync yet.
+      })
+      .addCase('auth/register/fulfilled', (state) => {
+         state.isDirty = false; 
+      })
+      // Match 'auth/logout' (Synchronous action)
+      .addCase('auth/logout', (state) => {
+         state.items = [];
+         state.isDirty = false; 
+         localStorage.removeItem('cartItems');
+      });
+  }
 });
 
-export const { 
-  addToCart, 
-  removeFromCart, 
-  updateQuantity, 
-  clearCart, 
-  setCart,
-  saveShippingAddress, 
-  savePaymentMethod,
-  applyDiscount,
-  removeDiscount,
-} = cartSlice.actions;
-
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setCart, saveShippingAddress, savePaymentMethod, applyDiscount, removeDiscount } = cartSlice.actions;
 export default cartSlice.reducer;
