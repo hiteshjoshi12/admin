@@ -17,12 +17,27 @@ const createTransporter = () => {
   });
 };
 
-// --- 2. BEAUTIFUL GENERIC EMAIL (Forgot Password / Welcome) ---
+// --- HELPER: GET RECIPIENT DETAILS ---
+const getRecipientDetails = (order) => {
+    // 1. Try Logged In User
+    if (order.user && order.user.email) {
+        return { email: order.user.email, name: order.user.name.split(' ')[0] };
+    }
+    // 2. Try Guest Info (The fix for your issue)
+    if (order.guestInfo && order.guestInfo.email) {
+        return { email: order.guestInfo.email, name: order.guestInfo.name || "Customer" };
+    }
+    // 3. Fallback to Payment Result
+    if (order.paymentResult && order.paymentResult.email_address) {
+        return { email: order.paymentResult.email_address, name: "Customer" };
+    }
+    return { email: null, name: "Customer" };
+};
+
+// --- 2. BEAUTIFUL GENERIC EMAIL ---
 const sendEmail = async (options) => {
   try {
     const transporter = createTransporter();
-
-    // Optional: Create a button if a URL is provided
     const buttonHtml = options.url ? `
       <div style="text-align: center; margin: 30px 0;">
         <a href="${options.url}" style="background-color: #1C1917; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block;">
@@ -37,44 +52,36 @@ const sendEmail = async (options) => {
       subject: options.subject,
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #333; line-height: 1.6; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
-          
           <div style="background-color: #1C1917; padding: 20px; text-align: center;">
             <h2 style="color: #ffffff; margin: 0; font-family: serif; letter-spacing: 1px;">BeadsNBloom</h2>
           </div>
-
           <div style="padding: 30px 20px;">
             <h3 style="color: #1C1917; margin-top: 0;">${options.title || 'Notification'}</h3>
-            
-            <p style="font-size: 15px; color: #555;">
-              ${options.message.replace(/\n/g, '<br>')}
-            </p>
-
+            <p style="font-size: 15px; color: #555;">${options.message.replace(/\n/g, '<br>')}</p>
             ${buttonHtml}
-
-            <p style="font-size: 13px; color: #999; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-              If you didn't request this email, you can safely ignore it.
-            </p>
-          </div>
-
-          <div style="background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #aaa;">
-            &copy; ${new Date().getFullYear()} BeadsNBloom. All rights reserved.
           </div>
         </div>
       `,
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`📧 Generic Email sent to: ${options.email}`);
   } catch (error) {
     console.error("❌ Generic Email Failed:", error.message);
-    throw new Error('Email could not be sent');
   }
 };
 
-// --- 3. ORDER CONFIRMATION (Keep this as is) ---
+// --- 3. ORDER CONFIRMATION (Fixed for Guests) ---
 const sendOrderConfirmation = async (order) => {
   try {
     const transporter = createTransporter();
+    
+    // 🚨 GET CORRECT EMAIL/NAME
+    const { email, name } = getRecipientDetails(order);
+    
+    if (!email) {
+        console.log("❌ No email found for order confirmation.");
+        return;
+    }
 
     const itemsHtml = order.orderItems.map(item => `
       <tr>
@@ -92,13 +99,13 @@ const sendOrderConfirmation = async (order) => {
 
     const mailOptions = {
       from: `"BeadsNBloom Orders" <Connect@beadsandbloom.com>`,
-      to: order.user?.email || order.paymentResult?.email_address,
+      to: email, // Use extracted email
       subject: `Order Confirmed! #${order._id.toString().slice(-6).toUpperCase()}`,
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #eee;">
             <h2 style="color: #1C1917; margin-bottom: 5px;">Thank You for Your Order!</h2>
-            <p style="color: #666; margin: 0;">Hi ${order.user?.name ? order.user.name.split(' ')[0] : 'Customer'}, we're getting your package ready.</p>
+            <p style="color: #666; margin: 0;">Hi ${name}, we're getting your package ready.</p>
           </div>
           
           <div style="background-color: #f8f8f8; padding: 15px; border-radius: 8px; margin: 25px 0; text-align: center;">
@@ -141,21 +148,21 @@ const sendOrderConfirmation = async (order) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Order Confirmation sent to: ${mailOptions.to}`);
+    console.log(`✅ Order Confirmation sent to: ${email}`);
   } catch (error) {
     console.error("❌ Email Sending Failed:", error.message);
   }
 };
 
-
-// ... existing imports and functions ...
-
-// --- 4. ORDER STATUS UPDATE EMAIL (Shipped/Delivered) ---
+// --- 4. ORDER STATUS EMAIL (Fixed for Guests) ---
 const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
   try {
     const transporter = createTransporter();
     
-    // Dynamic Subject & Message based on status
+    // 🚨 GET CORRECT EMAIL
+    const { email } = getRecipientDetails(order);
+    if (!email) return;
+
     let subject = `Update on Order #${order._id.toString().slice(-6).toUpperCase()}`;
     let heading = "Order Update";
     let message = `There is an update on your order.`;
@@ -174,7 +181,6 @@ const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
         message = `We have received your order and are currently packing it. You will receive a tracking link soon.`;
     }
 
-    // Tracking Button Logic
     const trackingHtml = trackingUrl ? `
       <div style="text-align: center; margin: 30px 0;">
         <a href="${trackingUrl}" style="background-color: #1C1917; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block;">
@@ -185,7 +191,7 @@ const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
 
     const mailOptions = {
       from: `"BeadsNBloom Updates" <Connect@beadsandbloom.com>`,
-      to: order.user?.email || order.paymentResult?.email_address,
+      to: email, // Use extracted email
       subject: subject,
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #333; line-height: 1.6; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
@@ -206,15 +212,10 @@ const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Status Email (${status}) sent to: ${mailOptions.to}`);
+    console.log(`✅ Status Email (${status}) sent to: ${email}`);
   } catch (error) {
     console.error("❌ Email Sending Failed:", error.message);
   }
 };
 
-// --- UPDATE EXPORTS ---
-module.exports = { 
-    sendEmail, 
-    sendOrderConfirmation, 
-    sendOrderStatusEmail // <--- Add this
-};
+module.exports = { sendEmail, sendOrderConfirmation, sendOrderStatusEmail };
