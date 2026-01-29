@@ -108,6 +108,7 @@ const cartSlice = createSlice({
       state.items = [];
       state.totalQuantity = 0;
       state.totalAmount = 0;
+      state.coupon = null; // ✅ Clear coupon on manual clear
       state.isDirty = false; 
       localStorage.removeItem('cartItems');
     },
@@ -135,6 +136,9 @@ const cartSlice = createSlice({
       // Match 'auth/logout' (Synchronous action)
       .addCase('auth/logout', (state) => {
          state.items = [];
+         state.totalQuantity = 0;
+         state.totalAmount = 0;
+         state.coupon = null; // ✅ FIXED: Clear coupon on logout
          state.isDirty = false; 
          localStorage.removeItem('cartItems');
       });

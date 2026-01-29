@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
+import { useEffect, useState, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ArrowLeft, Tag, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import confetti from 'canvas-confetti';
@@ -9,27 +9,66 @@ import { toast } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateQuantity, removeFromCart, applyDiscount, removeDiscount } from '../redux/cartSlice';
 import { API_BASE_URL } from '../util/config';
+import { getOptimizedImage } from '../util/imageUtils';
 
 export default function Cart() {
-  const navigate = useNavigate(); // Hook for navigation
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
+  const navigate = useNavigate(); 
   const dispatch = useDispatch();
   
-  // Get Cart Data
-  const { items: cartItems, totalAmount, coupon: appliedCoupon } = useSelector(
-    (state) => state.cart
-  );
-  
-  // Get Auth Status to decide where to send them
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Get Redux State
+  const { items: cartItems, totalAmount, coupon: appliedCoupon } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
 
   const [couponCode, setCouponCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // --- 1. NEW: RE-VALIDATE COUPON ON LOAD/LOGIN ---
+  useEffect(() => {
+    if (appliedCoupon) {
+      const validateCoupon = async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/coupons/verify`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                // Include token if user is logged in (for user-specific coupons)
+                ...(userInfo && { Authorization: `Bearer ${userInfo.token}` }) 
+            },
+            body: JSON.stringify({ code: appliedCoupon.code, cartTotal: totalAmount }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            // Coupon is no longer valid (Expired or User changed)
+            dispatch(removeDiscount());
+            toast.error(`Coupon ${appliedCoupon.code} has expired or is invalid.`);
+          } else {
+            // Optional: Update discount amount if logic depends on cart total
+            if (data.discountAmount !== appliedCoupon.discountAmount) {
+                 dispatch(applyDiscount({
+                    code: data.code,
+                    discountAmount: data.discountAmount,
+                }));
+            }
+          }
+        } catch (err) {
+          // If server error or network issue, maybe remove to be safe?
+          // Or just leave it. Usually safer to remove if validation fails.
+          console.error("Coupon validation failed", err);
+        }
+      };
+
+      validateCoupon();
+    }
+  }, [appliedCoupon?.code, totalAmount, userInfo, dispatch]);
+
+
+
+
 
   // --- CHECKOUT HANDLER (The Fork in the Road) ---
   const checkoutHandler = () => {
