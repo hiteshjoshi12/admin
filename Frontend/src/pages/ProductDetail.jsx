@@ -12,7 +12,7 @@ import {
   ZoomIn,
   HeartHandshake,
   Zap,
-  Heart, // <--- 1. Import Heart Icon
+  Heart, 
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -23,7 +23,6 @@ import {
   clearProductDetails,
 } from "../redux/productSlice";
 import { addToCart } from "../redux/cartSlice";
-// 2. Import Wishlist Actions
 import { toggleWishlistAPI, toggleWishlistLocal } from "../redux/wishlistSlice";
 import { API_BASE_URL } from "../util/config";
 
@@ -49,9 +48,8 @@ export default function ProductDetail() {
   const cart = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
 
-  // 3. GET WISHLIST STATE
+  // GET WISHLIST STATE
   const wishlist = useSelector((state) => state.wishlist.items);
-  // Check if current product is already in the wishlist array
   const isWishlisted =
     currentProduct && wishlist.some((item) => item._id === currentProduct._id);
 
@@ -106,25 +104,27 @@ export default function ProductDetail() {
     setQuantity(1);
   };
 
-  // 4. WISHLIST TOGGLE LOGIC
+  // Scroll Handler
+  const scrollToReviews = () => {
+    const element = document.getElementById('reviews-section');
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleWishlistToggle = () => {
-    // Determine action (Add or Remove) based on current state for the Toast message
     const willAdd = !isWishlisted;
 
     if (userInfo) {
-      // API Dispatch
       dispatch(toggleWishlistAPI(currentProduct))
-        .unwrap() // Wait for result
+        .unwrap()
         .then(() => {
-          // Show Toast on Success
           if (willAdd) toast.success("Added to Wishlist");
           else toast.success("Removed from Wishlist");
         })
         .catch(() => toast.error("Something went wrong"));
     } else {
-      // Local Dispatch
       dispatch(toggleWishlistLocal(currentProduct));
-      // Show Toast Immediately
       if (willAdd) toast.success("Added to Wishlist");
       else toast.success("Removed from Wishlist");
     }
@@ -180,6 +180,10 @@ export default function ProductDetail() {
     getOptimizedImage(img, 1000),
   );
 
+  // Calculate Rating Display
+  const avgRating = currentProduct.rating || 0;
+  const numReviews = currentProduct.numReviews || 0;
+
   return (
     <div className="bg-white min-h-screen pt-20">
       {isLightboxOpen && (
@@ -193,7 +197,6 @@ export default function ProductDetail() {
       <div className="max-w-[1440px] mx-auto px-0 md:px-6 lg:px-12 py-8 flex flex-col lg:flex-row gap-12">
         {/* LEFT: IMAGE GALLERY */}
         <div className="w-full lg:w-3/5 relative">
-          {/* 5. MOBILE WISHLIST BUTTON (Floating) */}
           <button
             onClick={handleWishlistToggle}
             className="lg:hidden absolute top-4 right-4 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm"
@@ -224,7 +227,6 @@ export default function ProductDetail() {
 
           {/* DESKTOP VIEW: Grid Layout */}
           <div className="hidden lg:grid grid-cols-2 gap-4 relative">
-            {/* 6. DESKTOP WISHLIST BUTTON (Top Right) */}
             <button
               onClick={handleWishlistToggle}
               className="absolute top-4 right-4 z-20 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform group"
@@ -255,13 +257,32 @@ export default function ProductDetail() {
 
         {/* RIGHT: PRODUCT DETAILS */}
         <div className="w-full lg:w-2/5 px-6 lg:px-0">
-          <div className="sticky top-28 space-y-8">
-            {/* Header Info */}
+          <div className="sticky top-28 space-y-6">
+            
+            {/* Header Info with Rating Badge */}
             <div>
               <h1 className="text-3xl md:text-4xl font-serif text-[#1C1917] leading-tight">
                 {currentProduct.name}
               </h1>
-              <div className="flex items-center gap-4 mb-4 mt-2">
+              
+              {/* --- NEW RATING BADGE --- */}
+              <div 
+                onClick={scrollToReviews}
+                className="flex items-center gap-2 mt-2 cursor-pointer group w-fit"
+              >
+                <div className="flex items-center gap-1 bg-[#F9F8F6] px-2 py-1 rounded-md border border-gray-200 group-hover:border-[#FF2865] transition-colors">
+                    <Star className="w-3.5 h-3.5 fill-[#FFCB45] text-[#FFCB45]" />
+                    <span className="text-xs font-bold text-[#1C1917] pt-0.5">
+                        {avgRating.toFixed(1)}
+                    </span>
+                </div>
+                <span className="text-xs text-gray-500 underline decoration-gray-300 group-hover:text-[#FF2865] group-hover:decoration-[#FF2865] underline-offset-2 transition-all">
+                    {numReviews} Reviews
+                </span>
+              </div>
+              {/* ----------------------- */}
+
+              <div className="flex items-center gap-4 mb-4 mt-4">
                 <span className="text-2xl font-bold text-[#1C1917]">
                   ₹{currentProduct.price.toLocaleString()}
                 </span>
@@ -325,7 +346,7 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* 4. QUANTITY & BUTTONS SECTION */}
+            {/* QUANTITY & BUTTONS SECTION */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
@@ -455,7 +476,11 @@ export default function ProductDetail() {
       </div>
 
       {/* Sub Components */}
-      <ReviewSection productId={id} />
+      {/* 8. WRAP IN ID FOR SCROLLING */}
+      <div id="reviews-section">
+        <ReviewSection productId={id} />
+      </div>
+      
       {/* Pass current ID so we can filter it out */}
       <RelatedProducts currentId={currentProduct._id} />
     </div>
@@ -539,4 +564,3 @@ function InfoRow({ icon: Icon, title, text }) {
     </div>
   );
 }
-
