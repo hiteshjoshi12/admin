@@ -1,4 +1,4 @@
-import { ShoppingBag, Menu, X, User, LogOut, Package, ChevronDown } from "lucide-react";
+import { ShoppingBag, Menu, X, User, LogOut, Package, ChevronDown, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 
@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
 import { clearCart } from "../redux/cartSlice";
+import { clearWishlist } from "../redux/wishlistSlice"; // Import clearWishlist
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,14 +17,15 @@ export default function Navbar() {
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
-  // 1. GET USER INFO & CART COUNT FROM REDUX
+  // 1. GET DATA FROM REDUX
   const { userInfo } = useSelector((state) => state.auth);
-  
-  // FIX: Default items to [] to prevent .reduce crash if state is empty
-  const { items = [] } = useSelector((state) => state.cart);
-  const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
+  const { items: cartItems = [] } = useSelector((state) => state.cart);
+  const { items: wishlistItems = [] } = useSelector((state) => state.wishlist); // Get Wishlist
 
-  // --- CONFIGURATION: Define your links here ---
+  // 2. CALCULATE COUNTS
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const wishlistCount = wishlistItems.length;
+
   const navLinks = [
     { name: 'Sale', path: '/sale', isSpecial: true },
     { name: 'New Arrivals', path: '/shop' },
@@ -31,14 +33,12 @@ export default function Navbar() {
     { name: 'About', path: '/about' },
   ];
 
-  // Scroll Handler
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close Dropdown on Click Outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -49,10 +49,10 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Logout Handler
   const handleLogout = () => {
-    dispatch(logout()); // Clear User
-    dispatch(clearCart()); // Clear Cart 
+    dispatch(logout()); 
+    dispatch(clearCart()); 
+    dispatch(clearWishlist()); // Clear wishlist on logout
     setIsMobileMenuOpen(false);
     navigate('/login');
   };
@@ -91,6 +91,16 @@ export default function Navbar() {
           {/* RIGHT: Auth & Icons */}
           <div className="flex items-center gap-4 z-50 relative">
             
+            {/* WISHLIST ICON (Desktop) */}
+            <Link to="/wishlist" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors group hidden sm:block">
+              <Heart className="w-5 h-5 text-gray-700 group-hover:text-[#FF2865] transition-colors" />
+              {wishlistCount > 0 && (
+                <span className="absolute top-0 right-0 h-4 w-4 bg-[#FF2865] text-white text-[9px] flex items-center justify-center rounded-full border-2 border-white font-bold">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
             {/* CART ICON */}
             <Link to="/cart" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors group">
               <ShoppingBag className="w-5 h-5 text-gray-700" />
@@ -104,7 +114,7 @@ export default function Navbar() {
             {/* --- DESKTOP AUTH LOGIC --- */}
             <div className="hidden md:block">
               {userInfo ? (
-                // 1. LOGGED IN VIEW (User Dropdown)
+                // LOGGED IN VIEW
                 <div className="relative" ref={dropdownRef}>
                   <button 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -128,6 +138,11 @@ export default function Navbar() {
                         <User className="w-4 h-4" /> My Profile
                       </Link>
                       
+                      {/* Dropdown Wishlist Link */}
+                      <Link to="/wishlist" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#FF2865] transition-colors">
+                        <Heart className="w-4 h-4" /> Wishlist ({wishlistCount})
+                      </Link>
+
                       <Link to="/myorders" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#FF2865] transition-colors">
                         <Package className="w-4 h-4" /> My Orders
                       </Link>
@@ -139,7 +154,7 @@ export default function Navbar() {
                   )}
                 </div>
               ) : (
-                // 2. LOGGED OUT VIEW (Login Buttons)
+                // LOGGED OUT VIEW
                 <div className="flex items-center gap-4 border-l border-gray-200 pl-6">
                   <Link to="/login" className="text-xs font-medium uppercase tracking-widest text-gray-600 hover:text-black transition-colors">Log In</Link>
                   <Link to="/signup" className="text-xs font-medium uppercase tracking-widest bg-black text-white px-5 py-2 rounded-full hover:bg-gray-800 transition-all hover:scale-105">Sign Up</Link>
@@ -175,9 +190,15 @@ export default function Navbar() {
 
           {/* MOBILE AUTH STATE */}
           <div className={`flex flex-col gap-3 w-full transition-all duration-500 delay-300 ${isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+            
+            {/* Mobile Wishlist Link (Always Visible) */}
+            <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center py-3 border border-gray-200 rounded-full text-sm font-sans uppercase tracking-widest hover:bg-gray-50 flex items-center justify-center gap-2">
+               <Heart className="w-4 h-4 text-[#FF2865]" /> Wishlist ({wishlistCount})
+            </Link>
+
             {userInfo ? (
               <>
-                <div className="text-center mb-4">
+                <div className="text-center mb-4 mt-4">
                   <div className="w-16 h-16 bg-[#1C1917] text-white rounded-full flex items-center justify-center font-serif text-2xl mx-auto mb-2">
                     {userInfo.name.charAt(0).toUpperCase()}
                   </div>

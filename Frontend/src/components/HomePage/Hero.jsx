@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { API_BASE_URL } from '../../util/config';
+// 1. IMPORT OPTIMIZER
+import { getOptimizedImage } from '../../util/imageUtils';
 
 // 1. THE SINGLE HARDCODED FALLBACK
-// This shows ONLY if the CMS has 0 slides.
 const fallbackSlide = {
   id: 'fallback-1',
-  image: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069487/banner1_viwl2e.png",
+  image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069487/banner1_viwl2e.png",
   subtitle: "The Wedding Edit '26",
   titleLine1: "Handcrafted",
   titleLine2: "Perfection",
@@ -18,7 +19,7 @@ const fallbackSlide = {
 const brandPink = "#FD61A7"; 
 
 export default function Hero() {
-  const [slides, setSlides] = useState([fallbackSlide]); // Default to fallback initially
+  const [slides, setSlides] = useState([fallbackSlide]); 
   const [current, setCurrent] = useState(0);
 
   // --- FETCH HERO CONTENT ---
@@ -28,13 +29,10 @@ export default function Hero() {
         const res = await fetch(`${API_BASE_URL}/api/content`);
         const data = await res.json();
         
-        // LOGIC: If CMS has slides, use them. Else, keep fallback.
         if (data && data.heroSlides && data.heroSlides.length > 0) {
-          // Map DB structure to UI structure (if names differ slightly)
           const formattedSlides = data.heroSlides.map((slide, idx) => ({
              id: slide._id || idx,
              image: slide.image,
-             // Split title logic (First word white, rest pink)
              titleLine1: slide.title ? slide.title.split(' ')[0] : 'New',
              titleLine2: slide.title ? slide.title.split(' ').slice(1).join(' ') : 'Arrivals',
              subtitle: slide.subtitle,
@@ -43,7 +41,6 @@ export default function Hero() {
           }));
           setSlides(formattedSlides);
         } else {
-           // Explicitly set fallback if DB returns empty array
            setSlides([fallbackSlide]); 
         }
       } catch (error) {
@@ -57,7 +54,6 @@ export default function Hero() {
 
   const length = slides.length;
 
-  // Auto-play (Only if > 1 slide)
   useEffect(() => {
     if (length > 1) {
       const timer = setInterval(() => {
@@ -84,10 +80,13 @@ export default function Hero() {
           <div className={`w-full h-full transition-transform duration-[8000ms] ease-linear ${
             index === current ? 'scale-110' : 'scale-100'
           }`}>
+             {/* 2. APPLY OPTIMIZATION HERE */}
+             {/* Width 1600 is good balance for desktop quality vs speed */}
              <img 
-               src={slide.image} 
+               src={getOptimizedImage(slide.image, 1600)} 
                alt={slide.titleLine1} 
                className="w-full h-full object-cover"
+               priority="true" // Optional: Hint to browser to load this immediately
              />
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60"></div>
@@ -131,7 +130,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* 3. CONTROLS (Hide if only 1 slide) */}
+      {/* 3. CONTROLS */}
       {length > 1 && (
         <>
           <button onClick={prevSlide} className="hidden md:flex absolute left-8 top-1/2 -translate-y-1/2 z-20 p-4 rounded-full text-white/70 hover:bg-white transition-all duration-300 group">

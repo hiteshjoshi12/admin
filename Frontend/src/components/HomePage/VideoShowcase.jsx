@@ -3,6 +3,9 @@ import { Play, Volume2, VolumeX, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { API_BASE_URL } from '../../util/config';
 
+// 1. IMPORT OPTIMIZER
+import { getOptimizedVideo } from '../../util/videoUtils';
+
 // Shadcn Imports
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,25 +15,25 @@ import { Badge } from "@/components/ui/badge";
 // LOADER IMPORTS
 import { VideoScrollSkeleton } from '../loaders/SectionLoader';
 
-// Fallback Data (If DB is empty)
+// Fallback Data
 const fallbackVideos = [
   {
     _id: 1,
-    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069368/j5_ketdz3.mp4", 
+    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069368/j5_ketdz3.mp4", 
     title: "Bridal BTS",
     ctaText: "Shop The Look",
     link: "/shop"
   },
   {
     _id: 2,
-    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069341/j8_fjkfoe.mp4", 
+    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069341/j8_fjkfoe.mp4", 
     title: "Summer Walk",
     ctaText: "View Collection",
     link: "/shop"
   },
   {
     _id: 3,
-    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,w_720,br_2m/v1769069290/j2_hkesie.mp4", 
+    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069290/j2_hkesie.mp4", 
     title: "Festive Vibes",
     ctaText: "Shop Festive",
     link: "/shop"
@@ -81,9 +84,10 @@ export default function VideoShowcase() {
       <Link to={video.link || '/shop'}>
         <Card className="relative w-[280px] md:w-[320px] aspect-[9/16] overflow-hidden border-0 rounded-2xl bg-black/5 group cursor-pointer snap-center">
           <CardContent className="p-0 h-full">
+            {/* 2. APPLY OPTIMIZATION: Width 720 */}
             <video
               ref={videoRef}
-              src={video.videoUrl}
+              src={getOptimizedVideo(video.videoUrl, 720)}
               className="w-full h-full object-cover pointer-events-none"
               autoPlay loop muted playsInline
             />

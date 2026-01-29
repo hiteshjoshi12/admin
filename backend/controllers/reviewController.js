@@ -140,10 +140,55 @@ const deleteReview = async (req, res) => {
   }
 };
 
+
+// @desc    Update an existing review
+// @route   PUT /api/reviews/:reviewId
+// @access  Private
+const updateReview = async (req, res) => {
+  const { rating, comment } = req.body;
+
+  try {
+    const review = await Review.findById(req.params.reviewId);
+
+    if (!review) {
+      res.status(404);
+      throw new Error('Review not found');
+    }
+
+    // 1. CHECK OWNERSHIP
+    // Ensure the logged-in user is the one who wrote this review
+    if (review.user.toString() !== req.user._id.toString()) {
+      res.status(401);
+      throw new Error('Not authorized to edit this review');
+    }
+
+    // 2. UPDATE FIELDS
+    review.rating = Number(rating) || review.rating;
+    review.comment = comment || review.comment;
+
+    // 3. SECURITY: RESET APPROVAL
+    // If a user edits a review, it must go back to moderation.
+    // Otherwise, they could write a nice review, get approved, then change it to spam.
+    review.isApproved = false;
+
+    await review.save();
+
+    // 4. RECALCULATE RATING
+    // Since it is now unapproved (hidden), we must update the product score immediately.
+    await updateProductRating(review.product);
+
+    res.json({ message: 'Review updated and sent for approval' });
+  } catch (error) {
+    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    res.status(statusCode).json({ message: error.message });
+  }
+};
+
 module.exports = { 
     getAllReviews, 
     getProductReviews, 
     createReview, 
     approveReview, 
-    deleteReview 
+    deleteReview,
+    updateReview
 };

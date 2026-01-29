@@ -1,13 +1,16 @@
 import { Instagram, Play, Heart } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { InstagramSkeleton } from '../loaders/SectionLoader';
-import { API_BASE_URL } from '../../util/config'; // Ensure this path is correct
+import { API_BASE_URL } from '../../util/config'; 
+// 1. IMPORT OPTIMIZERS
+import { getOptimizedImage} from '../../util/imageUtils';
+import { getOptimizedVideo } from '../../util/videoUtils';
 
-// DEFAULT FALLBACK CONTENT (If DB is empty)
+// DEFAULT FALLBACK CONTENT
 const defaultContent = {
-  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069569/img1_cwdqem.jpg", 
-  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto/v1769069569/img2_rssgsc.jpg", 
-  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/f_auto,q_auto,br_2m/v1769071460/reel_sqyodd.mp4",
+  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img1_cwdqem.jpg", 
+  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img2_rssgsc.jpg", 
+  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769071460/reel_sqyodd.mp4",
   handle: "@beadsnbloom.india",
   link: "https://www.instagram.com/beadsnbloom.india"
 };
@@ -17,8 +20,6 @@ const instaGradientClass = "bg-gradient-to-tr from-[#833ab4] via-[#fd1d1d] to-[#
 export default function InstagramFeed() {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
-  
-  // State for Data & Loading
   const [feedData, setFeedData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +31,6 @@ export default function InstagramFeed() {
         const data = await res.json();
         
         if (data && data.instagram && data.instagram.photo1) {
-           // Use DB Data if available
            setFeedData({
              photo1: data.instagram.photo1,
              photo2: data.instagram.photo2 || defaultContent.photo2,
@@ -39,14 +39,12 @@ export default function InstagramFeed() {
              link: data.instagram.profileLink || defaultContent.link
            });
         } else {
-           // Fallback to defaults
            setFeedData(defaultContent);
         }
       } catch (error) {
         console.error("Failed to load Instagram feed:", error);
         setFeedData(defaultContent);
       } finally {
-        // Add a small artificial delay to prevent layout flicker on fast networks
         setTimeout(() => setLoading(false), 500);
       }
     };
@@ -62,7 +60,6 @@ export default function InstagramFeed() {
     }
   };
 
-  // --- 2. SHOW SKELETON LOADING ---
   if (loading) return <InstagramSkeleton />;
 
   return (
@@ -94,20 +91,32 @@ export default function InstagramFeed() {
             {/* PHOTO 1: Tilted Left */}
             <div className="relative group w-full max-w-[320px] aspect-square bg-white p-3 shadow-xl transform rotate-[-3deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-start">
                <div className="relative w-full h-full overflow-hidden bg-gray-100">
-                  <img src={feedData.photo1} alt="Insta Photo 1" className="w-full h-full object-cover" loading="lazy" />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Heart className="text-white w-8 h-8 fill-white" />
-                  </div>
+                 {/* 2. OPTIMIZE IMAGE (Width 500 for high density screens) */}
+                 <img 
+                    src={getOptimizedImage(feedData.photo1, 500)} 
+                    alt="Insta Photo 1" 
+                    className="w-full h-full object-cover" 
+                    loading="lazy" 
+                 />
+                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <Heart className="text-white w-8 h-8 fill-white" />
+                 </div>
                </div>
             </div>
 
             {/* PHOTO 2: Tilted Right (Offset) */}
             <div className="relative group w-full max-w-[320px] aspect-[4/5] bg-white p-3 shadow-xl transform rotate-[4deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-end md:-mt-12">
                <div className="relative w-full h-full overflow-hidden bg-gray-100">
-                  <img src={feedData.photo2} alt="Insta Photo 2" className="w-full h-full object-cover" loading="lazy" />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Heart className="text-white w-8 h-8 fill-white" />
-                  </div>
+                 {/* 3. OPTIMIZE IMAGE */}
+                 <img 
+                    src={getOptimizedImage(feedData.photo2, 500)} 
+                    alt="Insta Photo 2" 
+                    className="w-full h-full object-cover" 
+                    loading="lazy" 
+                 />
+                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <Heart className="text-white w-8 h-8 fill-white" />
+                 </div>
                </div>
             </div>
 
@@ -119,9 +128,10 @@ export default function InstagramFeed() {
                className="relative w-full md:max-w-[400px] mx-auto aspect-[9/16] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white transform hover:scale-[1.02] transition-transform duration-500 cursor-pointer"
                onClick={togglePlay}
              >
+                {/* 4. OPTIMIZE VIDEO (Width 500 for quality vertical video) */}
                 <video
                   ref={videoRef}
-                  src={feedData.reel}
+                  src={getOptimizedVideo(feedData.reel, 500)}
                   className="w-full h-full object-cover"
                   autoPlay
                   muted

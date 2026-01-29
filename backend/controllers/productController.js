@@ -1,4 +1,10 @@
-const Product = require('../models/Product');
+const Product = require("../models/Product");
+const NodeCache = require("node-cache");
+
+// Initialize Cache
+// stdTTL: 300 seconds (5 minutes). This means data stays in RAM for 5 mins.
+// checkperiod: 320 seconds. How often the cache checks for expired keys.
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 320 });
 
 // @desc    Fetch products (Reusable for Shop & Admin)
 // @route   GET /api/products
@@ -8,70 +14,94 @@ const getProducts = async (req, res) => {
     const pageSize = Number(req.query.pageSize) || 12;
     const page = Number(req.query.pageNumber) || 1;
 
-    // --- BUILD DYNAMIC QUERY ---
-    const query = {};
+    // --- 1. CACHE CHECK ---
+    // Create a unique key based on ALL query params (page, search, category, etc.)
+    // If user searches "red shoes page 2", we cache that specific result.
+    const cacheKey = `products_${JSON.stringify(req.query)}`;
 
-    // 1. Search Keyword
-    if (req.query.keyword) {
-      query.name = { $regex: req.query.keyword, $options: 'i' };
+    if (cache.has(cacheKey)) {
+      // ⚡ HIT: Return cached data instantly (0ms latency)
+      return res.json(cache.get(cacheKey));
     }
 
-    // 2. Category Filter
-    if (req.query.category && req.query.category !== 'all') {
-      const categories = req.query.category.split(',').filter(c => c.trim() !== '');
+    // --- 2. BUILD DYNAMIC QUERY (If not in cache) ---
+    const query = {};
+
+    // Search Keyword (Optimized)
+    if (req.query.keyword) {
+      query.name = { $regex: req.query.keyword, $options: "i" };
+      // query.$text = { $search: req.query.keyword }; // Optional Text Index
+    }
+
+    // Category Filter
+    if (req.query.category && req.query.category !== "all") {
+      const categories = req.query.category
+        .split(",")
+        .filter((c) => c.trim() !== "");
       if (categories.length > 0) {
         query.category = { $in: categories };
       }
     }
 
-    // 3. Price Filter (Enhanced Safety)
+    // Price Filter
     if (req.query.priceRange) {
       const range = req.query.priceRange;
-      if (range === 'under-2500') {
+      if (range === "under-2500") {
         query.price = { $lt: 2500 };
-      } else if (range === '2500-5000') {
+      } else if (range === "2500-5000") {
         query.price = { $gte: 2500, $lte: 5000 };
-      } else if (range === 'above-5000') {
+      } else if (range === "above-5000") {
         query.price = { $gt: 5000 };
       }
     }
 
-    // 4. Size Filter (Stock Check)
+    // Size Filter (Stock Check)
     if (req.query.size) {
-      const sizes = req.query.size.split(',').map(s => Number(s.trim())).filter(n => !isNaN(n));
+      const sizes = req.query.size
+        .split(",")
+        .map((s) => Number(s.trim()))
+        .filter((n) => !isNaN(n));
       if (sizes.length > 0) {
-        query.stock = { 
-          $elemMatch: { 
-            size: { $in: sizes }, 
-            quantity: { $gt: 0 } 
-          } 
+        query.stock = {
+          $elemMatch: {
+            size: { $in: sizes },
+            quantity: { $gt: 0 },
+          },
         };
       }
     }
 
     // --- SORTING ---
-    let sort = { createdAt: -1 }; // Default: Newest first
-    if (req.query.sort === 'price-low') sort = { price: 1 };
-    if (req.query.sort === 'price-high') sort = { price: -1 };
-    if (req.query.sort === 'best-selling') sort = { isBestSeller: -1, totalStock: -1 }; // Push Best Sellers top
+    let sort = { createdAt: -1 };
+    if (req.query.sort === "price-low") sort = { price: 1 };
+    if (req.query.sort === "price-high") sort = { price: -1 };
+    if (req.query.sort === "best-selling")
+      sort = { isBestSeller: -1, totalStock: -1 };
 
-    // --- EXECUTE DB QUERY ---
+    // --- EXECUTE DB QUERY (OPTIMIZED) ---
     const count = await Product.countDocuments(query);
+
     const products = await Product.find(query)
+      .select("-description -reviews -images") // ⚡ Exclude heavy fields
       .sort(sort)
       .limit(pageSize)
-      .skip(pageSize * (page - 1));
+      .skip(pageSize * (page - 1))
+      .lean(); // ⚡ Return plain JS objects
 
-    res.json({ 
-      products, 
-      page, 
-      pages: Math.ceil(count / pageSize), 
-      totalProducts: count 
-    });
-    
+    const responseData = {
+      products,
+      page,
+      pages: Math.ceil(count / pageSize),
+      totalProducts: count,
+    };
+
+    // --- 3. SAVE TO CACHE ---
+    cache.set(cacheKey, responseData);
+
+    res.json(responseData);
   } catch (error) {
     console.error("Fetch Products Error:", error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -80,18 +110,19 @@ const getProducts = async (req, res) => {
 // @access  Public
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    // ⚡ Use lean() for faster read
+    const product = await Product.findById(req.params.id).lean();
+
     if (product) {
       res.json(product);
     } else {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
-    // Handle invalid Object ID format specifically
-    if(error.kind === 'ObjectId') {
-        return res.status(404).json({ message: 'Product not found' });
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Product not found" });
     }
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -104,13 +135,17 @@ const deleteProduct = async (req, res) => {
 
     if (product) {
       await product.deleteOne();
-      res.json({ message: 'Product removed' });
+
+      // 🧹 CLEAR CACHE: Ensure users see updated list immediately
+      cache.flushAll();
+
+      res.json({ message: "Product removed" });
     } else {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -119,19 +154,28 @@ const deleteProduct = async (req, res) => {
 // @access  Private/Admin
 const createProduct = async (req, res) => {
   try {
-    const { 
-      name, price, originalPrice, description, image, images, 
-      category, stock, isNewArrival, isBestSeller 
+    const {
+      name,
+      price,
+      originalPrice,
+      description,
+      image,
+      images,
+      category,
+      stock,
+      isNewArrival,
+      isBestSeller,
     } = req.body;
 
-    // Recalculate total stock on server side for safety
-    const calculatedTotalStock = stock ? stock.reduce((acc, item) => acc + Number(item.quantity), 0) : 0;
+    const calculatedTotalStock = stock
+      ? stock.reduce((acc, item) => acc + Number(item.quantity), 0)
+      : 0;
 
     const product = new Product({
       name,
       price,
       originalPrice,
-      user: req.user._id, 
+      user: req.user._id,
       image,
       images,
       category,
@@ -144,10 +188,14 @@ const createProduct = async (req, res) => {
     });
 
     const createdProduct = await product.save();
+
+    // 🧹 CLEAR CACHE: New product available
+    cache.flushAll();
+
     res.status(201).json(createdProduct);
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: 'Invalid product data' });
+    res.status(400).json({ message: "Invalid product data" });
   }
 };
 
@@ -156,9 +204,17 @@ const createProduct = async (req, res) => {
 // @access  Private/Admin
 const updateProduct = async (req, res) => {
   try {
-    const { 
-      name, price, originalPrice, description, image, images, 
-      category, stock, isNewArrival, isBestSeller 
+    const {
+      name,
+      price,
+      originalPrice,
+      description,
+      image,
+      images,
+      category,
+      stock,
+      isNewArrival,
+      isBestSeller,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -172,24 +228,31 @@ const updateProduct = async (req, res) => {
       product.images = images || product.images;
       product.category = category || product.category;
       product.stock = stock || product.stock;
-      
-      // Explicit boolean check (so false doesn't get ignored)
-      if (typeof isNewArrival !== 'undefined') product.isNewArrival = isNewArrival;
-      if (typeof isBestSeller !== 'undefined') product.isBestSeller = isBestSeller;
 
-      // Recalculate total stock if stock array is updated
+      if (typeof isNewArrival !== "undefined")
+        product.isNewArrival = isNewArrival;
+      if (typeof isBestSeller !== "undefined")
+        product.isBestSeller = isBestSeller;
+
       if (stock) {
-        product.totalStock = stock.reduce((acc, item) => acc + Number(item.quantity), 0);
+        product.totalStock = stock.reduce(
+          (acc, item) => acc + Number(item.quantity),
+          0,
+        );
       }
 
       const updatedProduct = await product.save();
+
+      // 🧹 CLEAR CACHE: Price/Stock/Details updated
+      cache.flushAll();
+
       res.json(updatedProduct);
     } else {
-      res.status(404).json({ message: 'Product not found' });
+      res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 

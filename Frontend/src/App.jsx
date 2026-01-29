@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Outlet, useLocation } from 'react-router-dom'; 
 import { useDispatch, useSelector } from 'react-redux';
 import { syncCartToBackend } from './redux/cartSlice';
+import { fetchWishlist } from './redux/wishlistSlice'; // 1. Import fetchWishlist Action
 import { Toaster } from 'react-hot-toast';
 
 // ... (Your Static Imports for Admin, Components, Layouts) ...
@@ -41,6 +42,7 @@ const AdminOrderDetails = lazy(() => import('./pages/admin/OrderDetails'));
 const Customers = lazy(() => import('./pages/admin/Customers'));
 const Reviews = lazy(() => import('./pages/admin/Reviews'));
 const Offers = lazy(() => import('./pages/admin/Offers'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
 
 const PageLoader = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
@@ -65,21 +67,22 @@ const PublicLayout = () => (
 
 function App() {
   const dispatch = useDispatch();
-  // 1. Get isDirty flag
+  // 1. Get Cart & Auth State
   const { items: cartItems, isDirty } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // 2. 🚦 DIRTY FLAG GUARD 🚦
+    // 2. Fetch Wishlist on Login
+    if (userInfo) {
+       dispatch(fetchWishlist());
+    }
+
+    // 3. 🚦 DIRTY FLAG GUARD (Sync Cart) 🚦
     // "Only sync if the User changed something (isDirty)"
-    // On Login, isDirty is false. So we SKIP syncing.
-    // On SetCart (DB Load), isDirty is false. So we SKIP syncing.
     if (userInfo && isDirty) {
-      
       const timer = setTimeout(() => {
         dispatch(syncCartToBackend(cartItems));
       }, 1000);
-      
       return () => clearTimeout(timer);
     }
   }, [cartItems, userInfo, isDirty, dispatch]); 
@@ -118,6 +121,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/sale" element={<Sale />} />
             <Route path="/shop" element={<Shop />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route element={<PrivateRoute />}>
                <Route path="/profile" element={<Profile />} />

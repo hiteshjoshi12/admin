@@ -4,10 +4,13 @@ import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
 import { confirmAction } from '../../util/toastUtils';
 import toast from 'react-hot-toast';
+// 1. IMPORT OPTIMIZERS
+import { getOptimizedImage} from '../../util/imageUtils';
+import { getOptimizedVideo } from '../../util/videoUtils';
 
 export default function CMS() {
   const { userInfo } = useSelector((state) => state.auth);
-  const [activeTab, setActiveTab] = useState('home'); // home | bestsellers | collections
+  const [activeTab, setActiveTab] = useState('home'); 
   
   return (
     <div className="max-w-5xl mx-auto pb-12 px-4 md:px-6">
@@ -19,7 +22,7 @@ export default function CMS() {
          </div>
       </div>
 
-      {/* TABS - Scrollable on mobile */}
+      {/* TABS */}
       <div className="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto scrollbar-hide pb-1">
         <TabButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={Layout} label="Home & Socials" />
         <TabButton active={activeTab === 'bestsellers'} onClick={() => setActiveTab('bestsellers')} icon={Star} label="Best Sellers" />
@@ -50,7 +53,7 @@ function TabButton({ active, onClick, icon: Icon, label }) {
 }
 
 // ==========================================
-// 1. HOME & SOCIALS COMPONENT (RESPONSIVE)
+// 1. HOME & SOCIALS COMPONENT
 // ==========================================
 function HomeCMS({ userInfo }) {
   const [heroLoading, setHeroLoading] = useState(false);
@@ -61,7 +64,6 @@ function HomeCMS({ userInfo }) {
     instagram: { photo1: '', photo2: '', reel: '', handle: '', profileLink: '' } 
   });
 
-  // Fetch Data
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/content`).then(res => res.json()).then(content => {
       if (content) setData(prev => ({ 
@@ -84,28 +86,33 @@ function HomeCMS({ userInfo }) {
   });
   
   const removeSlide = (index) => {
-  confirmAction({
-    title: "Remove Slide?",
-    message: "This slide will be removed from the carousel.",
-    confirmText: "Remove",
-    onConfirm: () => {
-      setData((prev) => ({
-        ...prev,
-        heroSlides: prev.heroSlides.filter((_, i) => i !== index),
-      }));
-    },
-  });
-};
+    confirmAction({
+        title: "Remove Slide?",
+        message: "This slide will be removed.",
+        confirmText: "Remove",
+        onConfirm: () => {
+        setData((prev) => ({
+            ...prev,
+            heroSlides: prev.heroSlides.filter((_, i) => i !== index),
+        }));
+        },
+    });
+  };
 
   const saveHero = async () => {
     setHeroLoading(true);
-    await fetch(`${API_BASE_URL}/api/content`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
-      body: JSON.stringify({ heroSlides: data.heroSlides }), 
-    });
-    setHeroLoading(false);
-    alert("Slider Updated!");
+    try {
+        await fetch(`${API_BASE_URL}/api/content`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
+            body: JSON.stringify({ heroSlides: data.heroSlides }), 
+        });
+        toast.success("Slider Updated Successfully!");
+    } catch (e) {
+        toast.error("Failed to update slider");
+    } finally {
+        setHeroLoading(false);
+    }
   };
 
   // --- INSTAGRAM HANDLERS ---
@@ -118,13 +125,18 @@ function HomeCMS({ userInfo }) {
 
   const saveInstagram = async () => {
     setInstaLoading(true);
-    await fetch(`${API_BASE_URL}/api/content`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
-      body: JSON.stringify({ instagram: data.instagram }), 
-    });
-    setInstaLoading(false);
-    alert("Instagram Feed Updated!");
+    try {
+        await fetch(`${API_BASE_URL}/api/content`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
+            body: JSON.stringify({ instagram: data.instagram }), 
+        });
+        toast.success("Instagram Feed Updated!");
+    } catch (e) {
+        toast.error("Failed to update Instagram");
+    } finally {
+        setInstaLoading(false);
+    }
   };
 
   return (
@@ -166,7 +178,8 @@ function HomeCMS({ userInfo }) {
                        <label className="text-xs font-bold text-gray-500 uppercase">Image URL</label>
                        <div className="flex flex-col md:flex-row gap-2 mt-1">
                           <input className="flex-1 border p-2 rounded text-sm font-mono" placeholder="https://..." value={slide.image} onChange={e=>handleHeroChange(i,'image',e.target.value)} />
-                          {slide.image && <img src={slide.image} alt="prev" className="w-full md:w-10 h-32 md:h-10 rounded object-cover border" />}
+                          {/* OPTIMIZED PREVIEW IMAGE */}
+                          {slide.image && <img src={getOptimizedImage(slide.image, 200)} alt="prev" className="w-full md:w-20 h-32 md:h-12 rounded object-cover border" />}
                        </div>
                     </div>
                     <div>
@@ -192,7 +205,7 @@ function HomeCMS({ userInfo }) {
          )}
       </div>
 
-      {/* --- INSTAGRAM SECTION (RESPONSIVE) --- */}
+      {/* --- INSTAGRAM SECTION --- */}
       <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
          <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
             <div className="flex items-center gap-2">
@@ -224,7 +237,8 @@ function HomeCMS({ userInfo }) {
                        value={data.instagram.photo1} 
                        onChange={e => handleInstaChange('photo1', e.target.value)} 
                      />
-                     {data.instagram.photo1 && <img src={data.instagram.photo1} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
+                     {/* OPTIMIZED PREVIEW */}
+                     {data.instagram.photo1 && <img src={getOptimizedImage(data.instagram.photo1, 100)} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
                   </div>
                </div>
 
@@ -236,7 +250,8 @@ function HomeCMS({ userInfo }) {
                        value={data.instagram.photo2} 
                        onChange={e => handleInstaChange('photo2', e.target.value)} 
                      />
-                     {data.instagram.photo2 && <img src={data.instagram.photo2} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
+                     {/* OPTIMIZED PREVIEW */}
+                     {data.instagram.photo2 && <img src={getOptimizedImage(data.instagram.photo2, 100)} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
                   </div>
                </div>
 
@@ -257,62 +272,65 @@ function HomeCMS({ userInfo }) {
 }
 
 // ==========================================
-// 2. BEST SELLERS COMPONENT (RESPONSIVE)
+// 2. BEST SELLERS COMPONENT
 // ==========================================
 function BestSellersCMS({ userInfo }) {
   const [slots, setSlots] = useState([]);
   const [products, setProducts] = useState([]); 
   const [loading, setLoading] = useState(false);
 
-  // Fetch Slots & All Products
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/cms/bestsellers`).then(res => res.json()).then(setSlots);
     fetch(`${API_BASE_URL}/api/products?pageSize=100`).then(res => res.json()).then(data => setProducts(data.products));
   }, []);
 
   const handleUpdateSlot = async (position, productId, tag) => {
-    if(!productId) return alert("Select a product");
+    if(!productId) return toast.error("Please select a product");
     setLoading(true);
-    const res = await fetch(`${API_BASE_URL}/api/cms/bestsellers`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
-      body: JSON.stringify({ position, productId, tag })
-    });
-    const updated = await res.json();
-    setSlots(prev => {
-       const filtered = prev.filter(p => p.position !== position);
-       return [...filtered, updated].sort((a,b) => a.position - b.position);
-    });
-    setLoading(false);
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/cms/bestsellers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
+            body: JSON.stringify({ position, productId, tag })
+        });
+        const updated = await res.json();
+        setSlots(prev => {
+            const filtered = prev.filter(p => p.position !== position);
+            return [...filtered, updated].sort((a,b) => a.position - b.position);
+        });
+        toast.success(`Slot ${position} updated!`);
+    } catch (e) {
+        toast.error("Update failed");
+    } finally {
+        setLoading(false);
+    }
   };
 
   const handleRemove = (position) => {
-  confirmAction({
-    title: "Clear this slot?",
-    message: "This product will be removed from the Best Sellers section.",
-    confirmText: "Clear Slot",
-    onConfirm: async () => {
-      const toastId = toast.loading("Removing...");
-      
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/cms/bestsellers/${position}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${userInfo.token}` }
-        });
+    confirmAction({
+        title: "Clear this slot?",
+        message: "This product will be removed from the Best Sellers.",
+        confirmText: "Clear Slot",
+        onConfirm: async () => {
+        const toastId = toast.loading("Removing...");
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/cms/bestsellers/${position}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${userInfo.token}` }
+            });
 
-        if (res.ok) {
-          setSlots(prev => prev.filter(p => p.position !== position));
-          toast.success("Slot cleared successfully!", { id: toastId });
-        } else {
-          toast.error("Failed to clear slot", { id: toastId });
+            if (res.ok) {
+            setSlots(prev => prev.filter(p => p.position !== position));
+            toast.success("Slot cleared!", { id: toastId });
+            } else {
+            toast.error("Failed to clear", { id: toastId });
+            }
+        } catch (error) {
+            toast.error("Server error", { id: toastId });
         }
-      } catch (error) {
-        console.error(error);
-        toast.error("Server error occurred", { id: toastId });
-      }
-    }
-  });
-};
+        }
+    });
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
@@ -325,10 +343,14 @@ function BestSellersCMS({ userInfo }) {
                 {currentSlot && <button onClick={() => handleRemove(pos)} className="text-red-500"><Trash2 className="w-4 h-4" /></button>}
              </div>
              
-             {/* Current Content Preview */}
+             {/* Current Content Preview (Optimized) */}
              {currentSlot ? (
                <div className="mb-2">
-                 <img src={currentSlot.product?.image} alt="" className="w-full h-48 object-cover rounded-lg mb-2" />
+                 <img 
+                    src={getOptimizedImage(currentSlot.product?.image, 300)} 
+                    alt="" 
+                    className="w-full h-48 object-cover rounded-lg mb-2" 
+                 />
                  <p className="font-bold text-sm truncate">{currentSlot.product?.name}</p>
                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">{currentSlot.tag}</span>
                </div>
@@ -336,7 +358,6 @@ function BestSellersCMS({ userInfo }) {
                <div className="h-48 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 text-sm mb-2">Empty Slot</div>
              )}
 
-             {/* Update Form */}
              <div className="mt-auto space-y-2 pt-4 border-t">
                <select id={`prod-${pos}`} className="w-full p-2 border rounded text-sm">
                  <option value="">Select Product...</option>
@@ -363,7 +384,7 @@ function BestSellersCMS({ userInfo }) {
 }
 
 // ==========================================
-// 3. COLLECTIONS COMPONENT (RESPONSIVE)
+// 3. COLLECTIONS COMPONENT
 // ==========================================
 function CollectionsCMS({ userInfo }) {
   const [collections, setCollections] = useState([]);
@@ -374,44 +395,47 @@ function CollectionsCMS({ userInfo }) {
   }, []);
 
   const handleAdd = async () => {
-    if(!newCol.name || !newCol.image) return;
-    const res = await fetch(`${API_BASE_URL}/api/cms/collections`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
-      body: JSON.stringify(newCol)
-    });
-    const saved = await res.json();
-    setCollections([...collections, saved]);
-    setNewCol({ name: '', image: '' });
+    if(!newCol.name || !newCol.image) return toast.error("All fields required");
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/cms/collections`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.token}` },
+            body: JSON.stringify(newCol)
+        });
+        const saved = await res.json();
+        setCollections([...collections, saved]);
+        setNewCol({ name: '', image: '' });
+        toast.success("Collection added!");
+    } catch(e) {
+        toast.error("Error adding collection");
+    }
   };
 
   const handleDelete = (id) => {
-  confirmAction({
-    title: "Delete Collection?",
-    message: "This collection will be permanently removed.",
-    confirmText: "Delete",
-    onConfirm: async () => {
-      const toastId = toast.loading("Deleting...");
-      
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/cms/collections/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${userInfo.token}` }
-        });
-
-        if (res.ok) {
-          setCollections(prev => prev.filter(c => c._id !== id));
-          toast.success("Collection deleted successfully", { id: toastId });
-        } else {
-          toast.error("Failed to delete collection", { id: toastId });
+    confirmAction({
+        title: "Delete Collection?",
+        message: "Permanently remove this collection.",
+        confirmText: "Delete",
+        onConfirm: async () => {
+        const toastId = toast.loading("Deleting...");
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/cms/collections/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${userInfo.token}` }
+            });
+            if (res.ok) {
+                setCollections(prev => prev.filter(c => c._id !== id));
+                toast.success("Deleted", { id: toastId });
+            } else {
+                toast.error("Failed", { id: toastId });
+            }
+        } catch (error) {
+            toast.error("Error", { id: toastId });
         }
-      } catch (error) {
-        console.error(error);
-        toast.error("Server error occurred", { id: toastId });
-      }
-    }
-  });
-};
+        }
+    });
+  };
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -432,7 +456,8 @@ function CollectionsCMS({ userInfo }) {
        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {collections.map(c => (
             <div key={c._id} className="relative group rounded-xl overflow-hidden aspect-[4/5]">
-               <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+               {/* OPTIMIZED IMAGE */}
+               <img src={getOptimizedImage(c.image, 400)} alt={c.name} className="w-full h-full object-cover" />
                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <h3 className="text-white font-serif text-lg md:text-xl text-center px-2">{c.name}</h3>
                </div>
@@ -448,7 +473,7 @@ function CollectionsCMS({ userInfo }) {
 
 
 // ==========================================
-// 4. RUNWAY CMS COMPONENT (RESPONSIVE)
+// 4. RUNWAY CMS COMPONENT
 // ==========================================
 function RunwayCMS({ userInfo }) {
   const [videos, setVideos] = useState([]);
@@ -463,7 +488,7 @@ function RunwayCMS({ userInfo }) {
   }, []);
 
   const handleAdd = async () => {
-    if(!newVideo.title || !newVideo.videoUrl) return alert("Title and Video URL required");
+    if(!newVideo.title || !newVideo.videoUrl) return toast.error("Title and Video URL required");
     setLoading(true);
     
     try {
@@ -475,40 +500,38 @@ function RunwayCMS({ userInfo }) {
       const saved = await res.json();
       setVideos([saved, ...videos]);
       setNewVideo({ title: '', videoUrl: '', ctaText: 'Shop The Look', link: '/shop' });
+      toast.success("Video added!");
     } catch (error) {
-      alert("Failed to add video");
+      toast.error("Failed to add video");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = (id) => {
-  confirmAction({
-    title: "Delete this Video?",
-    message: "This video will be permanently removed from the Runway section.",
-    confirmText: "Delete",
-    onConfirm: async () => {
-      const toastId = toast.loading("Deleting video...");
-      
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/cms/runway/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${userInfo.token}` }
-        });
-
-        if (res.ok) {
-          setVideos(prev => prev.filter(v => v._id !== id));
-          toast.success("Video deleted successfully", { id: toastId });
-        } else {
-          toast.error("Failed to delete video", { id: toastId });
+    confirmAction({
+        title: "Delete this Video?",
+        message: "Permanently remove this video.",
+        confirmText: "Delete",
+        onConfirm: async () => {
+        const toastId = toast.loading("Deleting...");
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/cms/runway/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${userInfo.token}` }
+            });
+            if (res.ok) {
+                setVideos(prev => prev.filter(v => v._id !== id));
+                toast.success("Deleted", { id: toastId });
+            } else {
+                toast.error("Failed", { id: toastId });
+            }
+        } catch (error) {
+            toast.error("Error", { id: toastId });
         }
-      } catch (error) {
-        console.error(error);
-        toast.error("Server error occurred", { id: toastId });
-      }
-    }
-  });
-};
+        }
+    });
+  };
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -540,7 +563,15 @@ function RunwayCMS({ userInfo }) {
        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {videos.map(v => (
             <div key={v._id} className="relative group rounded-xl overflow-hidden aspect-[9/16] bg-black">
-               <video src={v.videoUrl} className="w-full h-full object-cover opacity-80" muted loop onMouseOver={e => e.target.play()} onMouseOut={e => e.target.pause()} />
+               {/* OPTIMIZED VIDEO PREVIEW */}
+               <video 
+                 src={getOptimizedVideo(v.videoUrl, 400)} 
+                 className="w-full h-full object-cover opacity-80" 
+                 muted 
+                 loop 
+                 onMouseOver={e => e.target.play()} 
+                 onMouseOut={e => e.target.pause()} 
+               />
                
                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4">
                   <h3 className="text-white font-serif text-sm md:text-lg leading-tight">{v.title}</h3>

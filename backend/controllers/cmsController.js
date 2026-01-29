@@ -11,12 +11,11 @@ const RunwayVideo = require('../models/RunwayVideo');
 // @access  Public
 const getBestSellers = async (req, res) => {
   try {
-    // 1. Fetch items
-    // 2. .populate('product') -> Replaces the Product ID with actual product data (name, image, price)
-    // 3. .sort('position') -> Ensures Slot 1 comes before Slot 2 in the UI
+    // ⚡ Performance: Added .lean() for faster read
     const items = await BestSeller.find()
-      .populate('product', 'name image price')
-      .sort('position');
+      .populate('product', 'name image price') // Only fetch needed fields
+      .sort('position')
+      .lean(); 
       
     res.json(items);
   } catch (error) {
@@ -32,13 +31,10 @@ const updateBestSeller = async (req, res) => {
   try {
     const { productId, tag, position } = req.body;
     
-    // LOGIC: "Upsert" (Update if exists, Insert if new)
-    // We search by 'position'. If Slot 1 exists, we overwrite it.
-    // If Slot 1 doesn't exist, we create it.
     const item = await BestSeller.findOneAndUpdate(
       { position }, 
       { product: productId, tag, position },
-      { new: true, upsert: true } // options: return new doc, create if missing
+      { new: true, upsert: true } 
     );
 
     res.json(item);
@@ -53,7 +49,6 @@ const updateBestSeller = async (req, res) => {
 // @access  Private/Admin
 const deleteBestSeller = async (req, res) => {
   try {
-    // We delete by 'position' (e.g., Clear Slot 2) rather than ID
     await BestSeller.findOneAndDelete({ position: req.params.position });
     res.json({ message: 'Removed' });
   } catch (error) {
@@ -70,7 +65,8 @@ const deleteBestSeller = async (req, res) => {
 // @access  Public
 const getCollections = async (req, res) => {
   try {
-    const items = await Collection.find();
+    // ⚡ Performance: .lean()
+    const items = await Collection.find().lean();
     res.json(items);
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
@@ -111,8 +107,12 @@ const deleteCollection = async (req, res) => {
 // @access  Public
 const getRunwayVideos = async (req, res) => {
   try {
-    // Sort by createdAt: -1 to show the newest videos first
-    const videos = await RunwayVideo.find().sort({ createdAt: -1 });
+    // ⚡ Performance: .lean()
+    // Optional: Add .limit(5) if you only want the latest few
+    const videos = await RunwayVideo.find()
+        .sort({ createdAt: -1 })
+        .lean();
+        
     res.json(videos);
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });

@@ -1,4 +1,5 @@
 require('dotenv').config();
+const compression = require('compression');
 
 const express = require('express');
 const { connectDB } = require('./config/db.js');
@@ -13,9 +14,10 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const cmsRoutes = require('./routes/cmsRoutes');
 const coupons = require('./routes/couponRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes'); // <--- Import
 
 const app = express();
-
+app.use(compression());
 app.use(express.json());
 enableCors(app);
 
@@ -24,6 +26,7 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/wishlist', wishlistRoutes); // <--- ADD THIS
 app.use('/api/bestsellers', bestSellerRoutes); // Add this line
 app.use('/api/collections', collectionRoutes); // <--- Add this line
 app.use('/api/reviews', reviewRoutes);

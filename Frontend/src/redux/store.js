@@ -3,6 +3,7 @@ import cartReducer from './cartSlice';
 import productReducer from './productSlice';
 import authReducer from './authSlice';
 import orderReducer from './orderSlice';
+import wishlistReducer from './wishlistSlice'; // 1. Import Wishlist Reducer
 
 // 1. Load Cart from LocalStorage
 const loadCartState = () => {
@@ -35,8 +36,9 @@ const store = configureStore({
   reducer: {
     cart: cartReducer,
     products: productReducer,
-    auth: authReducer, // <--- Add Auth Reducer
-    order: orderReducer, // <--- Add to Store
+    auth: authReducer, 
+    order: orderReducer,
+    wishlist: wishlistReducer, // 2. Add Wishlist to Store
   },
   preloadedState
 });

@@ -3,6 +3,9 @@ import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import config from '../../config/config.js';
 
+// 1. IMPORT OPTIMIZER
+import { getOptimizedImage } from '../../util/imageUtils';
+
 // --- IMPORTS FOR SKELETON LOADING ---
 import { GridSkeleton } from '../loaders/SectionLoader.jsx';
 import { Skeleton } from '../ui/Skeleton.jsx';
@@ -39,22 +42,19 @@ export default function CollectionTiles() {
     </div>
   );
 
-  // --- 1. LOADING STATE ---
+  // --- LOADING STATE ---
   if (loading) return (
     <section className="py-24 px-4 md:px-12 max-w-[1440px] mx-auto">
       {/* Header Skeleton */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 px-2 gap-6 md:gap-0">
         <div>
-          {/* Title placeholder */}
           <Skeleton className="h-10 w-64 mb-4" />
-          {/* Subtitle placeholder */}
           <Skeleton className="h-4 w-48" />
         </div>
-        {/* Button placeholder */}
         <Skeleton className="h-4 w-24 hidden md:block" />
       </div>
 
-      {/* Grid Skeleton (Using 'arch' type to match your design) */}
+      {/* Grid Skeleton */}
       <GridSkeleton count={3} type="arch" />
     </section>
   );
@@ -94,12 +94,15 @@ export default function CollectionTiles() {
               className="group cursor-pointer block"
             >
               <div className="relative aspect-[3/4] overflow-hidden rounded-t-[12rem] bg-gray-200 shadow-md">
+                
+                {/* 2. APPLY OPTIMIZATION (Width 600) */}
                 <img 
-                  src={col.image} 
+                  src={getOptimizedImage(col.image, 600)} 
                   alt={col.name}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
+                
                 <QuickAddOverlay />
               </div>
 

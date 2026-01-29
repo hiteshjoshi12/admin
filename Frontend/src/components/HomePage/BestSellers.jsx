@@ -3,6 +3,9 @@ import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import config from '../../config/config.js';
 
+// 1. IMPORT OPTIMIZER
+import { getOptimizedImage } from '../../util/imageUtils';
+
 // --- IMPORTS FOR SKELETON LOADING ---
 import { BestSellerSkeleton } from '../loaders/SectionLoader.jsx';
 import { Skeleton } from '../ui/Skeleton.jsx';
@@ -17,7 +20,6 @@ export default function BestSellers() {
         const res = await fetch(`${config.API_BASE_URL}/api/bestsellers`);
         const data = await res.json();
         setItems(data);
-        console.log("Best Sellers fetched:", data); 
       } catch (error) {
         console.error("Failed to fetch best sellers:", error);
       } finally {
@@ -36,25 +38,17 @@ export default function BestSellers() {
     </div>
   );
 
-  // --- 1. LOADING STATE ---
+  // --- LOADING STATE ---
   if (loading) return (
     <section className="py-24 px-4 md:px-12 bg-white relative overflow-hidden">
        <div className="max-w-[1440px] mx-auto relative z-10">
-         
-         {/* HEADER SKELETON */}
          <div className="flex flex-col md:flex-row justify-between items-end mb-16">
-            <div>
-              {/* "Curated Favorites" placeholder */}
-              <Skeleton className="h-4 w-32 mb-4" />
-              {/* "The Best Sellers" Title placeholder */}
-              <Skeleton className="h-12 w-64 md:w-96" />
-            </div>
-            {/* "Shop All" Button placeholder */}
-            <Skeleton className="h-4 w-32 hidden md:block" />
+           <div>
+             <Skeleton className="h-4 w-32 mb-4" />
+             <Skeleton className="h-12 w-64 md:w-96" />
+           </div>
+           <Skeleton className="h-4 w-32 hidden md:block" />
          </div>
-         
-         {/* COMPLEX GRID SKELETON */}
-         {/* This loads the reusable layout we defined in SectionLoader */}
          <BestSellerSkeleton />
        </div>
     </section>
@@ -80,19 +74,19 @@ export default function BestSellers() {
       <div className="max-w-[1440px] mx-auto relative z-10">
         
         {/* Header */}
-       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16">
-  <div>
-    <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#C5A059] mb-2 block">
-      Curated Favorites
-    </span>
-    <h2 className="text-4xl md:text-5xl font-serif text-[#1C1917] leading-none">
-      The Best Sellers
-    </h2>
-  </div>
-  <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-[#C5A059] hover:border-[#C5A059] transition-colors mt-6 md:mt-0">
-    Shop All Icons <ArrowUpRight className="w-4 h-4" />
-  </Link>
-</div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#C5A059] mb-2 block">
+              Curated Favorites
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif text-[#1C1917] leading-none">
+              The Best Sellers
+            </h2>
+          </div>
+          <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-[#C5A059] hover:border-[#C5A059] transition-colors mt-6 md:mt-0">
+            Shop All Icons <ArrowUpRight className="w-4 h-4" />
+          </Link>
+        </div>
 
         {/* The Geometric Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
@@ -104,7 +98,12 @@ export default function BestSellers() {
                 {heroItem.tag}
               </span>
               <div className="relative h-[600px] rounded-t-[15rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all duration-500">
-                <img src={heroItem.product.image} alt={heroItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
+                {/* 2. OPTIMIZE IMAGE: Width 800 (Large) */}
+                <img 
+                  src={getOptimizedImage(heroItem.product.image, 800)} 
+                  alt={heroItem.product.name} 
+                  className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" 
+                />
                 <QuickAddOverlay />
               </div>
               <div className="text-center mt-6">
@@ -124,7 +123,12 @@ export default function BestSellers() {
                    {pebbleItem.tag}
                  </span>
                  <div className="relative h-[350px] rounded-[4rem] overflow-hidden bg-[#F9F8F6] shadow-xl group-hover:shadow-2xl transition-shadow border-2 border-transparent group-hover:border-[#C5A059]/20">
-                     <img src={pebbleItem.product.image} alt={pebbleItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
+                     {/* 3. OPTIMIZE IMAGE: Width 500 (Small) */}
+                     <img 
+                       src={getOptimizedImage(pebbleItem.product.image, 500)} 
+                       alt={pebbleItem.product.name} 
+                       className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" 
+                     />
                      <QuickAddOverlay />
                  </div>
                  <div className="text-left mt-4 ml-4">
@@ -141,7 +145,12 @@ export default function BestSellers() {
                    {archItem.tag}
                  </span>
                  <div className="relative h-[400px] rounded-t-[10rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all">
-                     <img src={archItem.product.image} alt={archItem.product.name} className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
+                     {/* 4. OPTIMIZE IMAGE: Width 600 (Medium) */}
+                     <img 
+                       src={getOptimizedImage(archItem.product.image, 600)} 
+                       alt={archItem.product.name} 
+                       className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" 
+                     />
                      <QuickAddOverlay />
                  </div>
                  <div className="text-center mt-4">
