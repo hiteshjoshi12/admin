@@ -12,7 +12,7 @@ import {
   ZoomIn,
   HeartHandshake,
   Zap,
-  Heart, 
+  Heart,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -106,9 +106,9 @@ export default function ProductDetail() {
 
   // Scroll Handler
   const scrollToReviews = () => {
-    const element = document.getElementById('reviews-section');
+    const element = document.getElementById("reviews-section");
     if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -258,28 +258,38 @@ export default function ProductDetail() {
         {/* RIGHT: PRODUCT DETAILS */}
         <div className="w-full lg:w-2/5 px-6 lg:px-0">
           <div className="sticky top-28 space-y-6">
-            
             {/* Header Info with Rating Badge */}
             <div>
               <h1 className="text-3xl md:text-4xl font-serif text-[#1C1917] leading-tight">
                 {currentProduct.name}
               </h1>
-              
-              {/* --- NEW RATING BADGE --- */}
-              <div 
-                onClick={scrollToReviews}
-                className="flex items-center gap-2 mt-2 cursor-pointer group w-fit"
-              >
-                <div className="flex items-center gap-1 bg-[#F9F8F6] px-2 py-1 rounded-md border border-gray-200 group-hover:border-[#FF2865] transition-colors">
+
+              {/* --- UPDATED RATING BADGE LOGIC --- */}
+              {/* Only show if there is at least 1 review */}
+              {numReviews > 0 ? (
+                <div
+                  onClick={scrollToReviews}
+                  className="flex items-center gap-2 mt-2 cursor-pointer group w-fit"
+                >
+                  <div className="flex items-center gap-1 bg-[#F9F8F6] px-2 py-1 rounded-md border border-gray-200 group-hover:border-[#FF2865] transition-colors">
                     <Star className="w-3.5 h-3.5 fill-[#FFCB45] text-[#FFCB45]" />
                     <span className="text-xs font-bold text-[#1C1917] pt-0.5">
-                        {avgRating.toFixed(1)}
+                      {avgRating.toFixed(1)}
                     </span>
+                  </div>
+                  <span className="text-xs text-gray-500 underline decoration-gray-300 group-hover:text-[#FF2865] group-hover:decoration-[#FF2865] underline-offset-2 transition-all">
+                    {numReviews} {numReviews === 1 ? "Review" : "Reviews"}
+                  </span>
                 </div>
-                <span className="text-xs text-gray-500 underline decoration-gray-300 group-hover:text-[#FF2865] group-hover:decoration-[#FF2865] underline-offset-2 transition-all">
-                    {numReviews} Reviews
-                </span>
-              </div>
+              ) : (
+                // Optional: Show "No reviews yet" or just null to hide it completely
+                <div
+                  onClick={scrollToReviews}
+                  className="mt-2 text-xs text-gray-400 cursor-pointer hover:text-[#FF2865] w-fit"
+                >
+                  No reviews yet
+                </div>
+              )}
               {/* ----------------------- */}
 
               <div className="flex items-center gap-4 mb-4 mt-4">
@@ -345,7 +355,6 @@ export default function ProductDetail() {
                 </>
               )}
             </div>
-
             {/* QUANTITY & BUTTONS SECTION */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
@@ -419,18 +428,17 @@ export default function ProductDetail() {
                 </div>
               )}
             </div>
-
             {/* Info Rows */}
             <div className="space-y-4 pt-6 border-t border-gray-100">
               <InfoRow
                 icon={Truck}
                 title="Free Shipping"
-                text="On all orders above ₹999 across India."
+                text="On all orders above ₹4999 across India."
               />
               <InfoRow
                 icon={RefreshCcw}
-                title="Easy Returns"
-                text="7-day hassle-free return policy."
+                title="Easy Exchanges"
+                text="Raise requests within 48 hrs. Must include a clear unboxing video and product images."
               />
               <InfoRow
                 icon={ShieldCheck}
@@ -438,7 +446,6 @@ export default function ProductDetail() {
                 text="100% secure payment processing."
               />
             </div>
-
             {/* Care Guide */}
             <div className="bg-[#F9F8F6] p-6 rounded-xl mt-6 border border-gray-100">
               <div className="flex items-center gap-3 mb-3">
@@ -457,11 +464,10 @@ export default function ProductDetail() {
                   damp cloth. Spot clean stains with mild detergent.
                 </li>
                 <li className="text-[#FF2865] font-medium">
-                  For heavy embroidered juttis, Dry Clean Only.
+                  Avoid Water and Heat During Cleaning.
                 </li>
               </ul>
             </div>
-
             {/* Editor's Note */}
             <div className="pt-4 border-t border-gray-100 mt-6">
               <h3 className="text-xs font-bold uppercase tracking-widest text-[#1C1917] mb-2">
@@ -480,7 +486,7 @@ export default function ProductDetail() {
       <div id="reviews-section">
         <ReviewSection productId={id} />
       </div>
-      
+
       {/* Pass current ID so we can filter it out */}
       <RelatedProducts currentId={currentProduct._id} />
     </div>

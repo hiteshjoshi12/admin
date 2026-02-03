@@ -12,6 +12,7 @@ const {
 // @route   POST /api/orders
 // @access  Public (Was Private)
 // @desc    Create new order (Supports Guest & Logged In)
+// @desc    Create new order (Supports Guest & Logged In)
 const addOrderItems = async (req, res) => {
   const { orderItems, shippingAddress, paymentMethod, guestEmail } = req.body;
 
@@ -55,9 +56,23 @@ const addOrderItems = async (req, res) => {
       calculatedItemsPrice += dbProduct.price * item.quantity;
     }
 
-    const shippingPrice = calculatedItemsPrice > 5000 ? 0 : 150;
-    const taxPrice = Math.round(calculatedItemsPrice * 0.05);
-    const totalPrice = calculatedItemsPrice + taxPrice + shippingPrice;
+    // --- UPDATED SHIPPING LOGIC ---
+    let shippingPrice = 150; // Default Pan India
+
+    if (calculatedItemsPrice > 5000) {
+      shippingPrice = 0; // Free Shipping priority
+    } else if (shippingAddress && shippingAddress.postalCode) {
+      // Logic: Delhi (11), Gurgaon/Faridabad (12), Noida/Ghaziabad (201)
+      const pincode = String(shippingAddress.postalCode).trim();
+      const isNCR = /^(11|12|201)/.test(pincode);
+      
+      if (isNCR) {
+        shippingPrice = 100;
+      }
+    }
+    // -----------------------------
+
+    const totalPrice = calculatedItemsPrice + shippingPrice;
 
     await Promise.all(productsToUpdate.map((product) => product.save()));
 
@@ -74,7 +89,6 @@ const addOrderItems = async (req, res) => {
       shippingAddress,
       paymentMethod,
       itemPrice: calculatedItemsPrice,
-      taxPrice,
       shippingPrice,
       totalPrice,
       isPaid: false,

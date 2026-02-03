@@ -215,10 +215,6 @@ export default function OrderDetails() {
                   <span>Shipping</span>
                   <span>{order.shippingPrice === 0 ? 'Free' : `₹${safePrice(order.shippingPrice)}`}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Tax</span>
-                  <span>₹{safePrice(order.taxPrice)}</span>
-                </div>
               </div>
 
               <div className="flex justify-between text-xl font-bold text-[#1C1917]">

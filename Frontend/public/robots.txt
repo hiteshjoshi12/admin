@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Disallow admin routes so Google doesn't index your dashboard
+Disallow: /admin
+Disallow: /profile
+Disallow: /myorders
+Disallow: /cart
+Disallow: /checkout
+
+# Point to your BACKEND sitemap URL
+# If your backend and frontend are on the same domain (e.g., via Nginx/Heroku), use the full URL.
+Sitemap: https://www.yourdomain.com/api/sitemap.xml 
+# OR if you mapped it to root in server.js:
+Sitemap: https://www.yourdomain.com/sitemap.xml

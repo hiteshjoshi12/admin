@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { 
-  Save, ArrowLeft, Plus, Trash2, Image as ImageIcon, 
-  UploadCloud, AlertCircle 
-} from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
+import { toast } from 'react-hot-toast';
+
+// 1. IMPORT FILE UPLOAD & OPTIMIZER
+import FileUpload from '../admin/FileUpload';
+import { getOptimizedImage } from '../../util/imageUtils';
 
 export default function ProductForm() {
   const { id } = useParams(); // If ID exists, we are in EDIT mode
@@ -13,20 +15,19 @@ export default function ProductForm() {
   const { userInfo } = useSelector((state) => state.auth);
   
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
   
   // --- FORM STATE ---
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    price: 0,
-    originalPrice: 0,
-    category: 'Bridal', // Default
-    image: '',
-    images: [],
+    price: '',
+    originalPrice: '',
+    category: 'Bridal',
+    image: '', // Main Image URL
+    images: [], // Gallery URLs
     isNewArrival: false,
     isBestSeller: false,
-    stock: [{ size: 36, quantity: 0 }] // Start with one stock row
+    stock: [{ size: '', quantity: 0 }] 
   });
 
   // --- FETCH DATA FOR EDIT MODE ---
@@ -37,22 +38,22 @@ export default function ProductForm() {
           const res = await fetch(`${API_BASE_URL}/api/products/${id}`);
           const data = await res.json();
           
-          // Populate form
+          // Populate form (Ensure stock array exists)
           setFormData({
             name: data.name,
             description: data.description,
             price: data.price,
-            originalPrice: data.originalPrice || 0,
+            originalPrice: data.originalPrice || '',
             category: data.category,
             image: data.image,
             images: data.images || [],
             isNewArrival: data.isNewArrival || false,
             isBestSeller: data.isBestSeller || false,
-            // If stock is empty (legacy data), provide default row
-            stock: data.stock && data.stock.length > 0 ? data.stock : [{ size: 36, quantity: 0 }]
+            stock: data.stock && data.stock.length > 0 ? data.stock : [{ size: '', quantity: 0 }]
           });
         } catch (error) {
           console.error("Failed to fetch product details", error);
+          toast.error("Failed to load product");
         }
       };
       fetchProduct();
@@ -68,14 +69,14 @@ export default function ProductForm() {
   // --- STOCK MANAGEMENT HANDLERS ---
   const handleStockChange = (index, field, value) => {
     const newStock = [...formData.stock];
-    newStock[index][field] = Number(value);
+    newStock[index][field] = value; // Keep as string for input, convert on submit
     setFormData({ ...formData, stock: newStock });
   };
 
   const addStockRow = () => {
     setFormData({ 
       ...formData, 
-      stock: [...formData.stock, { size: 0, quantity: 0 }] 
+      stock: [...formData.stock, { size: '', quantity: 0 }] 
     });
   };
 
@@ -88,7 +89,7 @@ export default function ProductForm() {
   const handleAddImage = () => {
     setFormData({ 
       ...formData, 
-      images: [...formData.images, ''] // Add empty string for new URL
+      images: [...formData.images, ''] // Add empty slot for new uploader
     });
   };
 
@@ -103,27 +104,27 @@ export default function ProductForm() {
     setFormData({ ...formData, images: newImages });
   };
 
-
-
-
   // --- SUBMIT HANDLER ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // 1. Calculate Total Stock automatically
-    const totalStock = formData.stock.reduce((acc, item) => acc + item.quantity, 0);
+    // 1. Calculate Total Stock
+    const totalStock = formData.stock.reduce((acc, item) => acc + Number(item.quantity), 0);
     
-    // 2. Prepare Payload
+    // 2. Prepare Payload (Convert types)
     const productData = {
       ...formData,
-      totalStock, // <--- Important: backend expects this
+      price: Number(formData.price),
+      originalPrice: Number(formData.originalPrice),
+      stock: formData.stock.map(s => ({ size: s.size, quantity: Number(s.quantity) })),
+      totalStock, 
     };
 
     try {
       const url = id 
-        ? `${API_BASE_URL}/api/products/${id}` // PUT
-        : `${API_BASE_URL}/api/products`;      // POST
+        ? `${API_BASE_URL}/api/products/${id}` 
+        : `${API_BASE_URL}/api/products`;      
       
       const method = id ? 'PUT' : 'POST';
 
@@ -137,92 +138,91 @@ export default function ProductForm() {
       });
 
       if (res.ok) {
-        navigate('/admin/products'); // Redirect to Inventory
+        toast.success(id ? "Product Updated" : "Product Created");
+        navigate('/admin/products'); 
       } else {
         const err = await res.json();
-        alert(err.message || 'Operation Failed');
+        toast.error(err.message || 'Operation Failed');
       }
     } catch (error) {
       console.error(error);
-      alert('Network Error');
+      toast.error('Network Error');
     } finally {
       setLoading(false);
     }
   };
 
-  // --- MOCK IMAGE UPLOAD (For now, text input) ---
-  // Ideally, you would have a function here that uploads to Cloudinary/ImageKit
-  // and sets setFormData({ ...formData, image: url })
-return (
+  return (
     <div className="max-w-4xl mx-auto pb-12 px-4 md:px-6">
       
       {/* HEADER */}
-      <div className="flex items-center gap-4 mb-8 pt-4 md:pt-0">
+      <div className="flex items-center gap-4 mb-8 pt-6">
         <button 
-          onClick={() => navigate('/admin/products')}
-          className="p-2 hover:bg-gray-200 rounded-full transition-colors bg-white shadow-sm md:shadow-none"
+          onClick={() => navigate('/admin/inventory')}
+          className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
         >
-          <ArrowLeft className="w-6 h-6 text-gray-600" />
+          <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-          {id ? 'Edit Product' : 'Add New Product'}
-        </h1>
+        <div>
+            <h1 className="text-2xl font-bold text-gray-800">
+                {id ? 'Edit Product' : 'Add New Product'}
+            </h1>
+            <p className="text-sm text-gray-500">
+                {id ? 'Update inventory details' : 'Create a new listing'}
+            </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8 animate-fade-in">
         
         {/* SECTION 1: BASIC DETAILS */}
-        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-          <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Basic Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-6">
+          <h2 className="text-lg font-bold text-gray-800 border-b pb-2">Basic Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Name */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-gray-700 mb-2">Product Name</label>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Product Name</label>
               <input 
                 type="text" 
                 name="name" 
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-black/5 outline-none" 
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none" 
                 placeholder="e.g. Royal Blue Velvet Jutti"
               />
             </div>
 
-            {/* Price */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Price (₹)</label>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Price (₹)</label>
               <input 
                 type="number" 
                 name="price" 
                 required
                 value={formData.price}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-black/5 outline-none" 
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none" 
               />
             </div>
 
-            {/* Original Price */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Original Price (Optional)</label>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Original Price (Optional)</label>
               <input 
                 type="number" 
                 name="originalPrice" 
                 value={formData.originalPrice}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-black/5 outline-none" 
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none" 
               />
             </div>
 
-            {/* Category */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Category</label>
               <select 
                 name="category" 
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-black/5 outline-none bg-white"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none bg-white"
               >
                 <option value="Bridal">Bridal</option>
                 <option value="Casual">Casual</option>
@@ -232,16 +232,15 @@ return (
               </select>
             </div>
 
-            {/* Description */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Description</label>
               <textarea 
                 name="description" 
                 rows="4"
                 required
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-black/5 outline-none" 
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none" 
                 placeholder="Detailed description of the product..."
               />
             </div>
@@ -249,74 +248,68 @@ return (
         </div>
 
         {/* SECTION 2: MEDIA (Images) */}
-        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-           <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Product Media</h2>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-6">
+           <h2 className="text-lg font-bold text-gray-800 border-b pb-2">Product Media</h2>
            
-           {/* 1. MAIN IMAGE */}
-           <div className="mb-6">
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Main Display Image <span className="text-red-500">*</span>
-              </label>
-              <div className="flex flex-col md:flex-row gap-4 items-start">
-                <div className="relative flex-1 w-full">
-                  <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input 
-                    type="text" 
-                    name="image" 
-                    required
+           {/* 1. MAIN IMAGE - USING FILE UPLOAD */}
+           <div>
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                <div className="flex-1 w-full">
+                  {/* REPLACED MANUAL INPUT WITH FILE UPLOAD */}
+                  <FileUpload 
+                    label="Main Display Image *"
                     value={formData.image}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-black/5" 
-                    placeholder="https://ik.imagekit.io/..."
+                    onUpload={(url) => setFormData({ ...formData, image: url })}
                   />
                 </div>
-                {/* Main Preview */}
-                {formData.image && (
-                  <div className="w-full md:w-16 h-32 md:h-16 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 shrink-0">
-                    <img src={formData.image} alt="Main" className="w-full h-full object-cover" />
-                  </div>
-                )}
+                {/* PREVIEW */}
+                <div className="w-full md:w-32 h-40 md:h-32 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 shrink-0 flex items-center justify-center">
+                  {formData.image ? (
+                    <img src={getOptimizedImage(formData.image, 300)} alt="Main" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs text-gray-400">No Image</span>
+                  )}
+                </div>
               </div>
            </div>
 
-           {/* 2. GALLERY IMAGES ARRAY */}
+           {/* 2. GALLERY IMAGES - USING FILE UPLOAD */}
            <div>
              <div className="flex justify-between items-center mb-3">
-                <label className="block text-sm font-bold text-gray-700">Gallery Images</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase">Gallery Images</label>
                 <button 
                   type="button" 
                   onClick={handleAddImage}
-                  className="text-sm font-bold text-[#FF2865] flex items-center gap-1 hover:underline"
+                  className="text-xs font-bold text-[#FF2865] flex items-center gap-1 hover:underline"
                 >
-                  <Plus className="w-4 h-4" /> Add Image
+                  <Plus className="w-4 h-4" /> Add Image Slot
                 </button>
              </div>
 
-             <div className="space-y-3">
+             <div className="space-y-4">
                {formData.images.map((url, index) => (
-                 <div key={index} className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center animate-fade-in">
+                 <div key={index} className="flex flex-col md:flex-row gap-4 items-start animate-fade-in border-b border-gray-50 pb-4 last:border-0">
                    
-                   <div className="flex-1 w-full flex gap-2 items-center">
-                      <span className="text-xs font-bold text-gray-400 w-6">#{index + 1}</span>
-                      <input 
-                        type="text" 
+                   <div className="flex-1 w-full">
+                      {/* REPLACED MANUAL INPUT WITH FILE UPLOAD */}
+                      <FileUpload 
+                        label={`Gallery Image #${index + 1}`}
                         value={url}
-                        onChange={(e) => handleImageChange(index, e.target.value)}
-                        className="w-full p-3 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-black/5" 
-                        placeholder="Paste image URL..."
+                        onUpload={(newUrl) => handleImageChange(index, newUrl)}
                       />
                    </div>
 
-                   <div className="flex gap-2 w-full sm:w-auto justify-end">
+                   <div className="flex gap-3 w-full md:w-auto items-center justify-end md:mt-6">
                       {url && (
                         <div className="w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-50 shrink-0">
-                           <img src={url} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
+                           <img src={getOptimizedImage(url, 100)} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
                         </div>
                       )}
                       <button 
                         type="button" 
                         onClick={() => handleRemoveImage(index)}
-                        className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove Image"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
@@ -326,21 +319,21 @@ return (
              </div>
              
              {formData.images.length === 0 && (
-               <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-400 text-sm">
-                 No gallery images added. Click "Add Image" to upload more angles.
+               <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 text-gray-400 text-sm">
+                 No additional images. Click "Add Image Slot" to upload.
                </div>
              )}
            </div>
         </div>
 
         {/* SECTION 3: INVENTORY & STOCK */}
-        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-           <div className="flex justify-between items-center mb-4 border-b pb-2">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-6">
+           <div className="flex justify-between items-center border-b pb-2">
               <h2 className="text-lg font-bold text-gray-800">Inventory & Stock</h2>
               <button 
                 type="button" 
                 onClick={addStockRow}
-                className="text-sm font-bold text-[#FF2865] flex items-center gap-1 hover:underline"
+                className="text-xs font-bold text-[#FF2865] flex items-center gap-1 hover:underline"
               >
                 <Plus className="w-4 h-4" /> Add Size
               </button>
@@ -348,51 +341,44 @@ return (
 
            <div className="space-y-3">
              {formData.stock.map((item, index) => (
-               <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-3 items-end animate-fade-in">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Size</label>
+               <div key={index} className="flex gap-4 items-end animate-fade-in">
+                  <div className="flex-1">
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Size (EU)</label>
                     <input 
-                      type="number" 
+                      type="text" 
                       value={item.size}
                       onChange={(e) => handleStockChange(index, 'size', e.target.value)}
-                      className="w-full p-2 border border-gray-200 rounded-lg"
-                      placeholder="EU"
+                      className="w-full p-2 border border-gray-200 rounded focus:border-[#1C1917] outline-none text-sm"
+                      placeholder="e.g. 38"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Qty</label>
+                  <div className="flex-1">
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Quantity</label>
                     <input 
                       type="number" 
                       value={item.quantity}
                       onChange={(e) => handleStockChange(index, 'quantity', e.target.value)}
-                      className="w-full p-2 border border-gray-200 rounded-lg"
+                      className="w-full p-2 border border-gray-200 rounded focus:border-[#1C1917] outline-none text-sm"
                     />
                   </div>
                   <button 
                     type="button" 
                     onClick={() => removeStockRow(index)}
-                    className="p-2 mb-[1px] text-gray-400 hover:text-red-500 bg-gray-50 rounded-lg hover:bg-red-50 transition-colors h-[42px] w-[42px] flex items-center justify-center"
+                    className="p-2.5 mb-[1px] text-gray-400 hover:text-red-500 bg-gray-50 rounded-lg hover:bg-red-50 transition-colors"
                     disabled={formData.stock.length === 1} 
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                </div>
              ))}
            </div>
-           
-           <div className="mt-6 p-4 bg-gray-50 rounded-lg text-right">
-              <span className="text-gray-500 font-medium mr-2">Total Calculated Stock:</span>
-              <span className="text-xl font-bold text-gray-900">
-                {formData.stock.reduce((acc, item) => acc + item.quantity, 0)}
-              </span>
-           </div>
         </div>
 
         {/* SECTION 4: SETTINGS */}
-        <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-           <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Visibility</h2>
-           <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-             <label className="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition-colors">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-6">
+           <h2 className="text-lg font-bold text-gray-800 border-b pb-2">Visibility</h2>
+           <div className="flex gap-8">
+             <label className="flex items-center gap-2 cursor-pointer">
                <input 
                   type="checkbox" 
                   name="isNewArrival"
@@ -400,10 +386,10 @@ return (
                   onChange={handleChange}
                   className="w-5 h-5 accent-[#1C1917]"
                />
-               <span className="font-medium text-gray-700">Mark as New Arrival</span>
+               <span className="font-medium text-gray-700 text-sm">Mark as New Arrival</span>
              </label>
 
-             <label className="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition-colors">
+             <label className="flex items-center gap-2 cursor-pointer">
                <input 
                   type="checkbox" 
                   name="isBestSeller"
@@ -411,26 +397,19 @@ return (
                   onChange={handleChange}
                   className="w-5 h-5 accent-[#1C1917]"
                />
-               <span className="font-medium text-gray-700">Mark as Best Seller</span>
+               <span className="font-medium text-gray-700 text-sm">Mark as Best Seller</span>
              </label>
            </div>
         </div>
 
         {/* SUBMIT BUTTON */}
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 md:gap-4">
-           <button 
-             type="button"
-             onClick={() => navigate('/admin/products')}
-             className="w-full sm:w-auto px-6 py-3 rounded-lg font-bold text-gray-500 hover:bg-gray-200 bg-gray-100 transition-colors"
-           >
-             Cancel
-           </button>
+        <div className="flex justify-end pt-4">
            <button 
              type="submit"
              disabled={loading}
              className="w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-white bg-[#1C1917] hover:bg-[#FF2865] transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-70"
            >
-             {loading ? 'Saving...' : <><Save className="w-5 h-5" /> Save Product</>}
+             {loading ? 'Saving...' : <><Save className="w-5 h-5" /> {id ? 'Update Product' : 'Publish Product'}</>}
            </button>
         </div>
 

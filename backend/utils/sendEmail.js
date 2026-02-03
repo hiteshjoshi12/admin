@@ -130,7 +130,6 @@ const sendOrderConfirmation = async (order) => {
             <table style="width: 100%; font-size: 14px;">
               <tr><td style="text-align: right; padding: 5px;">Subtotal:</td><td style="text-align: right; width: 100px; padding: 5px;">₹${(order.itemsPrice || order.itemPrice).toLocaleString()}</td></tr>
               <tr><td style="text-align: right; padding: 5px;">Shipping:</td><td style="text-align: right; padding: 5px;">${order.shippingPrice === 0 ? 'Free' : '₹' + order.shippingPrice}</td></tr>
-              <tr><td style="text-align: right; padding: 5px;">Tax:</td><td style="text-align: right; padding: 5px;">₹${order.taxPrice}</td></tr>
               <tr><td style="text-align: right; padding: 10px 5px; font-weight: bold; font-size: 16px; color: #1C1917;">Total Paid:</td><td style="text-align: right; padding: 10px 5px; font-weight: bold; font-size: 16px; color: #FF2865;">₹${order.totalPrice.toLocaleString()}</td></tr>
             </table>
           </div>

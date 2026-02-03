@@ -15,6 +15,8 @@ const contentRoutes = require('./routes/contentRoutes');
 const cmsRoutes = require('./routes/cmsRoutes');
 const coupons = require('./routes/couponRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes'); // <--- Import
+const uploadRoutes = require('./routes/uploadRoutes');
+const sitemapRoutes = require('./routes/sitemapRoutes');
 
 const app = express();
 app.use(compression());
@@ -23,6 +25,7 @@ enableCors(app);
 
 connectDB();
 
+app.use('/', sitemapRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
@@ -33,6 +36,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/coupons', coupons);
+app.use('/api/upload', uploadRoutes);
 
 // ✅ EXPORT APP FOR VERCEL
 module.exports = app;

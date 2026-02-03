@@ -4,9 +4,13 @@ import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
 import { confirmAction } from '../../util/toastUtils';
 import toast from 'react-hot-toast';
+
 // 1. IMPORT OPTIMIZERS
-import { getOptimizedImage} from '../../util/imageUtils';
+import { getOptimizedImage } from '../../util/imageUtils';
 import { getOptimizedVideo } from '../../util/videoUtils';
+
+// 2. IMPORT FILE UPLOAD COMPONENT
+import FileUpload from '../admin/FileUpload';
 
 export default function CMS() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -168,19 +172,25 @@ function HomeCMS({ userInfo }) {
               {data.heroSlides.map((slide, i) => (
                 <div key={i} className="p-4 md:p-6 border border-gray-200 rounded-xl bg-gray-50/30 relative hover:shadow-md transition-all">
                   <button onClick={() => removeSlide(i)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors p-2">
-                     <Trash2 className="w-5 h-5"/>
+                      <Trash2 className="w-5 h-5"/>
                   </button>
                   
                   <span className="text-xs font-bold bg-gray-200 text-gray-600 px-2 py-1 rounded mb-4 inline-block">SLIDE {i + 1}</span>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
-                       <label className="text-xs font-bold text-gray-500 uppercase">Image URL</label>
-                       <div className="flex flex-col md:flex-row gap-2 mt-1">
-                          <input className="flex-1 border p-2 rounded text-sm font-mono" placeholder="https://..." value={slide.image} onChange={e=>handleHeroChange(i,'image',e.target.value)} />
-                          {/* OPTIMIZED PREVIEW IMAGE */}
-                          {slide.image && <img src={getOptimizedImage(slide.image, 200)} alt="prev" className="w-full md:w-20 h-32 md:h-12 rounded object-cover border" />}
-                       </div>
+                       {/* --- REPLACED: File Upload for Hero Image --- */}
+                       <FileUpload 
+                          label="Slide Image"
+                          value={slide.image}
+                          onUpload={(url) => handleHeroChange(i, 'image', url)}
+                       />
+                       {/* PREVIEW */}
+                       {slide.image && (
+                         <div className="mt-2">
+                            <img src={getOptimizedImage(slide.image, 200)} alt="prev" className="w-full md:w-32 h-32 md:h-20 rounded object-cover border" />
+                         </div>
+                       )}
                     </div>
                     <div>
                        <label className="text-xs font-bold text-gray-500 uppercase">Title</label>
@@ -230,38 +240,38 @@ function HomeCMS({ userInfo }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Photo 1 URL (Left)</label>
-                  <div className="flex flex-col md:flex-row gap-2">
-                     <input 
-                       className="flex-1 p-3 border border-gray-200 rounded-lg outline-none focus:border-[#FF2865] text-sm font-mono" 
-                       value={data.instagram.photo1} 
-                       onChange={e => handleInstaChange('photo1', e.target.value)} 
-                     />
-                     {/* OPTIMIZED PREVIEW */}
-                     {data.instagram.photo1 && <img src={getOptimizedImage(data.instagram.photo1, 100)} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
-                  </div>
+                  {/* --- REPLACED: File Upload for Photo 1 --- */}
+                  <FileUpload 
+                    label="Photo 1 (Left)"
+                    value={data.instagram.photo1}
+                    onUpload={(url) => handleInstaChange('photo1', url)}
+                  />
+                  {/* OPTIMIZED PREVIEW */}
+                  {data.instagram.photo1 && (
+                    <img src={getOptimizedImage(data.instagram.photo1, 100)} alt="Preview" className="w-24 h-24 mt-2 rounded object-cover border" />
+                  )}
                </div>
 
                <div>
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Photo 2 URL (Right)</label>
-                  <div className="flex flex-col md:flex-row gap-2">
-                     <input 
-                       className="flex-1 p-3 border border-gray-200 rounded-lg outline-none focus:border-[#FF2865] text-sm font-mono" 
-                       value={data.instagram.photo2} 
-                       onChange={e => handleInstaChange('photo2', e.target.value)} 
-                     />
-                     {/* OPTIMIZED PREVIEW */}
-                     {data.instagram.photo2 && <img src={getOptimizedImage(data.instagram.photo2, 100)} alt="Preview" className="w-full md:w-12 h-32 md:h-12 rounded object-cover border" />}
-                  </div>
+                  {/* --- REPLACED: File Upload for Photo 2 --- */}
+                  <FileUpload 
+                    label="Photo 2 (Right)"
+                    value={data.instagram.photo2}
+                    onUpload={(url) => handleInstaChange('photo2', url)}
+                  />
+                  {/* OPTIMIZED PREVIEW */}
+                  {data.instagram.photo2 && (
+                    <img src={getOptimizedImage(data.instagram.photo2, 100)} alt="Preview" className="w-24 h-24 mt-2 rounded object-cover border" />
+                  )}
                </div>
 
                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Reel Video URL (Center)</label>
-                  <input 
-                    className="w-full p-3 border border-gray-200 rounded-lg outline-none focus:border-[#FF2865] text-sm font-mono" 
-                    placeholder="Must be a direct .mp4 link" 
-                    value={data.instagram.reel} 
-                    onChange={e => handleInstaChange('reel', e.target.value)} 
+                  {/* --- REPLACED: File Upload for Reel (Video) --- */}
+                  <FileUpload 
+                    label="Reel Video (.mp4)"
+                    value={data.instagram.reel}
+                    accept="video/*"
+                    onUpload={(url) => handleInstaChange('reel', url)}
                   />
                </div>
             </div>
@@ -446,8 +456,12 @@ function CollectionsCMS({ userInfo }) {
             <input className="w-full p-2 border rounded" value={newCol.name} onChange={e => setNewCol({...newCol, name: e.target.value})} placeholder="e.g. Wedding Edit" />
           </div>
           <div className="flex-1">
-            <label className="text-xs font-bold text-gray-500 block mb-1">Image URL</label>
-            <input className="w-full p-2 border rounded" value={newCol.image} onChange={e => setNewCol({...newCol, image: e.target.value})} placeholder="https://..." />
+            {/* --- REPLACED: File Upload for Collection Image --- */}
+            <FileUpload 
+               label="Collection Image"
+               value={newCol.image}
+               onUpload={(url) => setNewCol({...newCol, image: url})}
+            />
           </div>
           <button onClick={handleAdd} className="w-full md:w-auto bg-[#1C1917] text-white px-6 py-2.5 rounded font-bold hover:bg-[#FF2865] transition-colors">Add</button>
        </div>
@@ -550,8 +564,13 @@ function RunwayCMS({ userInfo }) {
               <input className="w-full p-2 border rounded mt-1" value={newVideo.ctaText} onChange={e => setNewVideo({...newVideo, ctaText: e.target.value})} placeholder="e.g. Shop Now" />
             </div>
             <div className="md:col-span-2">
-              <label className="text-xs font-bold text-gray-500 uppercase">Video URL (.mp4)</label>
-              <input className="w-full p-2 border rounded mt-1" value={newVideo.videoUrl} onChange={e => setNewVideo({...newVideo, videoUrl: e.target.value})} placeholder="https://..." />
+              {/* --- REPLACED: File Upload for Runway Video --- */}
+              <FileUpload 
+                 label="Video File (.mp4)"
+                 value={newVideo.videoUrl}
+                 accept="video/*"
+                 onUpload={(url) => setNewVideo({...newVideo, videoUrl: url})}
+              />
             </div>
           </div>
           <button onClick={handleAdd} disabled={loading} className="mt-4 bg-[#1C1917] text-white px-6 py-2 rounded font-bold hover:bg-[#FF2865] transition-colors w-full md:w-auto">
