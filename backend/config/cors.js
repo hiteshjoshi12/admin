@@ -5,23 +5,21 @@ module.exports = (app) => {
     ? process.env.FRONTEND_URL.split(',') 
     : ['http://localhost:5173'];
 
-  app.use(
-    cors({
-      origin: function (origin, callback) {
-        // allow requests with no origin (like mobile apps or curl)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
-        }
-      },
-      credentials: true,
-      optionsSuccessStatus: 200 // Essential for some legacy browsers/Vercel edge cases
-    })
-  );
+  const corsOptions = {
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+  };
 
-  // Explicitly handle OPTIONS preflight globally
-  app.options('*', cors());
+  app.use(cors(corsOptions));
+
+  // Fix: Use regex for the wildcard to avoid PathError
+  app.options(/(.*)/, cors(corsOptions));
 };
