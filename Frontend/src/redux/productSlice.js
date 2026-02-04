@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import API_BASE_URL from '../util/config';
+import {API_BASE_URL} from '../util/config';
 
 // 1. ASYNC THUNK: Fetch All Products (with Pagination & Search)
 export const fetchProducts = createAsyncThunk(
