@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import config from '../../config/config.js';
+import { API_BASE_URL } from '../../util/config.js';
 
 // 1. IMPORT OPTIMIZER
 import { getOptimizedImage } from '../../util/imageUtils';
@@ -17,7 +17,7 @@ export default function CollectionTiles() {
   useEffect(() => {
     const fetchCollections = async () => {
       try {
-        const res = await fetch(`${config.API_BASE_URL}/api/collections`);
+        const res = await fetch(`${API_BASE_URL}/api/collections`);
         const data = await res.json();
         
         // Filter for only active collections

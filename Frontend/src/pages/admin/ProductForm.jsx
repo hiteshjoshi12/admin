@@ -158,7 +158,7 @@ export default function ProductForm() {
       {/* HEADER */}
       <div className="flex items-center gap-4 mb-8 pt-6">
         <button 
-          onClick={() => navigate('/admin/inventory')}
+          onClick={() => navigate('/admin/products')}
           className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />

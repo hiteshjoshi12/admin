@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import config from '../config/config';
+import API_BASE_URL from '../util/config';
 
 // 1. ASYNC THUNK: Fetch All Products (with Pagination & Search)
 export const fetchProducts = createAsyncThunk(
@@ -15,7 +15,7 @@ export const fetchProducts = createAsyncThunk(
       if (priceRange) params.append('priceRange', priceRange);
       if (sort) params.append('sort', sort);
 
-      const response = await fetch(`${config.API_BASE_URL}/api/products?${params.toString()}`);
+      const response = await fetch(`${API_BASE_URL}/api/products?${params.toString()}`);
       const data = await response.json();
       
       if (!response.ok) throw new Error(data.message);
@@ -31,7 +31,7 @@ export const fetchProductDetails = createAsyncThunk(
   'products/fetchDetails', 
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/api/products/${id}`);
+      const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
       
       if (!response.ok) {
         throw new Error('Product not found');

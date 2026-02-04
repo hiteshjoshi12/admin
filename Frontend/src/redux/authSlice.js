@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import config from '../config/config';
+import { API_BASE_URL } from '../util/config';
 // 1. LOGIN
 export const login = createAsyncThunk('auth/login', async ({ email, password, localCart }, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${config.API_BASE_URL}/api/users/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/users/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, localCart }),
@@ -23,7 +23,7 @@ export const register = createAsyncThunk(
   'auth/register', 
   async ({ name, email, password, localCart }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/api/users`, {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, localCart }),
@@ -45,7 +45,7 @@ export const saveAddressToProfile = createAsyncThunk(
   async (addressData, { getState, rejectWithValue }) => {
     try {
       const { auth: { userInfo } } = getState();
-      const response = await fetch(`${config.API_BASE_URL}/api/users/profile/address`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/profile/address`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export const updateAddressInProfile = createAsyncThunk(
     try {
       const { auth: { userInfo } } = getState();
       // Notice the URL includes the ID: /address/${id}
-      const response = await fetch(`${config.API_BASE_URL}/api/users/profile/address/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/profile/address/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export const deleteAddressFromProfile = createAsyncThunk(
   async (id, { getState, rejectWithValue }) => {
     try {
       const { auth: { userInfo } } = getState();
-      const response = await fetch(`${config.API_BASE_URL}/api/users/profile/address/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/profile/address/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${userInfo.token}`,

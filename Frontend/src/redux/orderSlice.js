@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import config from '../config/config';
+import { API_BASE_URL } from '../util/config';
 
 // ASYNC THUNK: Create Order
 export const createOrder = createAsyncThunk(
@@ -20,7 +20,7 @@ export const createOrder = createAsyncThunk(
       }
 
       // 3. Make API Call
-      const response = await fetch(`${config.API_BASE_URL}/api/orders`, {
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: headers, // Use the dynamic headers object
         credentials: 'include',
