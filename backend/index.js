@@ -20,8 +20,8 @@ const sitemapRoutes = require('./routes/sitemapRoutes');
 
 const app = express();
 app.use(compression());
-app.use(express.json());
 enableCors(app);
+app.use(express.json());
 
 connectDB();
 
