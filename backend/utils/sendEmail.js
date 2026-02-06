@@ -11,6 +11,7 @@ const createTransporter = () => {
       user: process.env.EMAIL_USERNAME,
       pass: process.env.EMAIL_PASSWORD,
     },
+    // Required for some hosting environments to prevent self-signed cert errors
     tls: {
       rejectUnauthorized: false
     },
@@ -23,7 +24,7 @@ const getRecipientDetails = (order) => {
     if (order.user && order.user.email) {
         return { email: order.user.email, name: order.user.name.split(' ')[0] };
     }
-    // 2. Try Guest Info (The fix for your issue)
+    // 2. Try Guest Info (Hybrid System Support)
     if (order.guestInfo && order.guestInfo.email) {
         return { email: order.guestInfo.email, name: order.guestInfo.name || "Customer" };
     }
@@ -34,10 +35,12 @@ const getRecipientDetails = (order) => {
     return { email: null, name: "Customer" };
 };
 
-// --- 2. BEAUTIFUL GENERIC EMAIL ---
+// --- 2. GENERIC EMAIL (Password Reset, Welcome, etc.) ---
 const sendEmail = async (options) => {
   try {
     const transporter = createTransporter();
+    
+    // Optional: Add a button if URL is provided
     const buttonHtml = options.url ? `
       <div style="text-align: center; margin: 30px 0;">
         <a href="${options.url}" style="background-color: #1C1917; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block;">
@@ -47,7 +50,7 @@ const sendEmail = async (options) => {
     ` : '';
 
     const mailOptions = {
-      from: `"BeadsNBloom Security" <Connect@beadsandbloom.com>`,
+      from: `"BeadsNBloom Security" <${process.env.EMAIL_USERNAME}>`,
       to: options.email,
       subject: options.subject,
       html: `
@@ -56,9 +59,17 @@ const sendEmail = async (options) => {
             <h2 style="color: #ffffff; margin: 0; font-family: serif; letter-spacing: 1px;">BeadsNBloom</h2>
           </div>
           <div style="padding: 30px 20px;">
-            <h3 style="color: #1C1917; margin-top: 0;">${options.title || 'Notification'}</h3>
-            <p style="font-size: 15px; color: #555;">${options.message.replace(/\n/g, '<br>')}</p>
+            <h3 style="color: #1C1917; margin-top: 0; text-align: center;">${options.title || 'Notification'}</h3>
+            
+            <div style="font-size: 15px; color: #555; text-align: center;">
+                ${options.message} 
+            </div>
+            
             ${buttonHtml}
+            
+            <div style="margin-top: 30px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px;">
+               <p>If you did not request this email, please ignore it.</p>
+            </div>
           </div>
         </div>
       `,
@@ -70,12 +81,10 @@ const sendEmail = async (options) => {
   }
 };
 
-// --- 3. ORDER CONFIRMATION (Fixed for Guests) ---
+// --- 3. ORDER CONFIRMATION ---
 const sendOrderConfirmation = async (order) => {
   try {
     const transporter = createTransporter();
-    
-    // 🚨 GET CORRECT EMAIL/NAME
     const { email, name } = getRecipientDetails(order);
     
     if (!email) {
@@ -98,8 +107,8 @@ const sendOrderConfirmation = async (order) => {
     `).join('');
 
     const mailOptions = {
-      from: `"BeadsNBloom Orders" <Connect@beadsandbloom.com>`,
-      to: email, // Use extracted email
+      from: `"BeadsNBloom Orders" <${process.env.EMAIL_USERNAME}>`,
+      to: email,
       subject: `Order Confirmed! #${order._id.toString().slice(-6).toUpperCase()}`,
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
@@ -153,12 +162,10 @@ const sendOrderConfirmation = async (order) => {
   }
 };
 
-// --- 4. ORDER STATUS EMAIL (Fixed for Guests) ---
+// --- 4. ORDER STATUS EMAIL ---
 const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
   try {
     const transporter = createTransporter();
-    
-    // 🚨 GET CORRECT EMAIL
     const { email } = getRecipientDetails(order);
     if (!email) return;
 
@@ -189,8 +196,8 @@ const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
     ` : '';
 
     const mailOptions = {
-      from: `"BeadsNBloom Updates" <Connect@beadsandbloom.com>`,
-      to: email, // Use extracted email
+      from: `"BeadsNBloom Updates" <${process.env.EMAIL_USERNAME}>`,
+      to: email,
       subject: subject,
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #333; line-height: 1.6; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">

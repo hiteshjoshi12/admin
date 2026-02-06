@@ -5,11 +5,10 @@ const BestSeller = require('../models/BestSeller');
 // @access  Public
 const getBestSellers = async (req, res) => {
   try {
-    // .populate('product') is the magic command. 
-    // It replaces the product ID with the actual product object (name, image, price).
+    // ✅ FIX: Added 'slug' to the fields to be populated
     const bestSellers = await BestSeller.find({})
-      .populate('product', 'name image price') // Only fetch fields we need
-      .sort({ position: 1 }); // Ensure they come in order 1, 2, 3
+      .populate('product', 'name image price slug') 
+      .sort({ position: 1 });
 
     res.json(bestSellers);
   } catch (error) {
@@ -24,23 +23,30 @@ const setBestSeller = async (req, res) => {
   const { productId, tag, position } = req.body;
 
   try {
-    // Check if this position is already taken
     const existingSlot = await BestSeller.findOne({ position });
 
     if (existingSlot) {
-      // Update existing slot
       existingSlot.product = productId;
       existingSlot.tag = tag;
       await existingSlot.save();
-      res.json(existingSlot);
+      
+      // ✅ Best Practice: Re-populate after saving so the admin 
+      // response also contains the slug for immediate UI feedback.
+      const updatedSlot = await BestSeller.findById(existingSlot._id)
+        .populate('product', 'name image price slug');
+        
+      res.json(updatedSlot);
     } else {
-      // Create new slot
       const newSlot = await BestSeller.create({
         product: productId,
         tag,
         position
       });
-      res.status(201).json(newSlot);
+      
+      const populatedNewSlot = await BestSeller.findById(newSlot._id)
+        .populate('product', 'name image price slug');
+
+      res.status(201).json(populatedNewSlot);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

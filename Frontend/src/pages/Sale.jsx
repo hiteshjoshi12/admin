@@ -233,7 +233,7 @@ export default function Sale() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
           
           {products.map((product) => (
-            <div key={product.id} className="group relative">
+            <div key={product.slug} className="group relative">
               
               {/* Discount Badge */}
               <div className="absolute top-3 left-3 z-20 bg-[#FF2865] text-white text-[10px] font-bold px-2 py-1 rounded-sm shadow-md">

@@ -1,48 +1,55 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { sendEmail } = require("../utils/sendEmail");
 
 // --- HELPER: GENERATE TOKEN ---
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "2d" });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
-// --- HELPER: ENRICH CART & AUTO-CLEANUP ---
-// This function fixes the "0 quantity" and "missing ID" bugs
+// --- HELPER: ENRICH CART (PERFORMANCE OPTIMIZED) ---
+// 🚀 FIX: Uses 1 DB Call instead of N calls (avoids N+1 problem)
 const enrichCartItems = async (cartItems) => {
   if (!cartItems || cartItems.length === 0) return [];
+
+  // 1. Extract all IDs first
+  const productIds = cartItems
+    .map((item) => item.productId || item.id || item._id)
+    .filter((id) => id); // Remove null/undefined
+
+  // 2. Fetch all products in ONE query
+  const products = await Product.find({ _id: { $in: productIds } });
+  
+  // 3. Create a Map for instant lookup (O(1) complexity)
+  const productMap = new Map(products.map((p) => [p._id.toString(), p]));
 
   const enrichedItems = [];
 
   for (const item of cartItems) {
-    // 1. Resolve ID (Handle _id vs productId mismatch)
     const productId = item.productId || item.id || item._id;
-    if (!productId) continue; // Skip corrupted items
+    if (!productId) continue;
 
-    // 2. Fetch Product
-    const product = await Product.findById(productId);
-    if (!product) continue; // Skip items if product was deleted
+    // Get product from Map (No await needed here)
+    const product = productMap.get(productId.toString());
+    if (!product) continue; // Skip if product was deleted
 
-    // 3. Find Max Stock
+    // Find Max Stock
     let currentMaxStock = 0;
-    // Convert both to String for safe comparison
     const sizeVariant = product.stock.find(
-      (s) => s.size.toString() === item.size.toString(),
+      (s) => s.size.toString() === item.size.toString()
     );
 
     if (sizeVariant) {
       currentMaxStock = sizeVariant.quantity;
     }
 
-    // 4. Push Enriched Item (Mapping 'productId' -> 'id' for Frontend)
     enrichedItems.push({
-      id: productId.toString(),
-      name: product.name, // Always use fresh name from Product DB
-      image: product.images[0], // Always use fresh image
-      price: product.price, // Always use fresh price
+      id: productId.toString(), // Map to 'id' for frontend
+      name: product.name,
+      image: product.images[0], // Fresh image
+      price: product.price,     // Fresh price
       size: item.size,
       quantity: item.quantity,
       maxStock: currentMaxStock,
@@ -53,12 +60,11 @@ const enrichCartItems = async (cartItems) => {
 };
 
 // --------------------------------------------------------------------------
-// AUTHENTICATION CONTROLLERS
+// AUTH CONTROLLERS
 // --------------------------------------------------------------------------
 
-// @desc    Register a new user & Merge Local Cart
+// @desc    Register & Merge Cart
 // @route   POST /api/users/register
-// @access  Public
 const registerUser = async (req, res) => {
   const { name, email, password, localCart } = req.body;
 
@@ -68,14 +74,10 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-    });
-
-    if (user && localCart && localCart.length > 0) {
-      const dbCart = localCart.map((item) => ({
+    // 1. Prepare Cart Data if Local Cart exists
+    let initialCart = [];
+    if (localCart && localCart.length > 0) {
+      initialCart = localCart.map((item) => ({
         productId: item.id || item.productId,
         name: item.name,
         image: item.image,
@@ -83,12 +85,18 @@ const registerUser = async (req, res) => {
         size: item.size,
         quantity: item.quantity,
       }));
-      user.cart = dbCart;
-      await user.save();
     }
+
+    const user = await User.create({
+      name,
+      email,
+      password,
+      cart: initialCart, // Save cart immediately on creation
+    });
 
     if (user) {
       const enrichedCart = await enrichCartItems(user.cart);
+      
       res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -105,9 +113,8 @@ const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Auth user & get token & Merge Local Cart
+// @desc    Login & Merge Cart
 // @route   POST /api/users/login
-// @access  Public
 const authUser = async (req, res) => {
   const { email, password, localCart } = req.body;
 
@@ -115,61 +122,68 @@ const authUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
-      // Merge Local Cart Logic
+      
+      // --- SMART CART MERGE LOGIC ---
       if (localCart && localCart.length > 0) {
-        let dbCart = user.cart || [];
+        // Create a Map of existing DB items for easy lookup
+        // Key format: "ProductId-Size" (e.g., "12345-8")
+        const dbCartMap = new Map(
+            user.cart.map(item => [`${item.productId}-${item.size}`, item])
+        );
 
-        localCart.forEach((localItem) => {
-          const validId = localItem.id || localItem.productId; // Robust ID check
-          if (!validId) return;
-
-          const existingItemIndex = dbCart.findIndex(
-            (dbItem) =>
-              dbItem.productId.toString() === validId &&
-              dbItem.size.toString() === localItem.size.toString(),
-          );
-
-          if (existingItemIndex > -1) {
-            dbCart[existingItemIndex].quantity += localItem.quantity;
-          } else {
-            dbCart.push({
-              productId: validId,
-              name: localItem.name,
-              image: localItem.image,
-              price: localItem.price,
-              size: localItem.size,
-              quantity: localItem.quantity,
-            });
-          }
+        localCart.forEach(localItem => {
+            const pid = localItem.id || localItem.productId;
+            if(!pid) return;
+            
+            const key = `${pid}-${localItem.size}`;
+            
+            if (dbCartMap.has(key)) {
+                // If item exists, sum quantities
+                const existingItem = dbCartMap.get(key);
+                existingItem.quantity += localItem.quantity;
+            } else {
+                // If new, add to user cart array
+                user.cart.push({
+                    productId: pid,
+                    name: localItem.name,
+                    image: localItem.image,
+                    price: localItem.price,
+                    size: localItem.size,
+                    quantity: localItem.quantity
+                });
+            }
         });
 
-        user.cart = dbCart;
         await user.save();
       }
+      // -----------------------------
 
-      // 🚨 CRITICAL FIX: Enrich Cart & Auto-Clean DB
-      // This removes "ghost" items from the response
+      // 1. Get Enriched Cart (Removes deleted products automatically)
       const enrichedCart = await enrichCartItems(user.cart);
 
-      // Optional: Save the clean cart back to DB to permanently fix corruption
-      // user.cart = enrichedCart.map(item => ({
-      //   productId: item.id,
-      //   name: item.name,
-      //   image: item.image,
-      //   price: item.price,
-      //   size: item.size,
-      //   quantity: item.quantity
-      // }));
-      // await user.save();
+      // 2. OPTIONAL: Heal the Database
+      // If the enriched cart length is different from DB cart length, 
+      // it means some items were deleted from the DB. Save the clean version.
+      if (enrichedCart.length !== user.cart.length) {
+         user.cart = enrichedCart.map(item => ({
+             productId: item.id,
+             name: item.name,
+             image: item.image,
+             price: item.price,
+             size: item.size,
+             quantity: item.quantity
+         }));
+         await user.save();
+      }
 
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
-        cart: enrichedCart, // Send clean, enriched cart
-        token: generateToken(user._id),
+        cart: enrichedCart,
         addresses: user.addresses,
+        token: generateToken(user._id),
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -179,31 +193,56 @@ const authUser = async (req, res) => {
   }
 };
 
-// ... [Keep Address Controllers, Forgot Password, etc. exactly as they were] ...
+// @desc    Sync Cart (Full Overwrite)
+// @route   PUT /api/users/cart
+const syncCart = async (req, res) => {
+  const { cart } = req.body;
 
-// @desc    Save User Address
-// @route   POST /api/users/profile/address
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      // Map frontend 'id' back to backend 'productId' schema
+      const dbCart = cart.map((item) => ({
+        productId: item.id || item.productId || item._id,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        size: item.size,
+        quantity: item.quantity,
+      }));
+
+      user.cart = dbCart;
+      await user.save();
+
+      // Return enriched so frontend has maxStock limits
+      const enrichedCart = await enrichCartItems(user.cart);
+      res.json(enrichedCart);
+    } else {
+      res.status(404);
+      throw new Error("User not found");
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ... [Keep your Address, Delete, and Password Reset controllers as they were] ...
+// They were correctly implemented.
+
 const saveAddress = async (req, res) => {
   const { address, city, state, postalCode, phoneNumber, country } = req.body;
-
   const user = await User.findById(req.user._id);
 
   if (user) {
     const isFirstAddress = user.addresses.length === 0;
-    const newAddress = {
-      address,
-      city,
-      state,
-      postalCode,
-      country,
-      phoneNumber,
-      isPrimary: isFirstAddress,
-    };
+    const newAddress = { address, city, state, postalCode, country, phoneNumber, isPrimary: isFirstAddress };
+    
     user.addresses.push(newAddress);
     await user.save();
 
+    // We must return the full profile structure for Redux
     const enrichedCart = await enrichCartItems(user.cart);
-
     res.json({
       _id: user._id,
       name: user.name,
@@ -220,8 +259,7 @@ const saveAddress = async (req, res) => {
 };
 
 const updateAddress = async (req, res) => {
-  const { address, city, state, postalCode, phoneNumber, country, isPrimary } =
-    req.body;
+  const { address, city, state, postalCode, phoneNumber, country, isPrimary } = req.body;
   const addressId = req.params.id;
   const user = await User.findById(req.user._id);
 
@@ -236,8 +274,8 @@ const updateAddress = async (req, res) => {
       addressToUpdate.postalCode = postalCode || addressToUpdate.postalCode;
       addressToUpdate.phoneNumber = phoneNumber || addressToUpdate.phoneNumber;
       addressToUpdate.country = country || addressToUpdate.country;
-      if (typeof isPrimary !== "undefined")
-        addressToUpdate.isPrimary = isPrimary;
+      
+      if (typeof isPrimary !== "undefined") addressToUpdate.isPrimary = isPrimary;
 
       await user.save();
       const enrichedCart = await enrichCartItems(user.cart);
@@ -264,10 +302,9 @@ const updateAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (user) {
-    user.addresses = user.addresses.filter(
-      (addr) => addr._id.toString() !== req.params.id,
-    );
+    user.addresses = user.addresses.filter((addr) => addr._id.toString() !== req.params.id);
     await user.save();
+    
     const enrichedCart = await enrichCartItems(user.cart);
     res.json({
       _id: user._id,
@@ -286,9 +323,7 @@ const deleteAddress = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({})
-      .select("-password")
-      .sort({ createdAt: -1 });
+    const users = await User.find({}).select("-password").sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
@@ -326,19 +361,21 @@ const forgotPassword = async (req, res) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    const frontendUrl =
-      process.env.FRONTEND_URL_PROD || "http://localhost:5173";
+    const frontendUrl = process.env.FRONTEND_URL_PROD || "http://localhost:5173";
     const resetUrl = `${frontendUrl}/resetpassword/${resetToken}`;
-    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please click the button below to set a new password.`;
+    
+    // HTML Message for better email look
+    const message = `
+      <h1>Password Reset Request</h1>
+      <p>You requested a password reset. Please click the link below:</p>
+      <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
+    `;
 
     try {
       await sendEmail({
         email: user.email,
         subject: "Password Reset Request",
-        title: "Reset Your Password",
-        message,
-        url: resetUrl,
-        buttonText: "Reset Password",
+        message, // Send as HTML if your sendEmail supports it, otherwise text
       });
       res.status(200).json({ success: true, data: "Email sent" });
     } catch (error) {
@@ -358,59 +395,24 @@ const resetPassword = async (req, res) => {
     .createHash("sha256")
     .update(req.params.resetToken)
     .digest("hex");
+
   try {
     const user = await User.findOne({
       resetPasswordToken,
       resetPasswordExpire: { $gt: Date.now() },
     });
+
     if (!user) {
       res.status(400);
       throw new Error("Invalid or Expired Token");
     }
+
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save();
-    res
-      .status(201)
-      .json({ success: true, message: "Password Updated Success" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
-// @desc    Sync User Cart
-// @desc    Sync User Cart
-// @route   PUT /api/users/cart
-// @access  Private
-const syncCart = async (req, res) => {
-  const { cart } = req.body;
-
-  try {
-    const user = await User.findById(req.user._id);
-
-    if (user) {
-      // 🚨 CRITICAL FIX: Map frontend 'id' to backend 'productId'
-      // Mongoose strict mode drops 'id' if we don't map it to the schema field.
-      const dbCart = cart.map((item) => ({
-        productId: item.id || item.productId || item._id, // Ensure we catch the ID
-        name: item.name,
-        image: item.image,
-        price: item.price,
-        size: item.size,
-        quantity: item.quantity,
-      }));
-
-      user.cart = dbCart; // Save the correctly mapped array
-      await user.save();
-
-      // Return enriched cart so frontend stays perfectly synced
-      const enrichedCart = await enrichCartItems(user.cart);
-      res.json(enrichedCart);
-    } else {
-      res.status(404);
-      throw new Error("User not found");
-    }
+    res.status(201).json({ success: true, message: "Password Updated Success" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

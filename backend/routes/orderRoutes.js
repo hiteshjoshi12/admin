@@ -28,7 +28,7 @@ router.route('/myorders').get(protect, getMyOrders);
 // 3. Public Webhooks & Tracking
 router.post('/track', trackOrderPublic);
 router.post('/webhook', handleRazorpayWebhook);
-router.post('/shiprocket-webhook', handleShiprocketWebhook);
+router.post('/delivery-update', handleShiprocketWebhook);
 
 // 4. Single Order Operations
 // 🚨 REMOVED 'protect' from getOrderById so Guests can view their order status/receipt

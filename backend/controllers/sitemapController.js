@@ -3,22 +3,15 @@ const { createGzip } = require('zlib');
 const Product = require('../models/Product');
 
 const getSitemap = async (req, res) => {
-  let sitemap;
-  
   try {
     const header = { 'Content-Type': 'application/xml', 'Content-Encoding': 'gzip' };
     
-    // --- FIX START ---
-    let hostname = process.env.FRONTEND_URL || 'https://www.beadsandbloom.com';
-
-    // If the env variable has multiple URLs (comma separated), take the first one
+    // 1. Get Hostname from ENV
+    let hostname = process.env.FRONTEND_URL || 'https://beadsandbloom.in';
     if (hostname.includes(',')) {
         hostname = hostname.split(',')[0];
     }
-    
-    // Trim any whitespace
     hostname = hostname.trim();
-    // --- FIX END ---
 
     const smStream = new SitemapStream({ hostname });
     const pipeline = smStream.pipe(createGzip());
@@ -28,31 +21,32 @@ const getSitemap = async (req, res) => {
     smStream.write({ url: '/about', changefreq: 'monthly', priority: 0.7 });
     smStream.write({ url: '/shop', changefreq: 'daily', priority: 0.9 });
     smStream.write({ url: '/contact', changefreq: 'monthly', priority: 0.5 });
-    smStream.write({ url: '/login', changefreq: 'monthly', priority: 0.3 });
-    smStream.write({ url: '/signup', changefreq: 'monthly', priority: 0.3 });
 
-    // 3. Add Dynamic Product Pages
-    const products = await Product.find({}, '_id updatedAt'); 
+    // 3. Add Dynamic Product Pages (USING SLUGS)
+    // ✅ FIX: Fetch 'slug' instead of '_id'
+    const products = await Product.find({}, 'slug updatedAt').lean(); 
 
     products.forEach((product) => {
-      smStream.write({
-        url: `/product/${product._id}`,
-        changefreq: 'weekly',
-        priority: 0.8,
-        lastmod: product.updatedAt,
-      });
+      if (product.slug) { // Ensure slug exists before writing
+        smStream.write({
+          // ✅ FIX: The URL MUST match your frontend route path="/product/:slug"
+          url: `/product/${product.slug}`, 
+          changefreq: 'weekly',
+          priority: 0.8,
+          lastmod: product.updatedAt,
+        });
+      }
     });
 
-    streamToPromise(pipeline).then((sm) => (sitemap = sm));
     smStream.end();
 
-    pipeline.pipe(res).on('error', (e) => {
-      throw e;
-    });
-
+    // 4. Response
+    const sitemap = await streamToPromise(pipeline);
     res.header(header);
+    res.send(sitemap);
+
   } catch (e) {
-    console.error(e);
+    console.error("Sitemap Error:", e);
     res.status(500).end();
   }
 };

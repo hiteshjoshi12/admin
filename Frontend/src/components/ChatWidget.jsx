@@ -5,8 +5,8 @@ export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
   const contactInfo = {
-    instagram: "https://instagram.com/beadsnbloom.india",
-    email: "mailto:hello@beadsandbloom.com"
+    instagram: "https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr",
+    email: "mailto:connect@beadsandbloom.in"
   };
 
   return (

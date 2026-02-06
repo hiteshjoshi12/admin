@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import {API_BASE_URL} from '../util/config';
+import { API_BASE_URL } from '../util/config';
 
-// 1. ASYNC THUNK: Fetch All Products (with Pagination & Search)
+// 1. ASYNC THUNK: Fetch All Products
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async ({ pageNumber = 1, keyword = '', category, size, priceRange, sort }, { rejectWithValue }) => {
     try {
-      // Build Query Params
       const params = new URLSearchParams();
       params.append('pageNumber', pageNumber);
       if (keyword) params.append('keyword', keyword);
@@ -18,7 +17,7 @@ export const fetchProducts = createAsyncThunk(
       const response = await fetch(`${API_BASE_URL}/api/products?${params.toString()}`);
       const data = await response.json();
       
-      if (!response.ok) throw new Error(data.message);
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch products');
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -26,18 +25,21 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-// 2. ASYNC THUNK: Fetch Single Product Details
+// 2. FIXED ASYNC THUNK: Fetch Single Product Details by SLUG
+// We changed the parameter name from 'id' to 'slug' for clarity
 export const fetchProductDetails = createAsyncThunk(
   'products/fetchDetails', 
-  async (id, { rejectWithValue }) => {
+  async (slug, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
-      
-      if (!response.ok) {
-        throw new Error('Product not found');
-      }
+      // ✅ Now calling the slug-based endpoint
+      const response = await fetch(`${API_BASE_URL}/api/products/${slug}`);
       
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Product not found');
+      }
+      
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -48,26 +50,22 @@ export const fetchProductDetails = createAsyncThunk(
 const productSlice = createSlice({
   name: 'products',
   initialState: {
-    items: [],      // The list of products for the Shop page
-    product: null,  // The single product detail
-    
-    // Pagination State
-    page: 1,        // Current page number
-    pages: 1,       // Total pages
-    total: 0,       // <--- ADDED THIS: Total count of products found
-    
-    loading: false, // Global loading state
-    error: null,    // Global error state
+    items: [],      
+    product: null,  
+    page: 1,        
+    pages: 1,       
+    total: 0,       
+    loading: false, 
+    error: null,    
   },
   reducers: {
-    // Action to clear single product data when leaving the detail page
     clearProductDetails: (state) => {
       state.product = null;
+      state.error = null; // Also clear errors when leaving
     }
   },
   extraReducers: (builder) => {
     builder
-      // --- Handle Fetch Products (List) ---
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -77,17 +75,19 @@ const productSlice = createSlice({
         state.items = action.payload.products; 
         state.page = action.payload.page;
         state.pages = action.payload.pages;
-        state.total = action.payload.totalProducts; // <--- ADDED THIS to match backend response
+        state.total = action.payload.totalProducts; 
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // --- Handle Fetch Product Details (Single) ---
       .addCase(fetchProductDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
+        // Optional: clear previous product immediately to prevent "flicker" 
+        // of old data while loading the new one
+        state.product = null; 
       })
       .addCase(fetchProductDetails.fulfilled, (state, action) => {
         state.loading = false;

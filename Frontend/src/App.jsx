@@ -122,7 +122,7 @@ function App() {
             <Route path="/sale" element={<Sale />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/product/:slug" element={<ProductDetail />} />
             <Route element={<PrivateRoute />}>
                <Route path="/profile" element={<Profile />} />
                <Route path="/myorders" element={<MyOrders />} />

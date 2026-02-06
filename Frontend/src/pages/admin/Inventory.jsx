@@ -6,8 +6,8 @@ import {
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
-import { toast } from 'react-hot-toast'; // Import Toast
-import { confirmAction } from '../../util/toastUtils'; // Import Standard Confirm Helper
+import { toast } from 'react-hot-toast'; 
+import { confirmAction } from '../../util/toastUtils'; 
 
 export default function Inventory() {
   const [products, setProducts] = useState([]);
@@ -19,6 +19,7 @@ export default function Inventory() {
   // --- FETCH PRODUCTS ---
   const fetchProducts = async () => {
     try {
+      // List view can remain on the base route
       const res = await fetch(`${API_BASE_URL}/api/products?pageNumber=1&pageSize=100`); 
       const data = await res.json();
       setProducts(data.products || []); 
@@ -34,7 +35,7 @@ export default function Inventory() {
     fetchProducts();
   }, []);
 
-  // --- DELETE HANDLER (UPDATED) ---
+  // --- DELETE HANDLER (FIXED) ---
   const handleDelete = (id) => {
     confirmAction({
       title: "Delete this Product?",
@@ -44,7 +45,8 @@ export default function Inventory() {
         const toastId = toast.loading("Deleting...");
         
         try {
-          const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+          // ✅ FIX: Added '/admin/' to the path to match the backend SEO route structure
+          const res = await fetch(`${API_BASE_URL}/api/products/admin/${id}`, {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${userInfo.token}`,
@@ -52,10 +54,12 @@ export default function Inventory() {
           });
           
           if (res.ok) {
-            setProducts(products.filter(p => p._id !== id));
+            // Update local state to remove the item immediately
+            setProducts(prev => prev.filter(p => p._id !== id));
             toast.success('Product deleted successfully', { id: toastId });
           } else {
-            toast.error('Failed to delete product', { id: toastId });
+            const errData = await res.json();
+            toast.error(errData.message || 'Failed to delete product', { id: toastId });
           }
         } catch (error) {
           console.error(error);
@@ -188,8 +192,6 @@ export default function Inventory() {
       <div className="md:hidden grid grid-cols-1 gap-4">
         {filteredProducts.map((product) => (
           <div key={product._id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4">
-            
-            {/* Header: Image & Title */}
             <div className="flex gap-3">
               <div className="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden border border-gray-200 shrink-0">
                 <img src={product.image} alt="" className="w-full h-full object-cover" />
@@ -206,7 +208,6 @@ export default function Inventory() {
               </div>
             </div>
 
-            {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-3 border-t border-b border-gray-100 py-3">
               <div className="text-center border-r border-gray-100">
                 <p className="text-[10px] text-gray-400 uppercase font-bold">Total Stock</p>
@@ -225,7 +226,6 @@ export default function Inventory() {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3">
               <Link 
                 to={`/admin/product/edit/${product._id}`}

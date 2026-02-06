@@ -19,7 +19,7 @@ export default function Footer() {
             {[Instagram, Facebook, Twitter].map((Icon, i) => (
               <a 
                 key={i} 
-                href="#" 
+                href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" 
                 // Social Icons: White border/icon default -> White bg / Black icon on hover
                 className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white transition-all duration-300 hover:bg-white hover:text-black hover:border-white"
               >

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
   name: { type: String, required: true },
+  slug: { type: String, unique: true }, 
   image: { type: String, required: true },
   images: [{ type: String }],
   description: { type: String, required: true },
@@ -12,22 +13,31 @@ const productSchema = mongoose.Schema({
   numReviews: { type: Number, required: true, default: 0 },
   isNewArrival: { type: Boolean, default: false },
   isBestSeller: { type: Boolean, default: false },
-  
-  // --- NEW STRUCTURE ---
-  // Instead of just 'sizes: []' and 'countInStock: 0'
   stock: [
     {
       size: { type: Number, required: true },
       quantity: { type: Number, required: true, default: 0 }
     }
   ],
-  // We keep this purely for easier filtering/sorting, 
-  // but it will be the SUM of all quantities in the stock array
   totalStock: { type: Number, required: true, default: 0 } 
-  // ---------------------
-
 }, {
   timestamps: true,
+});
+
+// ✅ Corrected Slug Generator
+productSchema.pre('save', function (next) {
+  // Only generate slug if name is provided and modified
+  if (this.isModified('name')) {
+    this.slug = this.name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/[\s_]+/g, '-')  // Replace spaces with hyphens
+      .replace(/^-+|-+$/g, ''); // Trim extra hyphens
+  }
+  
+  // 🚀 CRITICAL: You must call next() to finish the save process!
+  // next();
 });
 
 const Product = mongoose.model('Product', productSchema);

@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 
 const orderSchema = mongoose.Schema({
-  // 🚨 CHANGE: Made User Optional + Added Guest Info
+  // 1. User Info (Hybrid: User OR Guest)
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    required: false, // <--- Was true, now false
+    required: false,
     ref: 'User',
   },
-  guestInfo: {  // <--- NEW FIELD FOR GUESTS
+  guestInfo: {
     name: { type: String },
     email: { type: String }
   },
 
+  // 2. Order Items
   orderItems: [
     {
       name: { type: String, required: true },
@@ -26,6 +27,8 @@ const orderSchema = mongoose.Schema({
       },
     },
   ],
+
+  // 3. Shipping Details
   shippingAddress: {
     address: { type: String, required: true },
     city: { type: String, required: true },
@@ -34,29 +37,29 @@ const orderSchema = mongoose.Schema({
     country: { type: String, required: true },
     phoneNumber: { type: String, required: true },
   },
+
+  // 4. Payment
   paymentMethod: {
     type: String,
     required: true, 
   },
-  
-  // --- MONEY ---
   itemPrice: { type: Number, required: true, default: 0.0 },
   shippingPrice: { type: Number, required: true, default: 0.0 },
   totalPrice: { type: Number, required: true, default: 0.0 },
   
-  // --- PAYMENT STATUS (Razorpay) ---
   isPaid: { type: Boolean, required: true, default: false },
   paidAt: { type: Date },
   
-  // Security Fields for Razorpay Verification
+  // Razorpay
   razorpayOrderId: { type: String }, 
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
 
-  // --- FULFILLMENT STATUS ---
+  // 5. Fulfillment Status
   orderStatus: { 
     type: String, 
     required: true, 
+    // Added 'Returned' to handle RTO logic from Shiprocket
     enum: ['Processing', 'Ready to Ship', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'],
     default: 'Processing', 
   },
@@ -64,7 +67,7 @@ const orderSchema = mongoose.Schema({
   isDelivered: { type: Boolean, required: true, default: false },
   deliveredAt: { type: Date },
 
-  // --- SHIPROCKET DATA ---
+  // 6. Shiprocket Integration
   shiprocketOrderId: { type: String },      
   shiprocketShipmentId: { type: String },   
   awbCode: { type: String },                

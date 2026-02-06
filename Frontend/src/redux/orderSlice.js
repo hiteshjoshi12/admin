@@ -1,38 +1,23 @@
+// orderSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { API_BASE_URL } from '../util/config';
 
-// ASYNC THUNK: Create Order
 export const createOrder = createAsyncThunk(
   'order/create',
   async (orderData, { getState, rejectWithValue }) => {
     try {
-      // 1. Get User Token from State
-      const { auth } = getState();
-      
-      // 2. Prepare Headers
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const { auth: { userInfo } } = getState();
+      const headers = { 'Content-Type': 'application/json' };
+      if (userInfo?.token) headers['Authorization'] = `Bearer ${userInfo.token}`;
 
-      // 🚨 CRITICAL FIX: Only add Authorization header if user is logged in
-      if (auth.userInfo && auth.userInfo.token) {
-        headers['Authorization'] = `Bearer ${auth.userInfo.token}`;
-      }
-
-      // 3. Make API Call
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
-        headers: headers, // Use the dynamic headers object
-        credentials: 'include',
+        headers,
         body: JSON.stringify(orderData),
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
-      }
-
+      if (!response.ok) throw new Error(data.message || 'Order creation failed');
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -44,6 +29,7 @@ const orderSlice = createSlice({
   name: 'order',
   initialState: {
     loading: false,
+    paymentLoading: false, // NEW: Track Razorpay status
     success: false,
     order: null,
     error: null,
@@ -55,12 +41,15 @@ const orderSlice = createSlice({
       state.order = null;
       state.error = null;
     },
+    // NEW: Action to handle when Razorpay modal is open
+    setPaymentLoading: (state, action) => {
+        state.paymentLoading = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
       .addCase(createOrder.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.loading = false;
@@ -74,5 +63,5 @@ const orderSlice = createSlice({
   },
 });
 
-export const { resetOrder } = orderSlice.actions;
+export const { resetOrder, setPaymentLoading } = orderSlice.actions;
 export default orderSlice.reducer;

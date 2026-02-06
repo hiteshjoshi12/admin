@@ -37,7 +37,7 @@ export default function CollectionTiles() {
   const QuickAddOverlay = () => (
     <div className="absolute inset-0 z-20 flex items-end justify-center pb-8 transition-opacity duration-300 bg-black/5 opacity-100 md:opacity-0 md:group-hover:opacity-100">
       <button className="bg-white text-[#1C1917] px-6 py-3 rounded-full text-xs uppercase tracking-widest font-bold flex items-center gap-2 shadow-xl transition-all duration-500 ease-out hover:bg-[#C5A059] hover:text-white translate-y-0 md:translate-y-4 md:group-hover:translate-y-0">
-        <ShoppingBag className="w-4 h-4"/> View Collection
+        <ShoppingBag className="w-4 h-4"/> Browse Selection
       </button>
     </div>
   );
@@ -45,7 +45,6 @@ export default function CollectionTiles() {
   // --- LOADING STATE ---
   if (loading) return (
     <section className="py-24 px-4 md:px-12 max-w-[1440px] mx-auto">
-      {/* Header Skeleton */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 px-2 gap-6 md:gap-0">
         <div>
           <Skeleton className="h-10 w-64 mb-4" />
@@ -53,8 +52,6 @@ export default function CollectionTiles() {
         </div>
         <Skeleton className="h-4 w-24 hidden md:block" />
       </div>
-
-      {/* Grid Skeleton */}
       <GridSkeleton count={3} type="arch" />
     </section>
   );
@@ -64,11 +61,12 @@ export default function CollectionTiles() {
       
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 px-2 gap-6 md:gap-0">
         <div>
+          {/* SEO: H2 with target keyword */}
           <h2 className="text-4xl md:text-5xl font-serif text-[#1C1917] mb-2">
-            Curated Collections
+            Handcrafted Jutti Collections
           </h2>
           <p className="text-sm font-sans text-gray-500 tracking-wide">
-            Handpicked favorites for every occasion.
+            Artisanal mojris and heritage designs for every occasion.
           </p>
         </div>
         
@@ -76,16 +74,14 @@ export default function CollectionTiles() {
           to="/shop" 
           className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-gray-500 transition-colors"
         >
-          View All <ArrowRight className="w-4 h-4" />
+          Explore All <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {collections.map((col) => {
-          // Safe Link Logic
-          const targetLink = col.products && col.products.length > 0 
-            ? `/product/${col.products[0]._id}` 
-            : '/shop'; 
+          // SEO: Redirect to the category filter on the shop page
+          const targetLink = `/shop?category=${encodeURIComponent(col.name)}`;
 
           return (
             <Link 
@@ -95,10 +91,10 @@ export default function CollectionTiles() {
             >
               <div className="relative aspect-[3/4] overflow-hidden rounded-t-[12rem] bg-gray-200 shadow-md">
                 
-                {/* 2. APPLY OPTIMIZATION (Width 600) */}
                 <img 
                   src={getOptimizedImage(col.image, 600)} 
-                  alt={col.name}
+                  // SEO: Descriptive Alt Text
+                  alt={`${col.name} - Handcrafted Indian Juttis`}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
@@ -109,10 +105,11 @@ export default function CollectionTiles() {
               <div className="text-center mt-6">
                 {col.products && (
                     <span className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-1 block">
-                      {col.products.length} Designs
+                      {col.products.length} Designs Available
                     </span>
                 )}
                 
+                {/* SEO: H3 for category names */}
                 <h3 className="text-2xl font-serif text-[#1C1917] group-hover:text-gray-600 transition-colors">
                   {col.name}
                 </h3>

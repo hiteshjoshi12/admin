@@ -7,6 +7,7 @@ const {
   sendOrderConfirmation,
   sendOrderStatusEmail,
 } = require("../utils/sendEmail");
+const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils'); 
 
 // @desc    Create new order (Supports Guest & Logged In)
 // @route   POST /api/orders
@@ -445,40 +446,60 @@ const verifyRazorpayPayment = async (req, res) => {
 // @route   POST /api/orders/webhook
 const handleRazorpayWebhook = async (req, res) => {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-  const shasum = crypto.createHmac("sha256", secret);
-  shasum.update(JSON.stringify(req.body));
-  const digest = shasum.digest("hex");
+  const signature = req.headers["x-razorpay-signature"];
 
-  if (digest === req.headers["x-razorpay-signature"]) {
-    console.log("Webhook Signature Verified");
-    if (req.body.event === "payment.captured") {
-      const payment = req.body.payload.payment.entity;
-      const razorpayOrderId = payment.order_id;
-      const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
+  try {
+    // ✅ SAFE VALIDATION: Let the SDK handle the math
+    // We stringify the body because the validator expects a string
+    const isValid = validateWebhookSignature(JSON.stringify(req.body), signature, secret);
 
-      if (order && !order.isPaid) {
-        order.isPaid = true;
-        order.paidAt = Date.now();
-        order.paymentResult = {
-          id: payment.id,
-          status: payment.status,
-          update_time: Date.now(),
-          email_address: payment.email,
-        };
-        order.razorpayPaymentId = payment.id;
-        order.orderStatus = "Processing";
-        await order.save();
+    if (isValid) {
+      console.log("✅ Webhook Signature Verified");
 
-        const fullOrder = await Order.findById(order._id).populate(
-          "user",
-          "name email",
-        );
-        await sendOrderConfirmation(fullOrder);
+      // Check specifically for "payment.captured"
+      if (req.body.event === "payment.captured") {
+        const payment = req.body.payload.payment.entity;
+        const razorpayOrderId = payment.order_id;
+        
+        // Find the order that matches this Razorpay ID
+        const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
+
+        // 🛡️ DOUBLE CHECK: Only update if it's NOT already paid
+        if (order && !order.isPaid) {
+          order.isPaid = true;
+          order.paidAt = Date.now();
+          order.paymentResult = {
+            id: payment.id,
+            status: payment.status,
+            update_time: Date.now(),
+            email_address: payment.email,
+          };
+          order.razorpayPaymentId = payment.id;
+          order.orderStatus = "Processing"; // Move status forward
+          
+          await order.save();
+
+          // Send Email (Now works for Guests too)
+          const fullOrder = await Order.findById(order._id).populate(
+            "user",
+            "name email",
+          );
+          await sendOrderConfirmation(fullOrder);
+          console.log(`Order ${order._id} marked Paid via Webhook`);
+        } else {
+          console.log(`Order ${razorpayOrderId} already processed or not found`);
+        }
       }
+      // Always return 200 OK to Razorpay so they don't keep retrying
+      res.json({ status: "ok" });
+    } else {
+      console.error("❌ Invalid Webhook Signature");
+      res.status(400).json({ message: "Invalid Signature" });
     }
-    res.json({ status: "ok" });
-  } else {
-    res.status(400).json({ message: "Invalid Signature" });
+  } catch (error) {
+    console.error("Webhook Error:", error);
+    // Return 200 even on error to stop Razorpay from retrying endlessly if it's a code bug
+    res.status(200).json({ status: "error_handled" }); 
   }
 };
 
@@ -486,48 +507,90 @@ const handleRazorpayWebhook = async (req, res) => {
 // @route   POST /api/orders/shiprocket-webhook
 const handleShiprocketWebhook = async (req, res) => {
   try {
-    const { order_id, current_status, awb } = req.body;
-    console.log(
-      `🚚 Shiprocket Update for Order ${order_id}: ${current_status}`,
-    );
+    // 1. Extract Data
+    // order_id = Shiprocket's ID (e.g. 123456)
+    // channel_order_id = Your Mongo ID (e.g. 65f2...)
+    const { order_id, channel_order_id, current_status, awb } = req.body;
 
-    const order = await Order.findById(order_id).populate("user", "name email");
+    console.log(`🚚 Shiprocket Event: ${current_status} for SR-ID: ${order_id} / DB-ID: ${channel_order_id}`);
 
-    if (order) {
-      let statusChanged = false;
-      const trackingUrl = awb ? `https://shiprocket.co/tracking/${awb}` : null;
+    // 2. ROBUST FIND LOGIC
+    // We try to find the order by EITHER the Mongo ID (channel_order_id)
+    // OR by matching the saved Shiprocket ID in our DB.
+    let order = null;
 
-      if (["PICKED UP", "IN TRANSIT", "SHIPPED"].includes(current_status)) {
-        if (
-          order.orderStatus !== "Shipped" &&
-          order.orderStatus !== "Delivered"
-        ) {
-          order.orderStatus = "Shipped";
-          statusChanged = true;
-          await sendOrderStatusEmail(order, "Shipped", trackingUrl);
-        }
-      } else if (current_status === "DELIVERED") {
-        if (order.orderStatus !== "Delivered") {
-          order.orderStatus = "Delivered";
-          order.isDelivered = true;
-          order.deliveredAt = Date.now();
-          statusChanged = true;
-          await sendOrderStatusEmail(order, "Delivered", trackingUrl);
-        }
-      } else if (
-        current_status === "CANCELED" ||
-        current_status === "RTO INITIATED"
-      ) {
-        order.orderStatus = "Cancelled";
-        statusChanged = true;
-      }
-
-      if (statusChanged) await order.save();
+    if (channel_order_id) {
+        order = await Order.findById(channel_order_id).populate("user", "name email");
     }
+
+    // Fallback: If channel_order_id failed or wasn't sent, try searching by the Shiprocket ID
+    if (!order && order_id) {
+        order = await Order.findOne({ shiprocketOrderId: order_id }).populate("user", "name email");
+    }
+
+    if (!order) {
+      console.error(`❌ Order not found for Webhook. SR-ID: ${order_id}`);
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // 3. STATUS UPDATE LOGIC
+    let statusChanged = false;
+    const trackingUrl = awb ? `https://shiprocket.co/tracking/${awb}` : null;
+    const status = current_status ? current_status.toUpperCase() : "";
+
+    // A. Shipped / In Transit
+    if (["PICKED UP", "IN TRANSIT", "SHIPPED", "OUT FOR DELIVERY"].includes(status)) {
+      if (order.orderStatus !== "Shipped" && order.orderStatus !== "Delivered") {
+        order.orderStatus = "Shipped"; // Maps to your Enum
+        statusChanged = true;
+        // Only send email if it wasn't already marked shipped
+        await sendOrderStatusEmail(order, "Shipped", trackingUrl);
+      }
+    } 
+    // B. Delivered
+    else if (status === "DELIVERED") {
+      if (order.orderStatus !== "Delivered") {
+        order.orderStatus = "Delivered"; // Maps to your Enum
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+        
+        // If it was COD, mark it as Paid upon delivery
+        if(order.paymentMethod === 'cod' && !order.isPaid) {
+            order.isPaid = true;
+            order.paidAt = Date.now();
+        }
+
+        statusChanged = true;
+        await sendOrderStatusEmail(order, "Delivered", trackingUrl);
+      }
+    } 
+    // C. Cancelled
+    else if (status === "CANCELED" || status === "CANCELLED") {
+       if(order.orderStatus !== "Cancelled") {
+          order.orderStatus = "Cancelled";
+          statusChanged = true;
+       }
+    }
+    // D. RTO / Returned
+    else if (status === "RTO INITIATED" || status === "RETURNED") {
+       if(order.orderStatus !== "Returned") {
+          order.orderStatus = "Returned"; // Maps to your Enum
+          statusChanged = true;
+       }
+    }
+
+    if (statusChanged) {
+      await order.save();
+      console.log(`✅ Order ${order._id} updated to ${order.orderStatus}`);
+    } else {
+      console.log(`ℹ️ No status change needed for Order ${order._id}`);
+    }
+
     res.json({ status: "success" });
   } catch (error) {
     console.error("Webhook Error:", error);
-    res.status(500).json({ error: "Server Error" });
+    // Return 200 even on error to stop Shiprocket from retrying endlessly
+    res.status(200).json({ status: "error_handled" });
   }
 };
 
