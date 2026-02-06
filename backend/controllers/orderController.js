@@ -11,9 +11,7 @@ const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils
 
 // @desc    Create new order (Supports Guest & Logged In)
 // @route   POST /api/orders
-// @access  Public (Was Private)
-// @desc    Create new order (Supports Guest & Logged In)
-// @desc    Create new order (Supports Guest & Logged In)
+// @access  Public
 const addOrderItems = async (req, res) => {
   const { orderItems, shippingAddress, paymentMethod, guestEmail } = req.body;
 
@@ -25,7 +23,8 @@ const addOrderItems = async (req, res) => {
     // 1. FETCH REAL PRODUCTS (Security)
     const productIds = orderItems.map(
       (item) => item.product || item.id || item._id,
-    );
+    ).filter(id => id); // Filter out nulls/undefined immediately
+
     const dbProducts = await Product.find({ _id: { $in: productIds } });
 
     // 2. RECALCULATE PRICES
@@ -33,7 +32,13 @@ const addOrderItems = async (req, res) => {
     const productsToUpdate = [];
 
     for (const item of orderItems) {
-      const productId = (item.product || item.id || item._id).toString();
+      // 🛡️ CRITICAL FIX: Safety Check for Missing ID
+      const rawId = item.product || item.id || item._id;
+      if (!rawId) {
+          throw new Error(`Product ID is missing for item: ${item.name || 'Unknown Item'}`);
+      }
+      const productId = rawId.toString();
+
       const dbProduct = dbProducts.find((p) => p._id.toString() === productId);
 
       if (!dbProduct) throw new Error(`Product not found: ${item.name}`);
@@ -63,7 +68,6 @@ const addOrderItems = async (req, res) => {
     if (calculatedItemsPrice > 5000) {
       shippingPrice = 0; // Free Shipping priority
     } else if (shippingAddress && shippingAddress.postalCode) {
-      // Logic: Delhi (11), Gurgaon/Faridabad (12), Noida/Ghaziabad (201)
       const pincode = String(shippingAddress.postalCode).trim();
       const isNCR = /^(11|12|201)/.test(pincode);
       
@@ -101,7 +105,6 @@ const addOrderItems = async (req, res) => {
     if (req.user && req.user._id) {
       orderData.user = req.user._id;
     } else {
-      // Ensure Guest Info is populated
       orderData.guestInfo = {
         name: req.body.name || shippingAddress.name || "Guest",
         email: req.body.email || guestEmail || "guest@example.com",
@@ -113,20 +116,18 @@ const addOrderItems = async (req, res) => {
 
     // 5. SEND EMAIL IF COD
     if (paymentMethod === "cod") {
-      // We fetch the order again to populate 'user' IF it exists
-      // If guest, 'user' is null, but 'guestInfo' is inside createdOrder
       const fullOrder = await Order.findById(createdOrder._id).populate(
         "user",
         "name email",
       );
-      await sendOrderConfirmation(fullOrder); // Now works for guests too!
+      await sendOrderConfirmation(fullOrder);
     }
 
     res.status(201).json(createdOrder);
   } catch (error) {
     console.error("Order Creation Error:", error.message);
     const status =
-      error.message.includes("found") || error.message.includes("stock")
+      error.message.includes("found") || error.message.includes("stock") || error.message.includes("missing")
         ? 400
         : 500;
     res
@@ -137,7 +138,7 @@ const addOrderItems = async (req, res) => {
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
-// @access  Public (Modified to allow Guest Access via ID)
+// @access  Public
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
@@ -204,7 +205,6 @@ const updateOrderToDelivered = async (req, res) => {
       order.orderStatus = "Delivered";
       const updatedOrder = await order.save();
 
-      // WORKS FOR GUESTS NOW
       await sendOrderStatusEmail(order, "Delivered");
 
       res.json(updatedOrder);
@@ -242,7 +242,6 @@ const shipOrder = async (req, res) => {
       if (shippingData.awbCode) {
         order.awbCode = shippingData.awbCode;
         order.orderStatus = "Ready to Ship";
-        // WORKS FOR GUESTS NOW
         await sendOrderStatusEmail(order, "Ready to Ship");
       }
       const updatedOrder = await order.save();
@@ -321,7 +320,6 @@ const trackOrderPublic = async (req, res) => {
   try {
     const order = await Order.findById(orderId).populate("user", "name email");
 
-    // Check if email matches User Email OR Guest Email
     const userEmail = order.user?.email || order.guestInfo?.email;
 
     if (
@@ -353,7 +351,7 @@ const trackOrderPublic = async (req, res) => {
 
 // @desc    Create Razorpay Order ID
 // @route   POST /api/orders/:id/pay/initiate
-// @access  Public (Modified for Guest)
+// @access  Public
 const initiateRazorpayPayment = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -388,7 +386,7 @@ const initiateRazorpayPayment = async (req, res) => {
 
 // @desc    Verify Signature & Update Order to Paid
 // @route   PUT /api/orders/:id/pay/verify
-// @access  Public (Modified for Guest)
+// @access  Public
 const verifyRazorpayPayment = async (req, res) => {
   const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
   try {
@@ -408,7 +406,6 @@ const verifyRazorpayPayment = async (req, res) => {
       order.isPaid = true;
       order.paidAt = Date.now();
 
-      // Fallback logic not strictly needed for email function anymore, but good for payment result
       const email =
         order.user?.email || order.guestInfo?.email || "guest@example.com";
 
@@ -425,7 +422,6 @@ const verifyRazorpayPayment = async (req, res) => {
 
       const updatedOrder = await order.save();
 
-      // SEND EMAIL (WORKS FOR GUESTS)
       const fullOrder = await Order.findById(updatedOrder._id).populate(
         "user",
         "name email",
@@ -449,22 +445,17 @@ const handleRazorpayWebhook = async (req, res) => {
   const signature = req.headers["x-razorpay-signature"];
 
   try {
-    // ✅ SAFE VALIDATION: Let the SDK handle the math
-    // We stringify the body because the validator expects a string
     const isValid = validateWebhookSignature(JSON.stringify(req.body), signature, secret);
 
     if (isValid) {
       console.log("✅ Webhook Signature Verified");
 
-      // Check specifically for "payment.captured"
       if (req.body.event === "payment.captured") {
         const payment = req.body.payload.payment.entity;
         const razorpayOrderId = payment.order_id;
         
-        // Find the order that matches this Razorpay ID
         const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
 
-        // 🛡️ DOUBLE CHECK: Only update if it's NOT already paid
         if (order && !order.isPaid) {
           order.isPaid = true;
           order.paidAt = Date.now();
@@ -475,11 +466,10 @@ const handleRazorpayWebhook = async (req, res) => {
             email_address: payment.email,
           };
           order.razorpayPaymentId = payment.id;
-          order.orderStatus = "Processing"; // Move status forward
+          order.orderStatus = "Processing"; 
           
           await order.save();
 
-          // Send Email (Now works for Guests too)
           const fullOrder = await Order.findById(order._id).populate(
             "user",
             "name email",
@@ -490,7 +480,6 @@ const handleRazorpayWebhook = async (req, res) => {
           console.log(`Order ${razorpayOrderId} already processed or not found`);
         }
       }
-      // Always return 200 OK to Razorpay so they don't keep retrying
       res.json({ status: "ok" });
     } else {
       console.error("❌ Invalid Webhook Signature");
@@ -498,39 +487,44 @@ const handleRazorpayWebhook = async (req, res) => {
     }
   } catch (error) {
     console.error("Webhook Error:", error);
-    // Return 200 even on error to stop Razorpay from retrying endlessly if it's a code bug
     res.status(200).json({ status: "error_handled" }); 
   }
 };
 
 // @desc    Handle Shiprocket Shipment Updates
-// @route   POST /api/orders/shiprocket-webhook
+// @route   POST /api/orders/delivery-update
 const handleShiprocketWebhook = async (req, res) => {
   try {
-    // 1. Extract Data
-    // order_id = Shiprocket's ID (e.g. 123456)
-    // channel_order_id = Your Mongo ID (e.g. 65f2...)
-    const { order_id, channel_order_id, current_status, awb } = req.body;
+    const { order_id, channel_order_id, current_status, awb, courier_name } = req.body;
 
-    console.log(`🚚 Shiprocket Event: ${current_status} for SR-ID: ${order_id} / DB-ID: ${channel_order_id}`);
+    console.log(`🚚 Shiprocket Event: ${current_status} for SR-ID: ${order_id}`);
 
-    // 2. ROBUST FIND LOGIC
-    // We try to find the order by EITHER the Mongo ID (channel_order_id)
-    // OR by matching the saved Shiprocket ID in our DB.
     let order = null;
 
+    // 1. Try Mongo ID
     if (channel_order_id) {
         order = await Order.findById(channel_order_id).populate("user", "name email");
     }
 
-    // Fallback: If channel_order_id failed or wasn't sent, try searching by the Shiprocket ID
+    // 2. Try Shiprocket ID
     if (!order && order_id) {
         order = await Order.findOne({ shiprocketOrderId: order_id }).populate("user", "name email");
     }
 
     if (!order) {
-      console.error(`❌ Order not found for Webhook. SR-ID: ${order_id}`);
-      return res.status(404).json({ message: "Order not found" });
+      console.error(`⚠️ Webhook received but Order not found. Returning 200.`);
+      return res.json({ status: "success", message: "Webhook received, but order not found" });
+    }
+
+    // 🚨 FIX: Update AWB and Courier immediately if provided in webhook
+    let dataChanged = false;
+    if (awb && order.awbCode !== awb) {
+        order.awbCode = awb;
+        dataChanged = true;
+    }
+    if (courier_name && order.courierCompanyName !== courier_name) {
+        order.courierCompanyName = courier_name;
+        dataChanged = true;
     }
 
     // 3. STATUS UPDATE LOGIC
@@ -541,20 +535,19 @@ const handleShiprocketWebhook = async (req, res) => {
     // A. Shipped / In Transit
     if (["PICKED UP", "IN TRANSIT", "SHIPPED", "OUT FOR DELIVERY"].includes(status)) {
       if (order.orderStatus !== "Shipped" && order.orderStatus !== "Delivered") {
-        order.orderStatus = "Shipped"; // Maps to your Enum
+        order.orderStatus = "Shipped"; 
         statusChanged = true;
-        // Only send email if it wasn't already marked shipped
+        // Now 'order' has the AWB code inside it, so the email will show it!
         await sendOrderStatusEmail(order, "Shipped", trackingUrl);
       }
     } 
     // B. Delivered
     else if (status === "DELIVERED") {
       if (order.orderStatus !== "Delivered") {
-        order.orderStatus = "Delivered"; // Maps to your Enum
+        order.orderStatus = "Delivered";
         order.isDelivered = true;
         order.deliveredAt = Date.now();
         
-        // If it was COD, mark it as Paid upon delivery
         if(order.paymentMethod === 'cod' && !order.isPaid) {
             order.isPaid = true;
             order.paidAt = Date.now();
@@ -574,12 +567,12 @@ const handleShiprocketWebhook = async (req, res) => {
     // D. RTO / Returned
     else if (status === "RTO INITIATED" || status === "RETURNED") {
        if(order.orderStatus !== "Returned") {
-          order.orderStatus = "Returned"; // Maps to your Enum
+          order.orderStatus = "Returned"; 
           statusChanged = true;
        }
     }
 
-    if (statusChanged) {
+    if (statusChanged || dataChanged) {
       await order.save();
       console.log(`✅ Order ${order._id} updated to ${order.orderStatus}`);
     } else {
@@ -589,7 +582,6 @@ const handleShiprocketWebhook = async (req, res) => {
     res.json({ status: "success" });
   } catch (error) {
     console.error("Webhook Error:", error);
-    // Return 200 even on error to stop Shiprocket from retrying endlessly
     res.status(200).json({ status: "error_handled" });
   }
 };

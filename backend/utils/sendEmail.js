@@ -192,6 +192,9 @@ const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
         <a href="${trackingUrl}" style="background-color: #1C1917; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block;">
           Track Your Package
         </a>
+        <p style="margin-top: 10px; font-size: 12px; color: #888;">
+           Tracking Number (AWB): <strong>${order.awbCode || 'N/A'}</strong>
+        </p>
       </div>
     ` : '';
 

@@ -4,9 +4,9 @@ import {
   Filter,
   X,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Heart,
+  Loader2,
+  Plus
 } from "lucide-react";
 import { getOptimizedImage } from "../util/imageUtils";
 import { toast } from "react-hot-toast";
@@ -20,17 +20,17 @@ export default function Shop() {
   const dispatch = useDispatch();
   const topRef = useRef(null);
 
-  // Redux State
+  // Redux State (This holds the *current page* data from API)
   const {
-    items: products,
+    items: reduxProducts, // The items for the current page only
     loading,
     error,
-    page,
-    pages,
+    pages, // Total pages available
     total,
   } = useSelector((state) => state.products);
 
-  // Local Filter State
+  // Local State
+  const [allProducts, setAllProducts] = useState([]); // Accumulates products (Load More logic)
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [sortOption, setSortOption] = useState("newest");
@@ -40,7 +40,7 @@ export default function Shop() {
     priceRange: null,
   });
 
-  // --- THE TRIGGER ---
+  // --- 1. FETCH TRIGGER ---
   useEffect(() => {
     dispatch(
       fetchProducts({
@@ -53,23 +53,37 @@ export default function Shop() {
     );
   }, [dispatch, currentPage, filters, sortOption]);
 
-  // --- SCROLL HANDLER ---
+  // --- 2. SYNC & APPEND LOGIC ---
   useEffect(() => {
-    const scrollBehavior = currentPage > 1 ? "smooth" : "auto";
-    if (topRef.current) {
-      topRef.current.scrollIntoView({ behavior: scrollBehavior });
+    // If loading is true, we wait.
+    // We only update when reduxProducts changes AND we are not loading (or just finished)
+    if (!loading) {
+      if (currentPage === 1) {
+        // New filter or sort applied -> Replace list
+        setAllProducts(reduxProducts);
+      } else {
+        // Load More clicked -> Append to list
+        // We check for duplicates just in case, though ID check is usually enough
+        setAllProducts((prev) => {
+            // Create a map of existing IDs to prevent duplicates
+            const existingIds = new Set(prev.map(p => p._id));
+            const newItems = reduxProducts.filter(p => !existingIds.has(p._id));
+            return [...prev, ...newItems];
+        });
+      }
     }
-  }, [products, currentPage]);
+  }, [reduxProducts, loading, currentPage]); // Depend on reduxProducts updating
 
   // --- HANDLERS ---
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= pages) {
-      setCurrentPage(newPage);
+  const handleLoadMore = () => {
+    if (currentPage < pages) {
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
   const toggleFilter = (type, value) => {
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to page 1
+    // setAllProducts([]); // Optional: clear view immediately to show loading state cleanly
     setFilters((prev) => {
       const current = prev[type];
       if (Array.isArray(current)) {
@@ -95,13 +109,7 @@ export default function Shop() {
     setSortOption(e.target.value);
   };
 
-  if (loading && products.length === 0)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1C1917]"></div>
-      </div>
-    );
-
+  // Error State
   if (error)
     return (
       <div className="min-h-screen flex items-center justify-center flex-col gap-4">
@@ -114,13 +122,8 @@ export default function Shop() {
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-20" ref={topRef}>
-      <title>
-        {currentPage > 1 ? `Page ${currentPage} - ` : ""}
-        Shop Handcrafted Jutis & Ethnic Mojris | Beads and Bloom
-      </title>
-      <meta name="robots" content={currentPage > 1 ? "noindex, follow" : "index, follow"} />
-      <link rel="canonical" href="https://beadsandbloom.in/shop" />
-
+      <title>Shop Handcrafted Jutis & Ethnic Mojris | Beads and Bloom</title>
+      
       {/* HEADER */}
       <div className="bg-white border-b border-gray-100 py-12 px-6 text-center">
         <h1 className="text-4xl md:text-5xl font-serif text-[#1C1917] mb-3">The Collection</h1>
@@ -164,13 +167,22 @@ export default function Shop() {
 
         {/* MAIN CONTENT */}
         <div className="flex-1">
+          {/* PRODUCT GRID */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12 transition-opacity duration-300">
-            {products.map((product) => (
+            {allProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
 
-          {!loading && products.length === 0 && (
+          {/* LOADING SPINNER (First Load) */}
+          {loading && currentPage === 1 && (
+             <div className="flex justify-center py-20">
+                <Loader2 className="w-10 h-10 animate-spin text-[#1C1917]" />
+             </div>
+          )}
+
+          {/* EMPTY STATE */}
+          {!loading && allProducts.length === 0 && currentPage === 1 && (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <p className="text-gray-400 text-lg mb-4">No products match your filters.</p>
               <button onClick={clearFilters} className="text-[#FF2865] underline font-medium">
@@ -179,25 +191,26 @@ export default function Shop() {
             </div>
           )}
 
-          {pages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-16">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center disabled:opacity-30 hover:bg-[#1C1917] hover:text-white transition-all"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <span className="text-sm font-bold text-[#1C1917]">Page {currentPage} of {pages}</span>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === pages}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center disabled:opacity-30 hover:bg-[#1C1917] hover:text-white transition-all"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+          {/* LOAD MORE BUTTON */}
+          <div className="text-center mt-16 mb-8">
+            {loading && currentPage > 1 ? (
+                // Show spinner when loading more
+                <button disabled className="bg-gray-100 text-gray-400 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 mx-auto">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Loading...
+                </button>
+            ) : (
+                // Show button if more pages exist
+                currentPage < pages ? (
+                    <button onClick={handleLoadMore} className="bg-white border-2 border-[#1C1917] text-[#1C1917] px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#1C1917] hover:text-white transition-all mx-auto flex items-center gap-2">
+                       <Plus size={16} /> Load More Products
+                    </button>
+                ) : (
+                    // End of list message
+                    allProducts.length > 0 && <p className="text-gray-400 text-xs uppercase tracking-widest">You've reached the end</p>
+                )
+            )}
+          </div>
+
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Search, Package, Truck, CheckCircle, Clock, MapPin } from 'lucide-react';
-import { API_BASE_URL } from '../util/config'; // Make sure you have this config
-import { getOptimizedImage } from '../util/imageUtils'; // Reuse your image util
+import { Search, Package, Truck, CheckCircle, Clock, AlertTriangle } from 'lucide-react'; // Added AlertTriangle for RTO
+import { API_BASE_URL } from '../util/config'; 
+import { getOptimizedImage } from '../util/imageUtils'; 
 
 export default function TrackOrder() {
   const [formData, setFormData] = useState({ orderId: '', email: '' });
@@ -31,7 +31,7 @@ export default function TrackOrder() {
       if (res.ok) {
         setOrder(data);
       } else {
-        setError(data.message || 'Could not find order.');
+        setError(data.message || 'Could not find order. Check ID & Email.');
       }
     } catch (err) {
       setError('Network error. Please try again.');
@@ -41,10 +41,12 @@ export default function TrackOrder() {
   };
 
   // --- HELPER: DETERMINE ACTIVE STEP ---
-  const getStepStatus = (status) => {
-    // Map backend status to step index
-    // 0: Placed, 1: Processing, 2: Shipped, 3: Delivered
+  const getStepStatus = () => {
     const currentStatus = order?.orderStatus || 'Processing';
+    
+    // 🚨 NEW: Handle Returned / Cancelled
+    if (currentStatus === 'Returned') return -1; // RTO Case
+    if (currentStatus === 'Cancelled') return -2; // Cancelled Case
     
     if (currentStatus === 'Delivered') return 4;
     if (currentStatus === 'Out for Delivery') return 3;
@@ -105,8 +107,8 @@ export default function TrackOrder() {
           </form>
 
           {error && (
-            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg text-sm text-center border border-red-100">
-              {error}
+            <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg text-sm text-center border border-red-100 flex items-center justify-center gap-2">
+              <AlertTriangle size={16} /> {error}
             </div>
           )}
         </div>
@@ -129,52 +131,67 @@ export default function TrackOrder() {
 
             <div className="p-8">
               
-              {/* TIMELINE */}
-              <div className="relative mb-12">
-                <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 z-0 hidden md:block"></div>
-                <div className="absolute left-6 top-0 w-1 h-full bg-gray-100 -translate-x-1/2 z-0 md:hidden"></div>
+              {/* STATUS ALERT FOR CANCELLED/RETURNED */}
+              {activeStep < 0 && (
+                 <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-700">
+                    <AlertTriangle className="shrink-0" />
+                    <div>
+                        <p className="font-bold">{order.orderStatus}</p>
+                        <p className="text-xs">This order has been {order.orderStatus.toLowerCase()}. Contact support for help.</p>
+                    </div>
+                 </div>
+              )}
 
-                <div className="grid grid-rows-4 md:grid-rows-1 md:grid-cols-4 gap-8 relative z-10">
-                  
-                  {/* Step 1: Placed */}
-                  <TimelineStep 
-                    icon={Clock} 
-                    label="Order Placed" 
-                    date={new Date(order.createdAt).toLocaleDateString()} 
-                    isActive={activeStep >= 0}
-                    isCompleted={activeStep > 0} 
-                  />
-                  
-                  {/* Step 2: Processing */}
-                  <TimelineStep 
-                    icon={Package} 
-                    label="Processing" 
-                    subLabel="We are packing your order"
-                    isActive={activeStep >= 1}
-                    isCompleted={activeStep > 1}
-                  />
+              {/* TIMELINE (Hidden if Cancelled/Returned) */}
+              {activeStep >= 0 && (
+                  <div className="relative mb-12">
+                    <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 z-0 hidden md:block"></div>
+                    <div className="absolute left-6 top-0 w-1 h-full bg-gray-100 -translate-x-1/2 z-0 md:hidden"></div>
 
-                  {/* Step 3: Shipped */}
-                  <TimelineStep 
-                    icon={Truck} 
-                    label="Shipped" 
-                    subLabel={order.awbCode ? `AWB: ${order.awbCode}` : "Waiting for courier"}
-                    isActive={activeStep >= 2}
-                    isCompleted={activeStep > 2}
-                    link={order.awbCode ? `https://shiprocket.co/tracking/${order.awbCode}` : null}
-                  />
+                    <div className="grid grid-rows-4 md:grid-rows-1 md:grid-cols-4 gap-8 relative z-10">
+                      
+                      {/* Step 1: Placed */}
+                      <TimelineStep 
+                        icon={Clock} 
+                        label="Order Placed" 
+                        date={new Date(order.createdAt).toLocaleDateString()} 
+                        isActive={activeStep >= 0}
+                        isCompleted={activeStep > 0} 
+                      />
+                      
+                      {/* Step 2: Processing */}
+                      <TimelineStep 
+                        icon={Package} 
+                        label="Processing" 
+                        subLabel="Packing your order"
+                        isActive={activeStep >= 1}
+                        isCompleted={activeStep > 1}
+                      />
 
-                  {/* Step 4: Delivered */}
-                  <TimelineStep 
-                    icon={CheckCircle} 
-                    label="Delivered" 
-                    date={order.isDelivered ? new Date(order.deliveredAt).toLocaleDateString() : null}
-                    isActive={activeStep >= 4} // Strict equality for delivered
-                    isCompleted={activeStep >= 4}
-                  />
+                      {/* Step 3: Shipped (UPDATED to show Courier Name) */}
+                      <TimelineStep 
+                        icon={Truck} 
+                        label="Shipped" 
+                        // Show Courier Name OR 'Waiting'
+                        subLabel={order.awbCode ? `${order.courierName || 'Courier'} (AWB: ${order.awbCode})` : "Waiting for courier"}
+                        isActive={activeStep >= 2}
+                        isCompleted={activeStep > 2}
+                        // Only show link if AWB exists
+                        link={order.awbCode ? `https://shiprocket.co/tracking/${order.awbCode}` : null}
+                      />
 
-                </div>
-              </div>
+                      {/* Step 4: Delivered */}
+                      <TimelineStep 
+                        icon={CheckCircle} 
+                        label="Delivered" 
+                        date={order.isDelivered ? new Date(order.deliveredAt).toLocaleDateString() : null}
+                        isActive={activeStep >= 4} 
+                        isCompleted={activeStep >= 4}
+                      />
+
+                    </div>
+                  </div>
+              )}
 
               {/* ITEMS LIST */}
               <div>
@@ -222,11 +239,16 @@ function TimelineStep({ icon: Icon, label, subLabel, date, isActive, isCompleted
       </div>
       <div>
         <p className={`font-bold text-sm ${isActive ? 'text-[#1C1917]' : 'text-gray-500'}`}>{label}</p>
-        {subLabel && <p className="text-xs text-gray-500 mt-0.5">{subLabel}</p>}
+        
+        {/* Render SubLabel (Courier Name, etc.) */}
+        {subLabel && <p className="text-xs text-gray-500 mt-0.5 break-all">{subLabel}</p>}
+        
         {date && <p className="text-xs text-gray-400 mt-0.5">{date}</p>}
+        
+        {/* Render Tracking Link */}
         {link && (
             <a href={link} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-[#FF2865] underline mt-1 block hover:text-[#1C1917]">
-                Track on Courier
+                Track Package
             </a>
         )}
       </div>
