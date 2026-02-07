@@ -7,7 +7,32 @@ const {
   sendOrderConfirmation,
   sendOrderStatusEmail,
 } = require("../utils/sendEmail");
-const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils'); 
+const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
+
+// --- HELPER: Reduce Stock (Used in Verify & Webhook) ---
+const reduceOrderStock = async (order) => {
+  try {
+    for (const item of order.orderItems) {
+      const product = await Product.findById(item.product);
+      if (product) {
+        const sizeVariant = product.stock.find((s) => s.size === Number(item.size));
+        if (sizeVariant) {
+          // Decrement stock
+          sizeVariant.quantity = Math.max(0, sizeVariant.quantity - item.quantity);
+          
+          // Recalculate total stock
+          product.totalStock = product.stock.reduce((acc, s) => acc + s.quantity, 0);
+          
+          await product.save();
+        }
+      }
+    }
+    console.log(`📉 Stock reduced for Order ${order._id}`);
+  } catch (error) {
+    console.error("Stock Reduction Failed:", error);
+    // Continue execution (don't block payment success for this)
+  }
+};
 
 // @desc    Create new order (Supports Guest & Logged In)
 // @route   POST /api/orders
@@ -23,16 +48,15 @@ const addOrderItems = async (req, res) => {
     // 1. FETCH REAL PRODUCTS (Security)
     const productIds = orderItems.map(
       (item) => item.product || item.id || item._id,
-    ).filter(id => id); // Filter out nulls/undefined immediately
+    ).filter(id => id);
 
     const dbProducts = await Product.find({ _id: { $in: productIds } });
 
-    // 2. RECALCULATE PRICES
+    // 2. RECALCULATE PRICES & CHECK STOCK
     let calculatedItemsPrice = 0;
     const productsToUpdate = [];
 
     for (const item of orderItems) {
-      // 🛡️ CRITICAL FIX: Safety Check for Missing ID
       const rawId = item.product || item.id || item._id;
       if (!rawId) {
           throw new Error(`Product ID is missing for item: ${item.name || 'Unknown Item'}`);
@@ -48,25 +72,30 @@ const addOrderItems = async (req, res) => {
       );
       if (!sizeVariant)
         throw new Error(`Size ${item.size} invalid for ${item.name}`);
+      
+      // Check Availability
       if (sizeVariant.quantity < item.quantity)
         throw new Error(`Out of stock: ${item.name}`);
 
-      sizeVariant.quantity -= item.quantity;
-      dbProduct.totalStock = dbProduct.stock.reduce(
-        (acc, s) => acc + s.quantity,
-        0,
-      );
-      if (!productsToUpdate.includes(dbProduct))
-        productsToUpdate.push(dbProduct);
+      // 🚨 LOGIC CHANGE: Only reduce stock immediately for COD
+      if (paymentMethod === 'cod') {
+          sizeVariant.quantity -= item.quantity;
+          dbProduct.totalStock = dbProduct.stock.reduce(
+            (acc, s) => acc + s.quantity,
+            0,
+          );
+          if (!productsToUpdate.includes(dbProduct))
+            productsToUpdate.push(dbProduct);
+      }
 
       calculatedItemsPrice += dbProduct.price * item.quantity;
     }
 
-    // --- UPDATED SHIPPING LOGIC ---
-    let shippingPrice = 150; // Default Pan India
+    // --- SHIPPING LOGIC ---
+    let shippingPrice = 150; 
 
     if (calculatedItemsPrice > 5000) {
-      shippingPrice = 0; // Free Shipping priority
+      shippingPrice = 0; 
     } else if (shippingAddress && shippingAddress.postalCode) {
       const pincode = String(shippingAddress.postalCode).trim();
       const isNCR = /^(11|12|201)/.test(pincode);
@@ -75,11 +104,14 @@ const addOrderItems = async (req, res) => {
         shippingPrice = 100;
       }
     }
-    // -----------------------------
+    // ----------------------
 
     const totalPrice = calculatedItemsPrice + shippingPrice;
 
-    await Promise.all(productsToUpdate.map((product) => product.save()));
+    // Save stock updates ONLY for COD
+    if (productsToUpdate.length > 0) {
+        await Promise.all(productsToUpdate.map((product) => product.save()));
+    }
 
     // 3. PREPARE ORDER DATA
     const orderData = {
@@ -403,6 +435,12 @@ const verifyRazorpayPayment = async (req, res) => {
       .digest("hex");
 
     if (expectedSignature === razorpaySignature) {
+      
+      // 🚨 STOCK REDUCTION: Only if verify passes & not already paid
+      if (!order.isPaid) {
+         await reduceOrderStock(order);
+      }
+
       order.isPaid = true;
       order.paidAt = Date.now();
 
@@ -457,6 +495,10 @@ const handleRazorpayWebhook = async (req, res) => {
         const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
 
         if (order && !order.isPaid) {
+          
+          // 🚨 STOCK REDUCTION: Webhook Fallback
+          await reduceOrderStock(order);
+
           order.isPaid = true;
           order.paidAt = Date.now();
           order.paymentResult = {
@@ -475,7 +517,7 @@ const handleRazorpayWebhook = async (req, res) => {
             "name email",
           );
           await sendOrderConfirmation(fullOrder);
-          console.log(`Order ${order._id} marked Paid via Webhook`);
+          console.log(`Order ${order._id} marked Paid & Stock Reduced via Webhook`);
         } else {
           console.log(`Order ${razorpayOrderId} already processed or not found`);
         }
