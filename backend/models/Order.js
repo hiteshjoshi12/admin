@@ -37,14 +37,17 @@ const orderSchema = mongoose.Schema({
     country: { type: String, required: true },
     phoneNumber: { type: String, required: true },
   },
-
-  // 4. Payment
-  paymentMethod: {
-    type: String,
-    required: true, 
-  },
+  
+  // 4. Payment & Price Breakdown
+  paymentMethod: { type: String, required: true },
+  
   itemPrice: { type: Number, required: true, default: 0.0 },
   shippingPrice: { type: Number, required: true, default: 0.0 },
+  
+  // 🚨 NEW FIELDS REQUIRED FOR ACCURATE MATH
+  discountAmount: { type: Number, default: 0.0 }, 
+  couponCode: { type: String },
+
   totalPrice: { type: Number, required: true, default: 0.0 },
   
   isPaid: { type: Boolean, required: true, default: false },
@@ -55,24 +58,7 @@ const orderSchema = mongoose.Schema({
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
 
-  // 5. Fulfillment Status
-  orderStatus: { 
-    type: String, 
-    required: true, 
-    // Added 'Returned' to handle RTO logic from Shiprocket
-    enum: ['Processing', 'Ready to Ship', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'],
-    default: 'Processing', 
-  },
-  
-  isDelivered: { type: Boolean, required: true, default: false },
-  deliveredAt: { type: Date },
-
-  // 6. Shiprocket Integration
-  shiprocketOrderId: { type: String },      
-  shiprocketShipmentId: { type: String },   
-  awbCode: { type: String },                
-  courierCompanyName: { type: String },     
-  
+  // ... (Your existing Fulfillment & Shiprocket fields) ...
 }, {
   timestamps: true,
 });

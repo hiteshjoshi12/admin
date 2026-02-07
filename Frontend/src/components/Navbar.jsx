@@ -143,11 +143,11 @@ export default function Navbar() {
 
           {/* 3. SEARCH BAR - CENTERED, DROPS FROM TOP */}
           <div 
-            className={`hidden lg:flex absolute left-1/2 -translate-x-1/2 top-0 h-full w-[600px] bg-white z-40 items-center justify-center px-4 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${isSearchOpen ? 'translate-y-0 opacity-100 shadow-sm border-x border-gray-50' : '-translate-y-full opacity-0 pointer-events-none'}`}
+            className={`hidden border rounded-2xl border-gray-200 lg:flex absolute left-1/2 -translate-x-1/2 top-0 h-full w-[600px] bg-white z-40 items-center justify-center  transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${isSearchOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}
           >
              <form onSubmit={handleSearchSubmit} className="relative w-full flex items-center">
                 {/* Search Icon Left */}
-                <Search className="absolute left-0 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 text-gray-400 w-6 h-6" />
                 
                 {/* Input Field */}
                 <input 
@@ -156,11 +156,11 @@ export default function Navbar() {
                    placeholder="Search..." 
                    value={searchQuery}
                    onChange={(e) => setSearchQuery(e.target.value)}
-                   className="w-full bg-transparent border-b border-gray-200 pl-8 pr-8 py-2 text-sm text-left focus:outline-none focus:border-[#1C1917] placeholder:text-gray-300 transition-all font-medium"
+                   className="w-full bg-transparent  pl-12 pr-8 py-2 text-sm text-left focus:outline-none focus:border-[#1C1917] placeholder:text-gray-300 transition-all font-medium "
                 />
                 
                 {/* Close Button Right */}
-                <button type="button" onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }} className="absolute right-0 text-gray-400 hover:text-red-500 p-1">
+                <button type="button" onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }} className="absolute right-4 text-gray-400 hover:text-red-500 p-1">
                    <X size={16} />
                 </button>
 

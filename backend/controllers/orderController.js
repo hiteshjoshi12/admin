@@ -37,103 +37,99 @@ const reduceOrderStock = async (order) => {
 // @desc    Create new order (Supports Guest & Logged In)
 // @route   POST /api/orders
 // @access  Public
+// controllers/orderController.js
+
 const addOrderItems = async (req, res) => {
-  const { orderItems, shippingAddress, paymentMethod, guestEmail } = req.body;
+  // 1. Destructure discountAmount and couponCode from the request body
+  const { 
+    orderItems, 
+    shippingAddress, 
+    paymentMethod, 
+    guestEmail, 
+    discountAmount, // <--- Getting this from Frontend
+    couponCode      // <--- Getting this from Frontend
+  } = req.body;
 
   if (!orderItems || orderItems.length === 0) {
     return res.status(400).json({ message: "No order items" });
   }
 
   try {
-    // 1. FETCH REAL PRODUCTS (Security)
-    const productIds = orderItems.map(
-      (item) => item.product || item.id || item._id,
-    ).filter(id => id);
-
+    // 2. Fetch Products from DB (Security Check)
+    const productIds = orderItems.map((item) => item.product || item.id || item._id);
     const dbProducts = await Product.find({ _id: { $in: productIds } });
 
-    // 2. RECALCULATE PRICES & CHECK STOCK
+    // 3. Recalculate Item Prices
     let calculatedItemsPrice = 0;
     const productsToUpdate = [];
 
     for (const item of orderItems) {
-      const rawId = item.product || item.id || item._id;
-      if (!rawId) {
-          throw new Error(`Product ID is missing for item: ${item.name || 'Unknown Item'}`);
-      }
-      const productId = rawId.toString();
-
+      const productId = (item.product || item.id || item._id).toString();
       const dbProduct = dbProducts.find((p) => p._id.toString() === productId);
 
       if (!dbProduct) throw new Error(`Product not found: ${item.name}`);
 
-      const sizeVariant = dbProduct.stock.find(
-        (s) => s.size === Number(item.size),
-      );
-      if (!sizeVariant)
-        throw new Error(`Size ${item.size} invalid for ${item.name}`);
-      
-      // Check Availability
-      if (sizeVariant.quantity < item.quantity)
+      // Check Stock
+      const sizeVariant = dbProduct.stock.find((s) => s.size === Number(item.size));
+      if (!sizeVariant || sizeVariant.quantity < item.quantity) {
         throw new Error(`Out of stock: ${item.name}`);
-
-      // 🚨 LOGIC CHANGE: Only reduce stock immediately for COD
+      }
+      
+      // Stock Reduction for COD happens here (optional, keeping your logic)
       if (paymentMethod === 'cod') {
           sizeVariant.quantity -= item.quantity;
-          dbProduct.totalStock = dbProduct.stock.reduce(
-            (acc, s) => acc + s.quantity,
-            0,
-          );
-          if (!productsToUpdate.includes(dbProduct))
-            productsToUpdate.push(dbProduct);
+          dbProduct.totalStock = dbProduct.stock.reduce((acc, s) => acc + s.quantity, 0);
+          if (!productsToUpdate.includes(dbProduct)) productsToUpdate.push(dbProduct);
       }
 
       calculatedItemsPrice += dbProduct.price * item.quantity;
     }
 
-    // --- SHIPPING LOGIC ---
-    let shippingPrice = 150; 
-
+    // 4. Calculate Shipping (Standard Logic)
+    let shippingPrice = 150;
     if (calculatedItemsPrice > 5000) {
-      shippingPrice = 0; 
+      shippingPrice = 0;
     } else if (shippingAddress && shippingAddress.postalCode) {
-      const pincode = String(shippingAddress.postalCode).trim();
-      const isNCR = /^(11|12|201)/.test(pincode);
-      
-      if (isNCR) {
-        shippingPrice = 100;
-      }
+      const isNCR = /^(11|12|201)/.test(String(shippingAddress.postalCode));
+      if (isNCR) shippingPrice = 100;
     }
-    // ----------------------
 
-    const totalPrice = calculatedItemsPrice + shippingPrice;
+    // 🚨 5. APPLY THE DISCOUNT HERE 🚨
+    const finalDiscount = Number(discountAmount) || 0;
+    
+    // Total = Items + Shipping - Discount
+    // We use Math.max(0, ...) to ensure total never goes negative
+    const totalPrice = Math.max(0, calculatedItemsPrice + shippingPrice - finalDiscount);
 
-    // Save stock updates ONLY for COD
+    // Save stock updates (if COD)
     if (productsToUpdate.length > 0) {
-        await Promise.all(productsToUpdate.map((product) => product.save()));
+      await Promise.all(productsToUpdate.map((product) => product.save()));
     }
 
-    // 3. PREPARE ORDER DATA
+    // 6. Create Order Object
     const orderData = {
       orderItems: orderItems.map((x) => ({
         ...x,
         product: x.product || x.id || x._id,
-        price: dbProducts.find(
-          (p) => p._id.toString() === (x.product || x.id).toString(),
-        ).price,
+        price: dbProducts.find((p) => p._id.toString() === (x.product || x.id).toString()).price,
         _id: undefined,
       })),
       shippingAddress,
       paymentMethod,
       itemPrice: calculatedItemsPrice,
       shippingPrice,
-      totalPrice,
+      
+      // 🚨 SAVE THESE TO DATABASE 🚨
+      discountAmount: finalDiscount,
+      couponCode: couponCode || null,
+      totalPrice: totalPrice, 
+      
       isPaid: false,
       isDelivered: false,
       orderStatus: "Processing",
     };
 
-    // 4. ATTACH USER OR GUEST INFO
+    // Attach User ID if logged in
     if (req.user && req.user._id) {
       orderData.user = req.user._id;
     } else {
@@ -146,27 +142,21 @@ const addOrderItems = async (req, res) => {
     const order = new Order(orderData);
     const createdOrder = await order.save();
 
-    // 5. SEND EMAIL IF COD
+    // Send Email for COD
     if (paymentMethod === "cod") {
-      const fullOrder = await Order.findById(createdOrder._id).populate(
-        "user",
-        "name email",
-      );
+      const fullOrder = await Order.findById(createdOrder._id).populate("user", "name email");
       await sendOrderConfirmation(fullOrder);
     }
 
     res.status(201).json(createdOrder);
+
   } catch (error) {
-    console.error("Order Creation Error:", error.message);
-    const status =
-      error.message.includes("found") || error.message.includes("stock") || error.message.includes("missing")
-        ? 400
-        : 500;
-    res
-      .status(status)
-      .json({ message: error.message || "Order creation failed" });
+    console.error("Order Error:", error.message);
+    res.status(500).json({ message: error.message || "Order creation failed" });
   }
 };
+
+
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
@@ -384,6 +374,7 @@ const trackOrderPublic = async (req, res) => {
 // @desc    Create Razorpay Order ID
 // @route   POST /api/orders/:id/pay/initiate
 // @access  Public
+// @desc    Create Razorpay Order ID
 const initiateRazorpayPayment = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -391,17 +382,24 @@ const initiateRazorpayPayment = async (req, res) => {
       res.status(404);
       throw new Error("Order not found");
     }
-    if (order.isPaid) {
-      return res.status(400).json({ message: "Order is already paid." });
-    }
+
+    // --- 🚨 LIVE TESTING LOGIC START 🚨 ---
+    // Uncomment the line below to force a ₹2.00 payment for testing.
+    // const amountToPay = 200; // 200 paise = ₹2
+    
+    // Standard Logic (Comment this out when using the test line above)
+    const amountToPay = Math.round(order.totalPrice * 100); 
+    // --- 🚨 LIVE TESTING LOGIC END 🚨 ---
 
     const options = {
-      amount: Math.round(order.totalPrice * 100),
+      amount: amountToPay, 
       currency: "INR",
       receipt: order._id.toString(),
     };
 
     const razorpayOrder = await razorpay.orders.create(options);
+    
+    // Update DB with Razorpay Order ID
     order.razorpayOrderId = razorpayOrder.id;
     await order.save();
 

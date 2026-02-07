@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
-import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ArrowLeft, Tag, X, MapPin } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ArrowLeft, Tag, X, MapPin, ShieldCheck, Truck, RotateCcw, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import confetti from 'canvas-confetti';
 import { toast } from 'react-hot-toast'; 
@@ -100,11 +100,7 @@ export default function Cart() {
   }, [appliedCoupon?.code, totalAmount, userInfo, dispatch]);
 
   const checkoutHandler = () => {
-    // Pass the calculated shipping cost to checkout via state or Redux
-    // For now, we assume Checkout will re-calculate based on actual address,
-    // or you can pass it in navigation state:
     const stateData = { estimatedShipping: shippingCost };
-    
     if (userInfo) {
       navigate('/checkout', { state: stateData });
     } else {
@@ -170,12 +166,13 @@ export default function Cart() {
   // --- EMPTY CART VIEW ---
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-24 animate-fade-in">
-        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-gray-400">
-          <ShoppingBag className="w-8 h-8" />
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 animate-fade-in bg-[#F8F9FA]">
+        <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 text-gray-300 shadow-sm border border-gray-100">
+          <ShoppingBag className="w-10 h-10" />
         </div>
-        <h2 className="text-2xl sm:text-3xl font-serif text-[#1C1917] mb-2">Your Bag is Empty</h2>
-        <Link to="/shop" className="bg-[#1C1917] text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-[#FF2865] transition-all">
+        <h2 className="text-3xl font-serif text-[#1C1917] mb-3">Your Bag is Empty</h2>
+        <p className="text-gray-500 mb-8 text-sm">Looks like you haven't added any luxury pieces yet.</p>
+        <Link to="/shop" className="bg-[#1C1917] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-gray-800 transition-all shadow-lg hover:-translate-y-1">
           Start Shopping
         </Link>
       </div>
@@ -183,76 +180,97 @@ export default function Cart() {
   }
 
   return (
-    <div className="bg-[#F9F8F6] min-h-screen pt-20 sm:pt-24 pb-20 sm:pb-24">
-      {/* Header */}
-      <div className="px-4 sm:px-6 mb-8 sm:mb-12 text-center md:text-left md:px-12 max-w-[1440px] mx-auto">
+    <div className="bg-[#F8F9FA] min-h-screen pt-24 pb-24">
+      
+      {/* HEADER */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 mb-8">
         <h1 className="text-3xl sm:text-4xl font-serif text-[#1C1917] mb-2">Shopping Bag</h1>
-        <p className="text-gray-500 text-xs sm:text-sm">
-          <span className="font-bold text-[#FF2865]">{cartItems.length} items</span> in your bag
-        </p>
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+             <span className="font-bold text-[#1C1917]">{cartItems.length} items</span> 
+             <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+             <span>Total: ₹{finalTotal.toLocaleString()}</span>
+        </div>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
           
-          {/* LEFT: CART ITEMS LIST (Unchanged Logic, just rendering) */}
-          <div className="w-full lg:w-2/3 space-y-4 sm:space-y-6">
+          {/* LEFT: CART ITEMS LIST */}
+          <div className="w-full lg:w-2/3 space-y-6">
             <AnimatePresence>
               {cartItems.map((item) => (
                 <motion.div
                   key={`${item.id}-${item.size}`}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -100 }}
+                  exit={{ opacity: 0, height: 0 }}
                   layout
-                  className="bg-white p-3 sm:p-4 md:p-6 rounded-2xl border border-gray-100 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center shadow-sm"
+                  className="bg-white p-4 sm:p-6 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col sm:flex-row gap-6 items-start sm:items-center group"
                 >
-                  <div className="w-24 h-24 md:w-32 md:h-32 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden mx-auto sm:mx-0 border border-gray-100">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  {/* Image */}
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden border border-gray-100 relative">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   </div>
+                  
+                  {/* Details */}
                   <div className="flex-grow w-full">
-                    <div className="flex justify-between items-start mb-2 gap-3">
-                      <Link to={`/product/${item.id}`} className="font-serif text-base sm:text-lg md:text-xl text-[#1C1917] hover:text-[#FF2865] transition-colors">
-                        {item.name}
-                      </Link>
-                      <button onClick={() => handleRemove(item.id, item.size)} className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0 p-1">
-                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                          <Link to={`/product/${item.id}`} className="font-serif text-lg sm:text-xl text-[#1C1917] hover:text-[#FF2865] transition-colors line-clamp-1">
+                            {item.name}
+                          </Link>
+                          <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider">In Stock</p>
+                      </div>
+                      <button onClick={() => handleRemove(item.id, item.size)} className="text-gray-300 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full">
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4 flex items-center gap-2">
-                      <span className="bg-gray-100 px-2 py-1 rounded text-xs font-bold uppercase">Size: {item.size}</span>
-                    </p>
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0">
-                      <div className="flex items-center gap-3 bg-[#F9F8F6] rounded-lg p-2 border border-gray-100">
-                        <button onClick={() => handleUpdateQty(item.id, item.size, item.quantity - 1, item.maxStock)} disabled={item.quantity <= 1} className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-600 hover:text-[#FF2865] disabled:opacity-50">
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="font-bold text-sm w-6 text-center text-[#1C1917]">{item.quantity}</span>
-                        <button onClick={() => handleUpdateQty(item.id, item.size, item.quantity + 1, item.maxStock)} disabled={item.maxStock && item.quantity >= item.maxStock} className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-600 hover:text-[#FF2865] disabled:opacity-50">
-                          <Plus className="w-3 h-3" />
-                        </button>
+
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mt-4">
+                      {/* Quantity & Size */}
+                      <div className="flex items-center gap-4">
+                         <span className="bg-gray-100 px-3 py-1.5 rounded-lg text-xs font-bold uppercase text-gray-600">Size: {item.size}</span>
+                         
+                         <div className="flex items-center gap-3 border border-gray-200 rounded-lg p-1">
+                            <button onClick={() => handleUpdateQty(item.id, item.size, item.quantity - 1, item.maxStock)} disabled={item.quantity <= 1} 
+                                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600 disabled:opacity-30 transition-colors">
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="font-bold text-sm w-4 text-center text-[#1C1917]">{item.quantity}</span>
+                            <button onClick={() => handleUpdateQty(item.id, item.size, item.quantity + 1, item.maxStock)} disabled={item.maxStock && item.quantity >= item.maxStock} 
+                                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600 disabled:opacity-30 transition-colors">
+                              <Plus className="w-3 h-3" />
+                            </button>
+                         </div>
                       </div>
+
+                      {/* Price */}
                       <div className="text-right">
-                          <p className="font-bold text-base sm:text-lg text-[#1C1917]">₹{(item.price * item.quantity).toLocaleString()}</p>
-                          <p className="text-[10px] text-gray-400">₹{item.price} / pair</p>
+                          <p className="font-bold text-lg text-[#1C1917]">₹{(item.price * item.quantity).toLocaleString()}</p>
+                          <p className="text-[10px] text-gray-400">₹{item.price} / unit</p>
                       </div>
                     </div>
                   </div>
                 </motion.div>
               ))}
             </AnimatePresence>
-            <Link to="/shop" className="inline-flex items-center gap-2 text-xs sm:text-sm text-gray-500 hover:text-[#1C1917] mt-2 sm:mt-4 font-medium transition-colors">
+            
+            <Link to="/shop" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#1C1917] font-medium transition-colors pl-2">
               <ArrowLeft className="w-4 h-4" /> Continue Shopping
             </Link>
           </div>
 
           {/* RIGHT: ORDER SUMMARY */}
           <div className="w-full lg:w-1/3 lg:sticky lg:top-24">
-            <div className="bg-white p-5 sm:p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden">
-              <h3 className="font-serif text-xl sm:text-2xl text-[#1C1917] mb-4 sm:mb-6">Order Summary</h3>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-[0_4px_25px_-5px_rgba(0,0,0,0.1)] border border-gray-100 relative overflow-hidden">
+              
+              {/* Header */}
+              <h3 className="font-serif text-xl text-[#1C1917] mb-6 flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-gray-400" /> Order Summary
+              </h3>
 
-              {/* --- NEW: PINCODE ESTIMATOR UI --- */}
-              <div className="mb-6 bg-gray-50 p-3 rounded-xl border border-gray-100">
+              {/* Shipping Estimator */}
+              <div className="mb-6">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-1">
                    <MapPin className="w-3 h-3" /> Estimate Shipping
                 </label>
@@ -263,38 +281,30 @@ export default function Cart() {
                       value={pincode}
                       onChange={(e) => setPincode(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder="Enter Pincode"
-                      className="flex-grow bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[#FF2865]"
+                      className="flex-grow bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all"
                    />
-                   <button 
-                      onClick={handleCheckPincode}
-                      className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg font-bold uppercase hover:bg-[#FF2865] transition-colors"
-                   >
+                   <button onClick={handleCheckPincode} className="bg-gray-900 text-white text-xs px-4 py-2 rounded-lg font-bold uppercase hover:bg-gray-800 transition-colors">
                      Check
                    </button>
                 </div>
               </div>
 
-              {/* Totals Section */}
-              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 text-sm sm:text-base">
-                <div className="flex justify-between text-gray-600">
+              {/* Financials */}
+              <div className="space-y-3 mb-6 pb-6 border-b border-gray-100">
+                <div className="flex justify-between text-sm text-gray-600">
                   <span>Subtotal</span>
                   <span>₹{totalAmount.toLocaleString()}</span>
                 </div>
 
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-sm text-gray-600">
                   <span>Shipping</span>
                   {totalAmount > 5000 ? (
-                     <span className="text-green-600 font-bold text-[10px] sm:text-xs uppercase tracking-widest">Free</span>
+                      <span className="text-green-600 font-bold text-xs uppercase">Free</span>
                   ) : (
-                     <div className="text-right">
+                      <div className="text-right">
                         <span>₹{shippingCost}</span>
-                        {!isPincodeChecked && (
-                          <p className="text-[9px] text-gray-400">(Est. Pan India)</p>
-                        )}
-                        {isPincodeChecked && shippingCost === 1 && (
-                          <p className="text-[9px] text-green-600">(Delhi NCR)</p>
-                        )}
-                     </div>
+                        {!isPincodeChecked && <p className="text-[9px] text-gray-400">(Est.)</p>}
+                      </div>
                   )}
                 </div>
 
@@ -304,68 +314,83 @@ export default function Cart() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="flex justify-between text-[#FF2865] font-bold bg-pink-50 p-2 rounded-lg text-xs sm:text-sm"
+                      className="flex justify-between text-green-600 font-bold text-sm bg-green-50 p-2 rounded-lg"
                     >
-                      <span className="flex items-center gap-1 text-[10px] sm:text-xs uppercase tracking-wider">
-                        <Tag className="w-3 h-3" /> {appliedCoupon.code} Applied
-                      </span>
+                      <span className="flex items-center gap-1"><Tag className="w-3 h-3" /> {appliedCoupon.code}</span>
                       <span>- ₹{appliedCoupon.discountAmount.toLocaleString()}</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                <div className="h-[1px] bg-gray-100 my-3 sm:my-4" />
-
-                <div className="flex justify-between text-lg sm:text-xl font-bold text-[#1C1917]">
-                  <span>Total</span>
-                  <motion.span
-                    key={finalTotal}
-                    initial={{ scale: 1.2, color: '#FF2865' }}
-                    animate={{ scale: 1, color: '#1C1917' }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    ₹{finalTotal.toLocaleString()}
-                  </motion.span>
-                </div>
-                <p className="text-[9px] sm:text-[10px] text-gray-400 text-right mt-1">Including all taxes</p>
               </div>
 
-              {/* Coupon Section */}
+              {/* Coupon Input */}
               {!appliedCoupon ? (
-                <div className="mb-6 sm:mb-8">
-                  <label className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 block">Coupon Code</label>
-                  <div className="flex flex-col xs:flex-row gap-2">
+                <div className="mb-6">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-2 block">Promo Code</label>
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                       placeholder="Try WELCOME50"
-                      className="flex-grow bg-[#F9F8F6] border-0 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-[#1C1917] outline-none uppercase text-xs sm:text-sm"
+                      className="flex-grow bg-[#F9F8F6] border border-transparent rounded-lg px-3 py-2.5 text-[#1C1917] outline-none focus:border-[#1C1917] focus:bg-white transition-all uppercase text-xs font-bold"
                     />
-                    <button onClick={handleApplyCoupon} disabled={loading} className="bg-[#1C1917] text-white px-4 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-70">
+                    <button onClick={handleApplyCoupon} disabled={loading} className="bg-[#1C1917] text-white px-4 py-2.5 rounded-lg text-xs font-bold uppercase hover:bg-gray-800 disabled:opacity-50 transition-colors">
                       {loading ? '...' : 'Apply'}
                     </button>
                   </div>
-                  {error && <p className="text-red-500 text-[10px] sm:text-xs mt-2 ml-1">{error}</p>}
+                  {error && <p className="text-red-500 text-[10px] mt-2 ml-1">{error}</p>}
                 </div>
               ) : (
-                <div className="mb-6 sm:mb-8 bg-green-50 border border-green-100 p-3 sm:p-4 rounded-xl flex justify-between items-center text-xs sm:text-sm">
+                <div className="mb-6 bg-green-50 border border-green-100 p-3 rounded-lg flex justify-between items-center text-xs">
                   <div>
-                    <p className="text-green-700 font-bold text-xs sm:text-sm">Coupon Applied!</p>
-                    <p className="text-green-600 text-[10px] sm:text-xs mt-1">You saved ₹{discountVal.toLocaleString()}</p>
+                    <p className="text-green-700 font-bold">Coupon Applied!</p>
+                    <p className="text-green-600 text-[10px]">You saved ₹{discountVal.toLocaleString()}</p>
                   </div>
-                  <button onClick={handleRemoveCoupon} className="text-green-400 hover:text-green-700"><X className="w-4 h-4" /></button>
+                  <button onClick={handleRemoveCoupon} className="text-green-400 hover:text-green-700 p-1"><X className="w-4 h-4" /></button>
                 </div>
               )}
 
-              <button onClick={checkoutHandler} className="w-full bg-[#FF2865] text-white py-4 sm:py-5 rounded-xl font-bold uppercase tracking-[0.2em] hover:bg-[#1C1917] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg transform hover:-translate-y-1 text-xs sm:text-sm">
-                Proceed to Checkout <ArrowRight className="w-4 h-4" />
+              {/* Total */}
+              <div className="flex justify-between text-xl font-bold text-[#1C1917] mb-6">
+                  <span>Total</span>
+                  <motion.span
+                    key={finalTotal}
+                    initial={{ scale: 1.1, color: '#FF2865' }}
+                    animate={{ scale: 1, color: '#1C1917' }}
+                  >
+                    ₹{finalTotal.toLocaleString()}
+                  </motion.span>
+              </div>
+
+              {/* Checkout Button */}
+              <button onClick={checkoutHandler} className="w-full bg-[#1C1917] text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-gray-800 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-gray-200 text-xs sm:text-sm">
+                <Lock className="w-4 h-4" /> Secure Checkout
               </button>
 
-              <div className="mt-4 sm:mt-6 flex flex-wrap justify-center gap-3 sm:gap-4 opacity-60 grayscale">
-                <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" className="h-5 sm:h-6" alt="Visa" />
-                <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" className="h-5 sm:h-6" alt="Mastercard" />
+              {/* Trust Badges */}
+              <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-3 gap-2 text-center">
+                  <div className="flex flex-col items-center gap-1">
+                      <ShieldCheck className="w-5 h-5 text-gray-400" />
+                      <span className="text-[9px] text-gray-500 font-bold uppercase">Secure Pay</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                      <Truck className="w-5 h-5 text-gray-400" />
+                      <span className="text-[9px] text-gray-500 font-bold uppercase">Fast Ship</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                      <RotateCcw className="w-5 h-5 text-gray-400" />
+                      <span className="text-[9px] text-gray-500 font-bold uppercase">Easy Return</span>
+                  </div>
               </div>
+
+            </div>
+            
+            {/* Payment Logos */}
+            <div className="mt-4 flex justify-center gap-4 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+               <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" className="h-6" alt="Visa" />
+               <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" className="h-6" alt="Mastercard" />
+               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" className="h-6 object-contain" alt="UPI" />
             </div>
           </div>
         </div>
