@@ -8,7 +8,14 @@ const productSchema = mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true, default: 0 },
   originalPrice: { type: Number, default: 0 },
-  category: { type: String, required: true },
+  
+  // 🚨 CHANGE 1: Array of Strings for Multi-Category Support
+  category: { 
+    type: [String], 
+    required: true,
+    index: true // Adds an index for faster filtering by category
+  },
+  
   rating: { type: Number, required: true, default: 0 },
   numReviews: { type: Number, required: true, default: 0 },
   isNewArrival: { type: Boolean, default: false },
@@ -35,9 +42,6 @@ productSchema.pre('save', function (next) {
       .replace(/[\s_]+/g, '-')  // Replace spaces with hyphens
       .replace(/^-+|-+$/g, ''); // Trim extra hyphens
   }
-  
-  // 🚀 CRITICAL: You must call next() to finish the save process!
-  // next();
 });
 
 const Product = mongoose.model('Product', productSchema);

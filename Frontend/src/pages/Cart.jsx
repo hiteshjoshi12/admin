@@ -291,7 +291,7 @@ export default function Cart() {
                         {!isPincodeChecked && (
                           <p className="text-[9px] text-gray-400">(Est. Pan India)</p>
                         )}
-                        {isPincodeChecked && shippingCost === 100 && (
+                        {isPincodeChecked && shippingCost === 1 && (
                           <p className="text-[9px] text-green-600">(Delhi NCR)</p>
                         )}
                      </div>

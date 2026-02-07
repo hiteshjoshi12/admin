@@ -7,12 +7,14 @@ const {
   deleteProduct,
   updateProduct,
   createProduct,
-  migrateSlugs
+  migrateSlugs,
+  searchProducts
 } = require('../controllers/productController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
 // 1. PUBLIC LIST
 router.route('/').get(getProducts).post(protect, admin, createProduct);
+router.get('/search/instant', searchProducts);
 
 // 2. MAINTENANCE (Run this once in your browser at /api/products/migrate)
 router.get('/migrate', protect, admin, migrateSlugs);

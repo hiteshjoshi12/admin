@@ -1,164 +1,142 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion'; 
 import { API_BASE_URL } from '../../util/config.js';
-
-// 1. IMPORT OPTIMIZER
 import { getOptimizedImage } from '../../util/imageUtils';
-
-// --- IMPORTS FOR SKELETON LOADING ---
-import { BestSellerSkeleton } from '../loaders/SectionLoader.jsx';
 import { Skeleton } from '../ui/Skeleton.jsx';
 
 export default function BestSellers() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeId, setActiveId] = useState(null); // Track which card is expanded
 
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/bestsellers`);
         const data = await res.json();
-        setItems(data);
+        setItems(data.slice(0, 3)); 
+        // Set middle item as active by default for visual balance
+        if(data.length > 1) setActiveId(data[1].product._id);
       } catch (error) {
         console.error("Failed to fetch best sellers:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchBestSellers();
   }, []);
 
-  const QuickAddOverlay = () => (
-    <div className="absolute inset-0 z-20 flex items-end justify-center pb-8 transition-opacity duration-300 bg-black/5 opacity-100 md:opacity-0 md:group-hover:opacity-100">
-      <button className="bg-white text-[#1C1917] px-6 py-3 rounded-full text-xs uppercase tracking-widest font-bold flex items-center gap-2 shadow-xl transition-all duration-500 ease-out hover:bg-[#C5A059] hover:text-white translate-y-0 md:translate-y-4 md:group-hover:translate-y-0">
-        <ShoppingBag className="w-4 h-4"/> View Product
-      </button>
-    </div>
-  );
+  const handleHover = (id) => {
+    setActiveId(id);
+  };
 
-  // --- LOADING STATE ---
-  if (loading) return (
-    <section className="py-24 px-4 md:px-12 bg-white relative overflow-hidden">
-       <div className="max-w-[1440px] mx-auto relative z-10">
-         <div className="flex flex-col md:flex-row justify-between items-end mb-16">
-           <div>
-             <Skeleton className="h-4 w-32 mb-4" />
-             <Skeleton className="h-12 w-64 md:w-96" />
-           </div>
-           <Skeleton className="h-4 w-32 hidden md:block" />
-         </div>
-         <BestSellerSkeleton />
-       </div>
-    </section>
-  );
-
-  const getItem = (pos) => items.find(i => i.position === pos);
-  
+  if (loading) return <div className="py-24 px-8"><Skeleton className="h-[600px] w-full rounded-xl" /></div>;
   if (items.length === 0) return null;
 
-  const heroItem = getItem(1);
-  const pebbleItem = getItem(2);
-  const archItem = getItem(3);
-
   return (
-    <section className="py-24 px-4 md:px-12 bg-white relative overflow-hidden">
-      
-      {/* Background Pattern */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] border-[20px] border-[#C5A059]/5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-
-      <div className="max-w-[1440px] mx-auto relative z-10">
+    <section className="py-24 px-4 md:px-8 bg-[#FAFAFA]">
+      <div className="max-w-[1440px] mx-auto">
         
-        {/* Header - SEO Optimized */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#C5A059] mb-2 block">
-              Curated Favorites
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-[#1C1917] leading-none">
-              Best Selling Handcrafted Juttis
-            </h2>
-          </div>
-          <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-[#C5A059] hover:border-[#C5A059] transition-colors mt-6 md:mt-0">
-            Shop All Icons <ArrowUpRight className="w-4 h-4" />
-          </Link>
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 px-2">
+           <div>
+             <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#C5A059] mb-2 block">
+               Top Rated
+             </span>
+             <h2 className="text-4xl md:text-5xl font-serif text-[#1C1917]">
+               The Spotlight
+             </h2>
+           </div>
+           <Link to="/shop" className="group hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest pb-1 border-b border-gray-300 hover:border-[#1C1917] transition-all mb-2">
+              View All <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+           </Link>
         </div>
 
-        {/* Geometric Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-          
-          {/* POSITION 1: The Hero Arch */}
-          {heroItem && (
-          // In BestSellers.jsx
+        {/* --- EXPANDING ACCORDION --- */}
+        <div className="flex flex-col md:flex-row h-[800px] md:h-[600px] gap-4">
+           {items.map((item) => (
+             <ExpandingCard 
+               key={item.product._id} 
+               item={item} 
+               isActive={activeId === item.product._id}
+               onHover={() => handleHover(item.product._id)}
+             />
+           ))}
+        </div>
 
-            <Link to={`/product/${heroItem.product.slug || heroItem.product._id}`} className="md:col-span-5 relative group cursor-pointer block">
-              <span className="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-[#1C1917] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                {heroItem.tag}
-              </span>
-              <div className="relative h-[600px] rounded-t-[15rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all duration-500">
-                <img 
-                  src={getOptimizedImage(heroItem.product.image, 800)} 
-                  alt={`${heroItem.product.name} - Best Selling Handcrafted Jutti`} 
-                  className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" 
-                />
-                <QuickAddOverlay />
-              </div>
-              <div className="text-center mt-6">
-                <h3 className="text-2xl font-serif text-[#1C1917]">{heroItem.product.name}</h3>
-                <p className="text-gray-500 mt-1">₹{heroItem.product.price.toLocaleString()}</p>
-              </div>
+        {/* Mobile View All Link */}
+        <div className="mt-8 text-center md:hidden">
+            <Link to="/shop" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-[#1C1917] pb-1">
+               View All Products <ArrowUpRight size={14} />
             </Link>
-          )}
-
-          {/* Right Side Container */}
-          <div className="md:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-8 relative">
-              
-             {/* POSITION 2: The Pebble */}
-             {pebbleItem && (
-               <Link to={`/product/${pebbleItem.product.slug}`} className="relative group cursor-pointer md:-ml-12 md:mt-12 z-10 block">
-                 <span className="absolute top-4 right-4 z-30 bg-[#C5A059] text-white text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                   {pebbleItem.tag}
-                 </span>
-                 <div className="relative h-[350px] rounded-[4rem] overflow-hidden bg-[#F9F8F6] shadow-xl group-hover:shadow-2xl transition-shadow border-2 border-transparent group-hover:border-[#C5A059]/20">
-                     <img 
-                       src={getOptimizedImage(pebbleItem.product.image, 500)} 
-                       alt={`${pebbleItem.product.name} - Ethnic Mojri Best Seller`} 
-                       className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" 
-                     />
-                     <QuickAddOverlay />
-                 </div>
-                 <div className="text-left mt-4 ml-4">
-                   <h3 className="text-xl font-serif text-[#1C1917]">{pebbleItem.product.name}</h3>
-                   <p className="text-gray-500">₹{pebbleItem.product.price.toLocaleString()}</p>
-                 </div>
-               </Link>
-             )}
-
-             {/* POSITION 3: The Short Arch */}
-             {archItem && (
-               <Link to={`/product/${archItem.product.slug}`} className="relative group cursor-pointer md:mt-32 block">
-                 <span className="absolute top-4 left-4 z-30 bg-white/90 backdrop-blur text-[#1C1917] text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                   {archItem.tag}
-                 </span>
-                 <div className="relative h-[400px] rounded-t-[10rem] overflow-hidden bg-[#F9F8F6] border-2 border-transparent group-hover:border-[#C5A059]/20 transition-all">
-                     <img 
-                       src={getOptimizedImage(archItem.product.image, 600)} 
-                       alt={`${archItem.product.name} - Handcrafted Punjabi Jutti`} 
-                       className="w-full h-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" 
-                     />
-                     <QuickAddOverlay />
-                 </div>
-                 <div className="text-center mt-4">
-                   <h3 className="text-xl font-serif text-[#1C1917]">{archItem.product.name}</h3>
-                   <p className="text-gray-500">₹{archItem.product.price.toLocaleString()}</p>
-                 </div>
-               </Link>
-             )}
-
-          </div>
         </div>
+
       </div>
     </section>
   );
+}
+
+// --- SUB-COMPONENT: EXPANDING CARD ---
+function ExpandingCard({ item, isActive, onHover }) {
+   const { product, tag } = item;
+
+   return (
+     <Link 
+       to={`/product/${product.slug || product._id}`}
+       onMouseEnter={onHover}
+       className={`relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]
+         ${isActive ? 'flex-[3] grayscale-0' : 'flex-[1] grayscale'}
+         h-[200px] md:h-auto md:flex-row
+       `}
+     >
+       {/* Background Image */}
+       <div className="absolute inset-0 w-full h-full">
+         <img 
+           src={getOptimizedImage(product.image, 800)} 
+           alt={product.name}
+           className={`w-full h-full object-cover transition-transform duration-1000 ${isActive ? 'scale-110' : 'scale-100'}`}
+         />
+         {/* Dark Gradient Overlay */}
+         <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-opacity duration-500 ${isActive ? 'opacity-80' : 'opacity-40'}`} />
+       </div>
+
+       {/* Content Container */}
+       <div className={`absolute bottom-0 left-0 w-full p-8 flex flex-col justify-end h-full`}>
+          
+          {/* Tag (Always Visible but moves) */}
+          <div className={`absolute top-6 left-6 transition-all duration-500 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+             <span className="bg-white text-[#1C1917] text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm">
+                {tag}
+             </span>
+          </div>
+
+          {/* Title & Price */}
+          <div className="relative z-10 overflow-hidden">
+             <motion.h3 
+               layout
+               className={`font-serif text-white transition-all duration-500 ${isActive ? 'text-3xl md:text-4xl mb-2' : 'text-xl md:text-2xl mb-0'}`}
+             >
+                {product.name}
+             </motion.h3>
+             
+             <div className={`overflow-hidden transition-all duration-500 ${isActive ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <p className="text-gray-300 text-sm mb-6 max-w-sm line-clamp-2">
+                   {/* Fallback description if none exists */}
+                   Experience luxury handcrafted with precision. Perfect for the modern wardrobe.
+                </p>
+                
+                <div className="flex items-center justify-between w-full border-t border-white/20 pt-4">
+                   <p className="text-2xl font-medium text-white">₹{product.price.toLocaleString()}</p>
+                   
+                   <div className="flex items-center gap-2 bg-white text-[#1C1917] px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#C5A059] hover:text-white transition-colors">
+                      Shop Now <ShoppingBag size={14} />
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+     </Link>
+   );
 }

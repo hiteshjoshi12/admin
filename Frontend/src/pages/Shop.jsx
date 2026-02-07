@@ -238,7 +238,7 @@ function FilterContent({ filters, toggleFilter, clearFilters }) {
   return (
     <>
       <FilterGroup title="Category">
-        {["Bridal", "Festive", "Everyday", "Limited Edition", "Party", "Casual"].map((cat) => (
+        {["Bridal", "Festive", "Everyday", "Limited Edition", "Office", "Party", "Casual"].map((cat) => (
           <button key={cat} onClick={() => toggleFilter("category", cat)} className="flex items-center gap-3 w-full text-left group">
             <div className={`w-4 h-4 border flex items-center justify-center transition-all ${filters.category.includes(cat) ? "bg-[#1C1917] border-[#1C1917]" : "border-gray-300 group-hover:border-[#FF2865]"}`}>
               {filters.category.includes(cat) && <span className="w-2 h-2 bg-white rounded-sm" />}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2, Check } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
 import { toast } from 'react-hot-toast';
@@ -9,8 +9,11 @@ import { toast } from 'react-hot-toast';
 import FileUpload from '../admin/FileUpload';
 import { getOptimizedImage } from '../../util/imageUtils';
 
+// AVAILABLE CATEGORIES
+const CATEGORIES = ["Bridal", "Casual", "Party", "Festive", "Office","Everyday", "Limited Edition"];
+
 export default function ProductForm() {
-  const { id } = useParams(); // MongoDB _id
+  const { id } = useParams(); 
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
   
@@ -22,7 +25,7 @@ export default function ProductForm() {
     description: '',
     price: '',
     originalPrice: '',
-    category: 'Bridal',
+    categories: [], // Changed from 'category' (string) to 'categories' (array)
     image: '', 
     images: [], 
     isNewArrival: false,
@@ -35,7 +38,6 @@ export default function ProductForm() {
     if (id) {
       const fetchProduct = async () => {
         try {
-          // ✅ FIX: Use the /admin/ prefix to fetch by ID safely
           const res = await fetch(`${API_BASE_URL}/api/products/admin/${id}`, {
             headers: {
               Authorization: `Bearer ${userInfo.token}`,
@@ -49,12 +51,20 @@ export default function ProductForm() {
 
           const data = await res.json();
           
+          // Handle legacy data (if 'category' was a string, convert to array)
+          let categoryArray = [];
+          if (Array.isArray(data.category)) {
+             categoryArray = data.category;
+          } else if (typeof data.category === 'string') {
+             categoryArray = [data.category];
+          }
+
           setFormData({
             name: data.name,
             description: data.description,
             price: data.price,
             originalPrice: data.originalPrice || '',
-            category: data.category,
+            categories: categoryArray, // Use the processed array
             image: data.image,
             images: data.images || [],
             isNewArrival: data.isNewArrival || false,
@@ -74,6 +84,20 @@ export default function ProductForm() {
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
+  };
+
+  // Toggle Category Selection
+  const toggleCategory = (cat) => {
+    setFormData(prev => {
+        const exists = prev.categories.includes(cat);
+        let newCategories;
+        if (exists) {
+            newCategories = prev.categories.filter(c => c !== cat);
+        } else {
+            newCategories = [...prev.categories, cat];
+        }
+        return { ...prev, categories: newCategories };
+    });
   };
 
   const handleStockChange = (index, field, value) => {
@@ -114,19 +138,24 @@ export default function ProductForm() {
     e.preventDefault();
     setLoading(true);
 
+    if (formData.categories.length === 0) {
+        toast.error("Please select at least one category");
+        setLoading(false);
+        return;
+    }
+
     const totalStock = formData.stock.reduce((acc, item) => acc + Number(item.quantity), 0);
     
-    // ✅ The Backend Model's 'pre-save' hook will handle the slug generation
     const productData = {
       ...formData,
       price: Number(formData.price),
       originalPrice: Number(formData.originalPrice),
       stock: formData.stock.map(s => ({ size: Number(s.size), quantity: Number(s.quantity) })),
       totalStock, 
+      category: formData.categories, // Send as array (Backend must support this or send as main category string)
     };
 
     try {
-      // ✅ FIX: Use /admin/:id for updates
       const url = id 
         ? `${API_BASE_URL}/api/products/admin/${id}` 
         : `${API_BASE_URL}/api/products`;      
@@ -220,20 +249,29 @@ export default function ProductForm() {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Category</label>
-              <select 
-                name="category" 
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none bg-white"
-              >
-                <option value="Bridal">Bridal</option>
-                <option value="Casual">Casual</option>
-                <option value="Party">Party</option>
-                <option value="Festive">Festive</option>
-                <option value="Office">Office</option>
-              </select>
+            {/* --- MULTI-SELECT CATEGORIES --- */}
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Categories</label>
+              <div className="flex flex-wrap gap-2">
+                 {CATEGORIES.map((cat) => {
+                    const isSelected = formData.categories.includes(cat);
+                    return (
+                        <button
+                            key={cat}
+                            type="button"
+                            onClick={() => toggleCategory(cat)}
+                            className={`px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-2
+                                ${isSelected 
+                                    ? "bg-[#1C1917] text-white border-[#1C1917]" 
+                                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                                }`}
+                        >
+                            {isSelected && <Check size={14} />}
+                            {cat}
+                        </button>
+                    );
+                 })}
+              </div>
             </div>
 
             <div className="md:col-span-2">
@@ -285,17 +323,17 @@ export default function ProductForm() {
                {formData.images.map((url, index) => (
                  <div key={index} className="flex flex-col md:flex-row gap-4 items-start border-b border-gray-50 pb-4">
                    <div className="flex-1 w-full">
-                      <FileUpload 
-                        label={`Gallery Image #${index + 1}`}
-                        value={url}
-                        onUpload={(newUrl) => handleImageChange(index, newUrl)}
-                      />
+                     <FileUpload 
+                       label={`Gallery Image #${index + 1}`}
+                       value={url}
+                       onUpload={(newUrl) => handleImageChange(index, newUrl)}
+                     />
                    </div>
                    <div className="flex gap-3 items-center mt-6">
-                      {url && <img src={getOptimizedImage(url, 100)} className="w-12 h-12 rounded object-cover" />}
-                      <button type="button" onClick={() => handleRemoveImage(index)} className="p-2 text-gray-400 hover:text-red-500">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                     {url && <img src={getOptimizedImage(url, 100)} className="w-12 h-12 rounded object-cover" />}
+                     <button type="button" onClick={() => handleRemoveImage(index)} className="p-2 text-gray-400 hover:text-red-500">
+                       <Trash2 className="w-5 h-5" />
+                     </button>
                    </div>
                  </div>
                ))}
