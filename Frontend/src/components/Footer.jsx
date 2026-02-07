@@ -33,9 +33,9 @@ export default function Footer() {
         <div>
           <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Shop</h4>
           <ul className="space-y-4 text-sm text-gray-400">
-            <li><Link to="/shop" className="hover:text-white transition-colors">New Arrivals</Link></li>
-            <li><Link to="/shop" className="hover:text-white transition-colors">Best Sellers</Link></li>
-            <li><Link to="/shop" className="hover:text-white transition-colors">Bridal Collection</Link></li>
+            <li><Link to="/shop" className="hover:text-white transition-colors">The Collection</Link></li>
+            <li><Link to="/collection/casual" className="hover:text-white transition-colors">Best Sellers</Link></li>
+            <li><Link to="/collection/bridal" className="hover:text-white transition-colors">Bridal Collection</Link></li>
             <li><Link to="/shop" className="hover:text-white transition-colors">Gift Cards</Link></li>
           </ul>
         </div>
@@ -46,7 +46,6 @@ export default function Footer() {
           <ul className="space-y-4 text-sm text-gray-400">
             {/* LINKED THESE TO /terms PAGE */}
             <li><Link to="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
-            <li><Link to="/terms" className="hover:text-white transition-colors">Shipping & Returns</Link></li>
             <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide</Link></li>
             <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
           </ul>

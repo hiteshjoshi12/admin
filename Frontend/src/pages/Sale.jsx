@@ -1,25 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, ShoppingBag, Loader2, Copy, Plus } from 'lucide-react';
+import { ChevronDown, ShoppingBag, Loader2, Copy, Plus, Ticket, X, Check } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 // REDUX & API
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import { API_BASE_URL } from '../util/config';
 import { getOptimizedImage } from '../util/imageUtils';
 
 export default function Sale() {
   const dispatch = useDispatch();
+  const topRef = useRef(null);
 
   // --- STATE ---
   const [allProducts, setAllProducts] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]); 
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false); // For "Load More" spinner
+  const [loadingMore, setLoadingMore] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   
-  // PAGINATION STATE
+  // PAGINATION
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -30,13 +31,12 @@ export default function Sale() {
     category: null
   });
 
-  // --- 1. FETCH PRODUCTS (Pagination Logic) ---
+  // --- 1. FETCH PRODUCTS ---
   const fetchProducts = async (pageNumber = 1) => {
     try {
       if (pageNumber === 1) setLoading(true);
       else setLoadingMore(true);
 
-      // Add ?pageNumber=X to the URL
       const res = await fetch(`${API_BASE_URL}/api/products?pageNumber=${pageNumber}`);
       const data = await res.json();
       
@@ -44,7 +44,6 @@ export default function Sale() {
         let newProducts = [];
         let total = 1;
 
-        // Handle { products: [...], pages: 10 } structure
         if (data.products && Array.isArray(data.products)) {
             newProducts = data.products;
             total = data.pages || 1;
@@ -54,14 +53,16 @@ export default function Sale() {
 
         setTotalPages(total);
 
-        // If Page 1, replace. If Page > 1, append.
         if (pageNumber === 1) {
             setAllProducts(newProducts);
-            setDisplayedProducts(newProducts);
+            // Only show items that are actually on sale or have a discount
+            // Logic: originalPrice > price
+            const saleItems = newProducts.filter(p => Number(p.originalPrice) > Number(p.price));
+            // Fallback: If no explicit sale items, show all (for demo purposes), otherwise show saleItems
+            setDisplayedProducts(saleItems.length > 0 ? saleItems : newProducts); 
         } else {
             const updatedList = [...allProducts, ...newProducts];
             setAllProducts(updatedList);
-            // Re-apply filters instantly to the new combined list
             setDisplayedProducts(applyFilters(updatedList, filters));
         }
 
@@ -77,15 +78,17 @@ export default function Sale() {
     }
   };
 
-  // Initial Load
   useEffect(() => {
     fetchProducts(1);
     window.scrollTo(0, 0);
   }, []);
 
-  // --- 2. FILTER LOGIC (Extracted for reuse) ---
+  // --- 2. FILTER LOGIC ---
   const applyFilters = (products, currentFilters) => {
       let result = [...products];
+
+      // Always ensure we prioritize sale items in the view
+      // result = result.filter(p => Number(p.originalPrice) > Number(p.price));
 
       if (currentFilters.size) {
         result = result.filter(p => 
@@ -107,7 +110,6 @@ export default function Sale() {
       return result;
   };
 
-  // Re-run filters when filter state changes
   useEffect(() => {
     setDisplayedProducts(applyFilters(allProducts, filters));
   }, [filters, allProducts]);
@@ -165,143 +167,141 @@ export default function Sale() {
 
   if (loading && page === 1) {
      return (
-        <div className="min-h-screen flex items-center justify-center bg-[#F9F8F6]">
-           <Loader2 className="w-10 h-10 animate-spin text-[#1C1917]" />
+        <div className="min-h-screen flex items-center justify-center bg-white">
+           <Loader2 className="w-8 h-8 animate-spin text-[#1C1917]" />
         </div>
      );
   }
 
   return (
-    <div className="bg-[#F9F8F6] min-h-screen pt-20">
+    <div className="bg-white min-h-screen pt-20" ref={topRef}>
       
-      {/* HERO SECTION */}
-      <section className="bg-[#1C1917] text-white py-12 px-6 text-center relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800 via-[#1C1917] to-[#1C1917] opacity-50"></div>
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <span className="bg-[#FF2865] text-white text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full mb-4 inline-block animate-pulse">Special Offer</span>
-          <h1 className="text-4xl md:text-6xl font-serif mb-4">Shop The <span className="italic text-[#FF2865]">Collection</span></h1>
-          <div className="mt-8 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl max-w-sm mx-auto flex items-center justify-between gap-4 shadow-lg">
-             <div className="text-left">
-                <p className="text-xs text-gray-300 uppercase tracking-wider">Extra 10% Off</p>
-                <p className="text-xl font-bold font-mono text-[#FF2865] tracking-wide">INAUGURAL10</p>
+      {/* HERO SECTION - Minimal & Classy */}
+      <section className="bg-[#fcf8f5] py-20 px-6 text-center relative overflow-hidden border-b border-[#f0ebe0]">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#1C1917 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+        
+        <div className="relative z-10 max-w-2xl mx-auto animate-fade-up">
+          <span className="text-[#FF2865] text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block">Limited Time Event</span>
+          <h1 className="text-5xl md:text-7xl font-serif text-[#1C1917] mb-6 tracking-tight">The Archive Sale</h1>
+          <p className="text-gray-500 text-sm md:text-base font-light mb-10 max-w-md mx-auto">
+            Exclusive access to our handcrafted favorites at exceptional prices. Quantities are limited.
+          </p>
+
+          {/* Coupon Ticket */}
+          <div onClick={copyCoupon} className="group cursor-pointer inline-flex items-center bg-white border border-[#1C1917] px-6 py-4 rounded-xl shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+             <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FF2865]"></div>
+             <div className="text-left mr-8">
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Extra 10% Off Code</p>
+                <p className="text-lg font-mono font-bold text-[#1C1917] tracking-widest group-hover:text-[#FF2865] transition-colors">INAUGURAL10</p>
              </div>
-             <button onClick={copyCoupon} className="bg-white text-black px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-[#FF2865] hover:text-white transition-colors flex items-center gap-2">
+             <div className="h-8 w-[1px] bg-gray-200 mx-4"></div>
+             <span className="text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-[#1C1917] flex items-center gap-2">
                 <Copy size={14} /> Copy
-             </button>
+             </span>
           </div>
         </div>
       </section>
 
-      {/* FILTER BAR */}
-      <div className="sticky top-20 z-30 bg-white border-b border-gray-100 shadow-sm">
+      {/* FILTER BAR - Sticky & Clean */}
+      <div className="sticky top-20 z-30 bg-white/90 backdrop-blur-md border-b border-gray-50 shadow-sm transition-all">
         <div className="max-w-[1440px] mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500">{allProducts.length} Styles Loaded</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{displayedProducts.length} Treasures Found</p>
+          
           <div className="flex flex-wrap justify-center gap-3 relative">
+            
             {/* Size Filter */}
             <div className="relative">
-              <button onClick={() => toggleDropdown('size')} className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full border transition-colors ${filters.size ? 'bg-[#1C1917] text-white border-[#1C1917]' : 'bg-white text-gray-600 border-gray-200 hover:border-black'}`}>
+              <button onClick={() => toggleDropdown('size')} className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest px-5 py-2.5 rounded-full border transition-all ${filters.size ? 'bg-[#1C1917] text-white border-[#1C1917]' : 'bg-transparent text-[#1C1917] border-gray-200 hover:border-[#1C1917]'}`}>
                 Size {filters.size ? `(${filters.size})` : ''} <ChevronDown className="w-3 h-3" />
               </button>
               {activeDropdown === 'size' && (
-                <div className="absolute top-full mt-2 w-48 bg-white shadow-xl rounded-xl p-2 border border-gray-100 grid grid-cols-3 gap-1 z-40 animate-fade-up">
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-2xl rounded-xl p-3 border border-gray-100 grid grid-cols-3 gap-2 z-40 animate-fade-in">
                   {[36, 37, 38, 39, 40, 41].map(size => (
-                    <button key={size} onClick={() => setFilter('size', size)} className={`py-2 text-sm rounded-lg hover:bg-gray-50 ${filters.size === size ? 'bg-[#FF2865] text-white' : ''}`}>{size}</button>
+                    <button key={size} onClick={() => setFilter('size', size)} className={`py-2 text-xs font-bold rounded-md transition-colors ${filters.size === size ? 'bg-[#1C1917] text-white' : 'hover:bg-gray-50 text-gray-600'}`}>{size}</button>
                   ))}
                 </div>
               )}
             </div>
+
             {/* Price Filter */}
             <div className="relative">
-              <button onClick={() => toggleDropdown('price')} className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full border transition-colors ${filters.priceRange ? 'bg-[#1C1917] text-white border-[#1C1917]' : 'bg-white text-gray-600 border-gray-200 hover:border-black'}`}>
+              <button onClick={() => toggleDropdown('price')} className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest px-5 py-2.5 rounded-full border transition-all ${filters.priceRange ? 'bg-[#1C1917] text-white border-[#1C1917]' : 'bg-transparent text-[#1C1917] border-gray-200 hover:border-[#1C1917]'}`}>
                 Price <ChevronDown className="w-3 h-3" />
               </button>
               {activeDropdown === 'price' && (
-                <div className="absolute top-full mt-2 w-48 bg-white shadow-xl rounded-xl p-2 border border-gray-100 flex flex-col gap-1 z-40 animate-fade-up">
+                <div className="absolute top-full right-0 mt-2 w-56 bg-white shadow-2xl rounded-xl p-2 border border-gray-100 flex flex-col gap-1 z-40 animate-fade-in">
                   {[
                     { label: 'Under ₹2000', value: 'under-2000' },
                     { label: '₹2000 - ₹3000', value: '2000-3000' },
                     { label: 'Above ₹3000', value: 'above-3000' }
                   ].map(option => (
-                    <button key={option.value} onClick={() => setFilter('priceRange', option.value)} className={`py-2 px-3 text-left text-sm rounded-lg hover:bg-gray-50 ${filters.priceRange === option.value ? 'bg-[#FF2865] text-white' : 'text-gray-600'}`}>{option.label}</button>
+                    <button key={option.value} onClick={() => setFilter('priceRange', option.value)} className={`py-3 px-4 text-left text-xs font-bold uppercase tracking-wide rounded-lg transition-colors ${filters.priceRange === option.value ? 'bg-[#f8f8f8] text-[#1C1917]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#1C1917]'}`}>
+                       {option.label}
+                    </button>
                   ))}
                 </div>
               )}
             </div>
-            {/* Category Filter */}
-            <div className="relative">
-              <button onClick={() => toggleDropdown('category')} className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full border transition-colors ${filters.category ? 'bg-[#1C1917] text-white border-[#1C1917]' : 'bg-white text-gray-600 border-gray-200 hover:border-black'}`}>
-                Category {filters.category ? `(${filters.category})` : ''} <ChevronDown className="w-3 h-3" />
-              </button>
-              {activeDropdown === 'category' && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-xl rounded-xl p-2 border border-gray-100 flex flex-col gap-1 z-40 animate-fade-up">
-                  {['Mules', 'Heels', 'Wedges', 'Flats'].map(cat => (
-                    <button key={cat} onClick={() => setFilter('category', cat)} className={`py-2 px-3 text-left text-sm rounded-lg hover:bg-gray-50 ${filters.category === cat ? 'bg-[#FF2865] text-white' : 'text-gray-600'}`}>{cat}</button>
-                  ))}
-                </div>
-              )}
-            </div>
+
             {/* Clear All */}
             {hasActiveFilters && (
-              <button onClick={clearAllFilters} className="text-xs text-[#FF2865] underline hover:text-black ml-2">Clear All</button>
+              <button onClick={clearAllFilters} className="text-[10px] font-bold uppercase tracking-widest text-[#FF2865] hover:text-[#1C1917] ml-2 border-b border-[#FF2865] hover:border-[#1C1917] transition-all pb-0.5">
+                 Clear
+              </button>
             )}
           </div>
         </div>
       </div>
 
       {/* --- PRODUCT GRID --- */}
-      <div className="max-w-[1440px] mx-auto px-6 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+      <div className="max-w-[1440px] mx-auto px-6 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16">
           
           {Array.isArray(displayedProducts) && displayedProducts.map((product) => {
             
-            // 🚨 FIXED LOGIC: Force Number conversion to ensure accurate math
             const pPrice = Number(product.price);
             const pOriginal = Number(product.originalPrice);
-
-            // It is on sale ONLY if original > price AND original is not zero
             const isOnSale = pOriginal > 0 && pOriginal > pPrice;
-            
-            const discount = isOnSale 
-                ? Math.round(((pOriginal - pPrice) / pOriginal) * 100) 
-                : 0;
+            const discount = isOnSale ? Math.round(((pOriginal - pPrice) / pOriginal) * 100) : 0;
             
             return (
-                <Link to={`/product/${product.slug}`} key={product._id} className="group relative block">
+                <Link to={`/product/${product.slug}`} key={product._id} className="group relative block cursor-pointer">
                 
                 {/* 🔴 DISCOUNT BADGE */}
                 {isOnSale && (
-                    <div className="absolute top-3 left-3 z-20 bg-[#FF2865] text-white text-[10px] font-bold px-2 py-1 rounded-sm shadow-md animate-fade-in">
-                        -{discount}%
+                    <div className="absolute top-3 left-3 z-20 bg-[#FF2865] text-white text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm shadow-sm">
+                        -{discount}% Sale
                     </div>
                 )}
 
-                {/* Product Image */}
-                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-gray-100 mb-4">
-                    <img src={getOptimizedImage(product.image, 400)} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                {/* Product Image - Soft Corners & Physics Transition */}
+                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#f4f4f4] mb-5">
+                    <img 
+                       src={getOptimizedImage(product.image, 500)} 
+                       alt={product.name} 
+                       className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105" 
+                    />
                     
                     {/* Quick Add Overlay */}
-                    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
-                        <button onClick={(e) => handleQuickAdd(e, product)} className="bg-white text-[#1C1917] px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-[#FF2865] hover:text-white transition-colors shadow-lg translate-y-4 group-hover:translate-y-0 duration-300">
+                    <div className="absolute inset-x-4 bottom-4 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out translate-y-4 group-hover:translate-y-0">
+                        <button 
+                           onClick={(e) => handleQuickAdd(e, product)} 
+                           className="w-full bg-white/95 backdrop-blur-sm text-[#1C1917] py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest shadow-lg hover:bg-[#1C1917] hover:text-white transition-colors flex items-center justify-center gap-2"
+                        >
                            <ShoppingBag className="w-3 h-3" /> Quick Add
                         </button>
                     </div>
-
-                    {product.isNewArrival && (
-                      <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-2 py-1 text-[9px] uppercase tracking-widest font-bold text-[#1C1917] rounded-sm">New Arrival</div>
-                    )}
                 </div>
 
                 {/* Product Info */}
-                <div className="text-center group-hover:-translate-y-1 transition-transform duration-300">
-                    <h3 className="font-serif text-lg text-[#1C1917] mb-1">{product.name}</h3>
+                <div className="text-center">
+                    <h3 className="font-serif text-base text-[#1C1917] mb-1 group-hover:text-[#8B5E3C] transition-colors">{product.name}</h3>
                     <div className="flex items-center justify-center gap-3">
-                        {/* 🔴 CROSSED PRICE */}
+                        <span className="font-bold text-sm text-[#FF2865]">₹{pPrice.toLocaleString()}</span>
                         {isOnSale && (
-                            <span className="text-gray-400 line-through text-sm">₹{pOriginal.toLocaleString()}</span>
+                            <span className="text-xs text-gray-400 line-through">₹{pOriginal.toLocaleString()}</span>
                         )}
-                        <span className={`${isOnSale ? 'text-[#FF2865]' : 'text-[#1C1917]'} font-bold text-lg`}>
-                            ₹{pPrice.toLocaleString()}
-                        </span>
                     </div>
                 </div>
 
@@ -310,30 +310,40 @@ export default function Sale() {
           })}
         </div>
 
-        {/* --- LOAD MORE BUTTON --- */}
-        <div className="text-center mt-12 mb-8">
+        {/* --- LOAD MORE --- */}
+        <div className="text-center mt-20 mb-8">
            {loadingMore ? (
-               <button disabled className="bg-gray-100 text-gray-400 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 mx-auto">
-                   <Loader2 className="w-4 h-4 animate-spin" /> Loading...
-               </button>
+               <div className="flex items-center justify-center gap-2 opacity-50">
+                   <Loader2 className="w-5 h-5 animate-spin" />
+                   <span className="text-xs font-bold uppercase tracking-widest">Loading...</span>
+               </div>
            ) : (
-               // Only show if we have more pages to load
                page < totalPages ? (
-                   <button onClick={handleLoadMore} className="bg-white border-2 border-[#1C1917] text-[#1C1917] px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#1C1917] hover:text-white transition-all mx-auto flex items-center gap-2">
-                      <Plus size={16} /> Load More Products
+                   <button onClick={handleLoadMore} className="group relative px-10 py-4 overflow-hidden rounded-full border border-[#1C1917] bg-transparent text-[#1C1917] transition-all hover:bg-[#1C1917] hover:text-white">
+                      <span className="relative z-10 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+                         View More
+                      </span>
                    </button>
                ) : (
-                   displayedProducts.length > 0 && <p className="text-gray-400 text-xs uppercase tracking-widest">You've reached the end</p>
+                   displayedProducts.length > 0 && (
+                      <div className="flex items-center justify-center gap-4 opacity-20">
+                         <div className="h-[1px] w-12 bg-black"></div>
+                         <span className="text-[9px] uppercase tracking-[0.3em] font-serif">End</span>
+                         <div className="h-[1px] w-12 bg-black"></div>
+                      </div>
+                   )
                )
            )}
         </div>
 
         {/* Empty State */}
         {(!displayedProducts || displayedProducts.length === 0) && !loading && (
-          <div className="text-center py-20 animate-fade-in">
-            <h3 className="text-2xl font-serif text-gray-400">No treasures found.</h3>
-            <p className="text-gray-400 text-sm mt-2">Try adjusting your filters.</p>
-            <button onClick={clearAllFilters} className="text-[#FF2865] mt-4 underline font-bold">Clear all filters</button>
+          <div className="text-center py-32 opacity-0 animate-fade-in forwards" style={{animationDelay: '0.2s'}}>
+            <h3 className="text-2xl font-serif text-[#1C1917] mb-2">No sale items found.</h3>
+            <p className="text-gray-400 text-sm mb-6">Check back later for new markdowns.</p>
+            <button onClick={clearAllFilters} className="text-[#1C1917] border-b border-[#1C1917] pb-1 hover:text-[#FF2865] hover:border-[#FF2865] transition-all text-xs font-bold uppercase tracking-widest">
+                Clear Filters
+            </button>
           </div>
         )}
       </div>
