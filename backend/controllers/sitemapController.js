@@ -26,10 +26,14 @@ const getSitemap = async (req, res) => {
     smStream.write({ url: '/', changefreq: 'daily', priority: 1.0 });
     smStream.write({ url: '/about', changefreq: 'monthly', priority: 0.7 });
     smStream.write({ url: '/contact', changefreq: 'monthly', priority: 0.5 });
+
+    smStream.write({ url: '/terms', changefreq: 'monthly', priority: 0.5 });
+    smStream.write({ url: '/size-chart', changefreq: 'monthly', priority: 0.6 });
     
     // Shop & Collections
     smStream.write({ url: '/shop', changefreq: 'daily', priority: 0.9 });
     smStream.write({ url: '/sale', changefreq: 'daily', priority: 0.8 });
+
     
     // Specific Categories (The new pages you made)
     smStream.write({ url: '/collection/bridal', changefreq: 'weekly', priority: 0.8 });
