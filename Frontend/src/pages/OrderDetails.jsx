@@ -74,6 +74,12 @@ export default function OrderDetails() {
     </div>
   );
 
+  const handleSupport = () => {
+    window.location.href = `mailto: connect@beadsandbloom.com?subject=Support%20Request%20for%20Order%20${order._id.slice(-6).toUpperCase()}&body=Hello%20Support%20Team,%0D%0A%0D%0AI%20need%20assistance%20with%20my%20order%20${order._id.slice(-6).toUpperCase()}.%0D%0A%0D%0AOrder%20Details:%0D%0A- %20Order ID:%20${order._id}%0D%0A- %20Placed On:%20${new Date(order.createdAt).toLocaleString()}%0D%0A- %20Items:%20${order.orderItems.map(item => `${item.name} (Qty: ${item.quantity})`).join(', ')}.%0D%0A- %20Total:%20₹${safePrice(order.totalPrice)}.%0D%0A%0D%0APlease%20assist%20me%20with...`;
+
+
+  }
+
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12">
       <div className="max-w-5xl mx-auto px-4 md:px-6">
@@ -248,7 +254,7 @@ export default function OrderDetails() {
             <div className="bg-[#1C1917] text-white p-6 rounded-2xl text-center">
               <h4 className="font-serif text-lg mb-2">Need Help?</h4>
               <p className="text-xs text-gray-400 mb-4">Have an issue with this order?</p>
-              <button className="bg-white text-[#1C1917] px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#FF2865] hover:text-white transition-colors w-full">
+              <button onClick={handleSupport} className="bg-white text-[#1C1917] px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#FF2865] hover:text-white transition-colors w-full">
                 Contact Support
               </button>
             </div>

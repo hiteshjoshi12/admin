@@ -58,9 +58,9 @@ const createShiprocketOrder = async (mongoOrder) => {
       // --- FIX #2: SAFE CHECK ---
       payment_method: isCod ? "COD" : "Prepaid",
       sub_total: mongoOrder.totalPrice, // Use totalPrice instead of itemPrice to capture tax/shipping
-      length: 10,
-      breadth: 10,
-      height: 10,
+      length: 30,
+      breadth: 14,
+      height: 11,
       weight: 0.5 
     };
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, Package, MapPin, Plus, Trash2, Edit2, X, CheckCircle } from 'lucide-react';
 import { logout, saveAddressToProfile, updateAddressInProfile, deleteAddressFromProfile } from '../redux/authSlice';
 import { clearCart } from '../redux/cartSlice';
+import toast from 'react-hot-toast';
 
 export default function Profile() {
   const { userInfo } = useSelector((state) => state.auth);
