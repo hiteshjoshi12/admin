@@ -67,24 +67,40 @@ export default function ProductDetail() {
   const [showMaxReached, setShowMaxReached] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
-  // --- RECENTLY VIEWED LOGIC ---
+  // --- RECENTLY VIEWED LOGIC (SAFE) ---
   useEffect(() => {
     if (currentProduct && currentProduct.slug === slug) {
-      const existing = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
-      const filtered = existing.filter(item => item._id !== currentProduct._id);
-      const updated = [
-        {
-          _id: currentProduct._id,
-          name: currentProduct.name,
-          slug: currentProduct.slug,
-          image: currentProduct.image || currentProduct.images[0],
-          price: currentProduct.price
-        },
-        ...filtered
-      ].slice(0, 6); 
+      try {
+        // 1. Safe Parse
+        const stored = localStorage.getItem("recentlyViewed");
+        const existing = stored ? JSON.parse(stored) : [];
 
-      localStorage.setItem("recentlyViewed", JSON.stringify(updated));
-      setRecentlyViewed(updated.filter(item => item._id !== currentProduct._id));
+        // 2. Filter out duplicates (remove current product if it exists)
+        const filtered = existing.filter(item => item._id !== currentProduct._id);
+
+        // 3. Add current to top
+        const updated = [
+          {
+            _id: currentProduct._id,
+            name: currentProduct.name,
+            slug: currentProduct.slug,
+            image: currentProduct.image || (currentProduct.images && currentProduct.images[0]),
+            price: currentProduct.price
+          },
+          ...filtered
+        ].slice(0, 6); // Keep only last 6 items
+
+        // 4. Save back
+        localStorage.setItem("recentlyViewed", JSON.stringify(updated));
+        
+        // 5. Update UI (Show list excluding current)
+        setRecentlyViewed(updated.filter(item => item._id !== currentProduct._id));
+
+      } catch (err) {
+        console.error("Recently Viewed Error:", err);
+        // If error, reset storage to avoid persistent crashes
+        localStorage.removeItem("recentlyViewed");
+      }
     }
   }, [currentProduct, slug]);
 

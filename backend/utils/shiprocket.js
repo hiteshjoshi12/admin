@@ -61,7 +61,7 @@ const createShiprocketOrder = async (mongoOrder) => {
       length: 30,
       breadth: 14,
       height: 11,
-      weight: 0.5 
+      weight: 0.7 
     };
 
     // --- FIX #3: CORRECT URL SPELLING (adhoc, not ad-hoc) ---

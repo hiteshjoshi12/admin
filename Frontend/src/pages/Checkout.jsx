@@ -3,12 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Check,
   CreditCard,
-  Smartphone,
   ArrowRight,
   MapPin,
   ShoppingBag,
   Loader2,
-  Mail,
   Copy,
   ChevronDown,
   ChevronUp,
@@ -41,7 +39,7 @@ export default function Checkout() {
 
   // --- REDUX STATE ---
   const { userInfo } = useSelector((state) => state.auth);
-  const { items: cartItems, totalAmount, shippingAddress = {}, coupon } = useSelector((state) => state.cart);
+  const { items: cartItems, totalAmount, coupon } = useSelector((state) => state.cart);
   const { loading, error } = useSelector((state) => state.order);
 
   // --- LOCAL STATE ---
@@ -51,18 +49,46 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [createdOrderId, setCreatedOrderId] = useState(null); 
   
+  // 1. ✅ GET PRIMARY ADDRESS (Prioritize 'isPrimary', fallback to first index)
+  const getPrimaryAddress = (addresses) => {
+      if (!addresses || addresses.length === 0) return {};
+      // Find the one marked isPrimary, OR default to the first one
+      return addresses.find(addr => addr.isPrimary) || addresses[0];
+  };
+
+  const dbAddress = getPrimaryAddress(userInfo?.addresses);
+
   const [formData, setFormData] = useState({
     email: userInfo?.email || "",
-    address: shippingAddress?.address || "",
-    city: shippingAddress?.city || "",
-    state: shippingAddress?.state || "",
-    postalCode: shippingAddress?.postalCode || "",
-    phoneNumber: shippingAddress?.phoneNumber || "",
-    country: "India",
     name: userInfo?.name || "",
+    // Populate strictly from DB profile
+    address: dbAddress.address || "",
+    city: dbAddress.city || "",
+    state: dbAddress.state || "",
+    postalCode: dbAddress.postalCode || "",
+    phoneNumber: dbAddress.phoneNumber || "",
+    country: "India",
   });
 
-  // --- 1. DYNAMIC SHIPPING ---
+  // 2. ✅ SYNC ON LOAD (With Primary Check)
+  useEffect(() => {
+    if (userInfo && userInfo.addresses && userInfo.addresses.length > 0) {
+        const addr = getPrimaryAddress(userInfo.addresses);
+        
+        setFormData(prev => ({
+            ...prev,
+            address: addr.address || "",
+            city: addr.city || "",
+            state: addr.state || "",
+            postalCode: addr.postalCode || "",
+            phoneNumber: addr.phoneNumber || "",
+            name: userInfo.name || prev.name,
+            email: userInfo.email || prev.email
+        }));
+    }
+  }, [userInfo]);
+
+  // --- DYNAMIC SHIPPING LOGIC ---
   const { itemsPrice, shippingCost, discountAmount, finalTotal, shippingLabel } = useMemo(() => {
     const itemsPrice = totalAmount;
     let shipping = 150;
@@ -85,11 +111,11 @@ export default function Checkout() {
     return { itemsPrice, shippingCost: shipping, discountAmount: discount, finalTotal: total, shippingLabel: label };
   }, [totalAmount, coupon, formData.postalCode]);
 
-  // --- 2. LIFECYCLE ---
+  // --- LIFECYCLE ---
   useEffect(() => { dispatch(resetOrder()); }, [dispatch]);
   useEffect(() => { if(error){ toast.error(error); } }, [error]);
 
-  // --- 3. RAZORPAY LOGIC ---
+  // --- RAZORPAY LOGIC ---
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       if (window.Razorpay) return resolve(true);
@@ -177,11 +203,12 @@ export default function Checkout() {
     }
   };
 
-  // --- 4. HANDLERS ---
+  // --- HANDLERS ---
   const handleNextStep = (e) => {
     e.preventDefault();
     if (formData.phoneNumber.length < 10) return toast.error("Invalid phone number");
     dispatch(saveShippingAddress(formData));
+    // If user has no addresses yet, save this one to profile automatically
     if (userInfo && (!userInfo.addresses || userInfo.addresses.length === 0)) {
       dispatch(saveAddressToProfile(formData));
     }
@@ -236,7 +263,7 @@ export default function Checkout() {
         </div>
         <h1 className="text-4xl font-serif mb-3 text-[#1C1917]">Order Confirmed!</h1>
         <p className="text-gray-500 mb-10 text-sm">
-           A secure receipt has been sent to <span className="font-bold text-black">{formData.email}</span>
+            A secure receipt has been sent to <span className="font-bold text-black">{formData.email}</span>
         </p>
         <div className="bg-gray-50 px-6 py-4 rounded-xl flex items-center gap-4 mb-10 border border-gray-200 shadow-sm">
           <div className="text-left">
@@ -314,11 +341,11 @@ export default function Checkout() {
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Contact Information</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div className="group">
-                     <input type="email" required placeholder="Email Address" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+                      <input type="email" required placeholder="Email Address" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
                         className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
                   </div>
                   <div className="group">
-                     <input type="text" required placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                      <input type="text" required placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
                         className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
                   </div>
                 </div>
@@ -327,13 +354,13 @@ export default function Checkout() {
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Address</p>
                 <div className="space-y-4">
                   <input type="text" required placeholder="Street Address / Flat No." value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} 
-                     className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
+                      className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
                   
                   <div className="grid grid-cols-2 gap-4">
                     <input type="text" required placeholder="City" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} 
-                       className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
+                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
                     <select required value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })} 
-                       className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm">
+                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm">
                       <option value="">Select State</option>
                       {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -341,9 +368,9 @@ export default function Checkout() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <input type="text" maxLength={6} required placeholder="Pincode" value={formData.postalCode} onChange={(e) => setFormData({ ...formData, postalCode: e.target.value.replace(/\D/g, "") })} 
-                       className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
+                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
                     <input type="text" maxLength={10} required placeholder="Phone Number" value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value.replace(/\D/g, "") })} 
-                       className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
+                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
                   </div>
                 </div>
 
@@ -386,9 +413,9 @@ export default function Checkout() {
 
                     {/* Trust Logos */}
                     <div className="flex gap-2 opacity-80">
-                         <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" className="h-5" alt="Visa" />
-                         <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" className="h-5" alt="Mastercard" />
-                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" className="h-5 object-contain" alt="UPI" />
+                          <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" className="h-5" alt="Visa" />
+                          <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" className="h-5" alt="Mastercard" />
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png" className="h-5 object-contain" alt="UPI" />
                     </div>
                     
                     {paymentMethod === "razorpay" && <div className="absolute top-0 right-0 bg-[#1C1917] text-white text-[10px] px-2 py-1 rounded-bl-lg rounded-tr-lg font-bold">RECOMMENDED</div>}
