@@ -75,7 +75,7 @@ export default function OrderDetails() {
   );
 
   const handleSupport = () => {
-    window.location.href = `mailto: connect@beadsandbloom.com?subject=Support%20Request%20for%20Order%20${order._id.slice(-6).toUpperCase()}&body=Hello%20Support%20Team,%0D%0A%0D%0AI%20need%20assistance%20with%20my%20order%20${order._id.slice(-6).toUpperCase()}.%0D%0A%0D%0AOrder%20Details:%0D%0A- %20Order ID:%20${order._id}%0D%0A- %20Placed On:%20${new Date(order.createdAt).toLocaleString()}%0D%0A- %20Items:%20${order.orderItems.map(item => `${item.name} (Qty: ${item.quantity})`).join(', ')}.%0D%0A- %20Total:%20₹${safePrice(order.totalPrice)}.%0D%0A%0D%0APlease%20assist%20me%20with...`;
+    window.location.href = `mailto: connect@beadsandbloom.in?subject=Support%20Request%20for%20Order%20${order._id.slice(-6).toUpperCase()}&body=Hello%20Support%20Team,%0D%0A%0D%0AI%20need%20assistance%20with%20my%20order%20${order._id.slice(-6).toUpperCase()}.%0D%0A%0D%0AOrder%20Details:%0D%0A- %20Order ID:%20${order._id}%0D%0A- %20Placed On:%20${new Date(order.createdAt).toLocaleString()}%0D%0A- %20Items:%20${order.orderItems.map(item => `${item.name} (Qty: ${item.quantity})`).join(', ')}.%0D%0A- %20Total:%20₹${safePrice(order.totalPrice)}.%0D%0A%0D%0APlease%20assist%20me%20with...`;
 
 
   }

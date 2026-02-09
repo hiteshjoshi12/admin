@@ -17,6 +17,7 @@ const coupons = require('./routes/couponRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes'); 
 const uploadRoutes = require('./routes/uploadRoutes');
 const sitemapRoutes = require('./routes/sitemapRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/content', contentRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/coupons', coupons);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/contact', contactRoutes);
 
 // --- MILESWEB PRODUCTION CONFIGURATION ---
 
