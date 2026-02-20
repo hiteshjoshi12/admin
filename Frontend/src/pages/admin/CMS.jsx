@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Save, Layout, Instagram, Image as ImageIcon, Plus, Trash2, Star, Grid, Video, PlayCircle } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { 
+  Save, Layout, Instagram, Image as ImageIcon, Plus, 
+  Trash2, Star, Grid, Video, PlayCircle, GripVertical 
+} from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
 import { confirmAction } from '../../util/toastUtils';
 import toast from 'react-hot-toast';
 
-// 1. IMPORT OPTIMIZERS
 import { getOptimizedImage } from '../../util/imageUtils';
 import { getOptimizedVideo } from '../../util/videoUtils';
-
-// 2. IMPORT FILE UPLOAD COMPONENT
 import FileUpload from '../admin/FileUpload';
 
 export default function CMS() {
@@ -18,15 +19,13 @@ export default function CMS() {
   
   return (
     <div className="max-w-5xl mx-auto pb-12 px-4 md:px-6">
-      {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between sticky top-0 bg-[#F3F4F6] py-4 z-20 border-b border-gray-200 mb-6 gap-2">
-         <div>
-           <h1 className="text-2xl font-bold text-gray-800">Content Management</h1>
-           <p className="text-sm text-gray-500">Manage your storefront content</p>
-         </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Content Management</h1>
+            <p className="text-sm text-gray-500">Manage your storefront content</p>
+          </div>
       </div>
 
-      {/* TABS */}
       <div className="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto scrollbar-hide pb-1">
         <TabButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={Layout} label="Home & Socials" />
         <TabButton active={activeTab === 'bestsellers'} onClick={() => setActiveTab('bestsellers')} icon={Star} label="Best Sellers" />
@@ -34,7 +33,6 @@ export default function CMS() {
         <TabButton active={activeTab === 'runway'} onClick={() => setActiveTab('runway')} icon={Video} label="Runway" />
       </div>
 
-      {/* TAB CONTENT */}
       {activeTab === 'home' && <HomeCMS userInfo={userInfo} />}
       {activeTab === 'bestsellers' && <BestSellersCMS userInfo={userInfo} />}
       {activeTab === 'collections' && <CollectionsCMS userInfo={userInfo} />}
@@ -70,24 +68,34 @@ function HomeCMS({ userInfo }) {
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/content`).then(res => res.json()).then(content => {
-      if (content) setData(prev => ({ 
-        heroSlides: content.heroSlides || [], 
-        instagram: { ...prev.instagram, ...content.instagram } 
-      }));
+      if (content) {
+        // FIX: Ensure every slide has a string-based "id" immediately
+        const sanitizedSlides = (content.heroSlides || []).map((slide, idx) => ({
+          ...slide,
+          id: slide._id ? String(slide._id) : `init-${idx}`
+        }));
+
+        setData(prev => ({ 
+          heroSlides: sanitizedSlides, 
+          instagram: { ...prev.instagram, ...content.instagram } 
+        }));
+      }
     });
   }, []);
 
-  // --- HERO HANDLERS ---
   const handleHeroChange = (index, field, value) => {
     const newSlides = [...data.heroSlides];
     newSlides[index][field] = value;
     setData({ ...data, heroSlides: newSlides });
   };
 
-  const addSlide = () => setData({ 
-    ...data, 
-    heroSlides: [...data.heroSlides, { image: '', title: 'New', subtitle: '', cta: 'Shop Now', link: '/shop' }] 
-  });
+  const addSlide = () => {
+    const newId = `new-${Date.now()}`;
+    setData({ 
+      ...data, 
+      heroSlides: [...data.heroSlides, { id: newId, image: '', title: 'New', subtitle: '', cta: 'Shop Now', link: '/shop' }] 
+    });
+  };
   
   const removeSlide = (index) => {
     confirmAction({
@@ -119,7 +127,14 @@ function HomeCMS({ userInfo }) {
     }
   };
 
-  // --- INSTAGRAM HANDLERS ---
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(data.heroSlides);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setData({ ...data, heroSlides: items });
+  };
+
   const handleInstaChange = (field, value) => {
     setData(prev => ({
       ...prev,
@@ -158,60 +173,91 @@ function HomeCMS({ userInfo }) {
                   <Plus className="w-4 h-4" /> Add Slide
                </button>
                <button onClick={saveHero} disabled={heroLoading} className="flex-1 md:flex-none justify-center bg-[#1C1917] text-white px-4 py-2 md:py-1.5 rounded text-sm font-bold flex items-center gap-2 hover:bg-[#333]">
-                  <Save className="w-4 h-4" /> {heroLoading ? 'Saving...' : 'Save Slider'}
+                  <Save className="w-4 h-4" /> {heroLoading ? 'Saving...' : 'Save Order & Content'}
                </button>
             </div>
          </div>
 
          {data.heroSlides.length === 0 ? (
             <div className="text-center p-8 bg-gray-50 text-gray-400 text-sm italic">
-               No slides added. Using default hardcoded banner.
+               No slides added.
             </div>
          ) : (
-            <div className="space-y-6">
-              {data.heroSlides.map((slide, i) => (
-                <div key={i} className="p-4 md:p-6 border border-gray-200 rounded-xl bg-gray-50/30 relative hover:shadow-md transition-all">
-                  <button onClick={() => removeSlide(i)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors p-2">
-                      <Trash2 className="w-5 h-5"/>
-                  </button>
-                  
-                  <span className="text-xs font-bold bg-gray-200 text-gray-600 px-2 py-1 rounded mb-4 inline-block">SLIDE {i + 1}</span>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="hero-slides-list">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-6">
+                    {data.heroSlides.map((slide, i) => (
+                      <Draggable key={String(slide.id)} draggableId={String(slide.id)} index={i}>
+                        {(provided, snapshot) => (
+                          <div 
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={`flex gap-4 p-4 md:p-6 border rounded-xl transition-all duration-200 ${
+                              snapshot.isDragging 
+                                ? 'bg-white shadow-2xl border-[#FD61A7] scale-[1.02] z-50' 
+                                : 'bg-gray-50/30 border-gray-200'
+                            }`}
+                          >
+                            {/* ANIMATED DRAG HANDLE */}
+                            <div 
+                              {...provided.dragHandleProps} 
+                              className={`flex items-center justify-center px-1 transition-colors ${
+                                snapshot.isDragging ? 'text-[#FD61A7]' : 'text-gray-400 hover:text-gray-600'
+                              } cursor-grab active:cursor-grabbing`}
+                            >
+                              <GripVertical className="w-6 h-6" />
+                            </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                       {/* --- REPLACED: File Upload for Hero Image --- */}
-                       <FileUpload 
-                          label="Slide Image"
-                          value={slide.image}
-                          onUpload={(url) => handleHeroChange(i, 'image', url)}
-                       />
-                       {/* PREVIEW */}
-                       {slide.image && (
-                         <div className="mt-2">
-                            <img src={getOptimizedImage(slide.image, 200)} alt="prev" className="w-full md:w-32 h-32 md:h-20 rounded object-cover border" />
-                         </div>
-                       )}
-                    </div>
-                    <div>
-                       <label className="text-xs font-bold text-gray-500 uppercase">Title</label>
-                       <input className="w-full border p-2 rounded mt-1 text-sm" placeholder="Main Headline" value={slide.title} onChange={e=>handleHeroChange(i,'title',e.target.value)} />
-                    </div>
-                    <div>
-                       <label className="text-xs font-bold text-gray-500 uppercase">Subtitle</label>
-                       <input className="w-full border p-2 rounded mt-1 text-sm" placeholder="Top small text" value={slide.subtitle} onChange={e=>handleHeroChange(i,'subtitle',e.target.value)} />
-                    </div>
-                    <div>
-                       <label className="text-xs font-bold text-gray-500 uppercase">Button Text</label>
-                       <input className="w-full border p-2 rounded mt-1 text-sm" placeholder="Shop Now" value={slide.cta} onChange={e=>handleHeroChange(i,'cta',e.target.value)} />
-                    </div>
-                    <div>
-                       <label className="text-xs font-bold text-gray-500 uppercase">Link URL</label>
-                       <input className="w-full border p-2 rounded mt-1 text-sm" placeholder="/shop" value={slide.link} onChange={e=>handleHeroChange(i,'link',e.target.value)} />
-                    </div>
+                            <div className="flex-1 relative">
+                              <button onClick={() => removeSlide(i)} className="absolute -top-2 -right-2 text-gray-300 hover:text-red-500 transition-colors p-2">
+                                  <Trash2 className="w-5 h-5"/>
+                              </button>
+                              
+                              <span className="text-[10px] font-bold bg-gray-200 text-gray-600 px-2 py-0.5 rounded mb-4 inline-block uppercase tracking-wider">
+                                Slide Position: {i + 1}
+                              </span>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="md:col-span-2">
+                                   <FileUpload 
+                                      label="Slide Image"
+                                      value={slide.image}
+                                      onUpload={(url) => handleHeroChange(i, 'image', url)}
+                                   />
+                                   {slide.image && (
+                                     <div className="mt-2">
+                                        <img src={getOptimizedImage(slide.image, 200)} alt="prev" className="w-32 h-20 rounded object-cover border shadow-inner" />
+                                     </div>
+                                   )}
+                                </div>
+                                <div>
+                                   <label className="text-xs font-bold text-gray-500 uppercase">Title</label>
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Main Headline" value={slide.title} onChange={e=>handleHeroChange(i,'title',e.target.value)} />
+                                </div>
+                                <div>
+                                   <label className="text-xs font-bold text-gray-500 uppercase">Subtitle</label>
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Top small text" value={slide.subtitle} onChange={e=>handleHeroChange(i,'subtitle',e.target.value)} />
+                                </div>
+                                <div>
+                                   <label className="text-xs font-bold text-gray-500 uppercase">Button Text</label>
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Shop Now" value={slide.cta} onChange={e=>handleHeroChange(i,'cta',e.target.value)} />
+                                </div>
+                                <div>
+                                   <label className="text-xs font-bold text-gray-500 uppercase">Link URL</label>
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="/shop" value={slide.link} onChange={e=>handleHeroChange(i,'link',e.target.value)} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </Droppable>
+            </DragDropContext>
          )}
       </div>
 
@@ -240,33 +286,28 @@ function HomeCMS({ userInfo }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div>
-                  {/* --- REPLACED: File Upload for Photo 1 --- */}
                   <FileUpload 
                     label="Photo 1 (Left)"
                     value={data.instagram.photo1}
                     onUpload={(url) => handleInstaChange('photo1', url)}
                   />
-                  {/* OPTIMIZED PREVIEW */}
                   {data.instagram.photo1 && (
-                    <img src={getOptimizedImage(data.instagram.photo1, 100)} alt="Preview" className="w-24 h-24 mt-2 rounded object-cover border" />
+                    <img src={getOptimizedImage(data.instagram.photo1, 100)} alt="Preview" className="w-24 h-24 mt-2 rounded object-cover border shadow-sm" />
                   )}
                </div>
 
                <div>
-                  {/* --- REPLACED: File Upload for Photo 2 --- */}
                   <FileUpload 
                     label="Photo 2 (Right)"
                     value={data.instagram.photo2}
                     onUpload={(url) => handleInstaChange('photo2', url)}
                   />
-                  {/* OPTIMIZED PREVIEW */}
                   {data.instagram.photo2 && (
-                    <img src={getOptimizedImage(data.instagram.photo2, 100)} alt="Preview" className="w-24 h-24 mt-2 rounded object-cover border" />
+                    <img src={getOptimizedImage(data.instagram.photo2, 100)} alt="Preview" className="w-24 h-24 mt-2 rounded object-cover border shadow-sm" />
                   )}
                </div>
 
                <div className="md:col-span-2">
-                  {/* --- REPLACED: File Upload for Reel (Video) --- */}
                   <FileUpload 
                     label="Reel Video (.mp4)"
                     value={data.instagram.reel}
@@ -280,6 +321,8 @@ function HomeCMS({ userInfo }) {
     </div>
   );
 }
+
+// ... BestSellersCMS, CollectionsCMS, RunwayCMS remain the same ...
 
 // ==========================================
 // 2. BEST SELLERS COMPONENT
