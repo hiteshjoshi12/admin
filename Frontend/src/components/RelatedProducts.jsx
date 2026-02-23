@@ -78,7 +78,7 @@ export default function RelatedProducts({ currentId }) {
 
             return (
               <div key={p._id} className="group relative">
-                <Link to={`/product/${p._id}`} className="block">
+                <Link to={`/product/${p.slug}`} className="block">
                   <div className="overflow-hidden rounded-xl mb-3 relative aspect-[3/4] bg-gray-100">
                     <img
                       src={optImg}
