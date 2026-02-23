@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Plus, Trash2, Check } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2, Check, AlertCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
 import { toast } from 'react-hot-toast';
 
-// IMPORT FILE UPLOAD & OPTIMIZER
 import FileUpload from '../admin/FileUpload';
 import { getOptimizedImage } from '../../util/imageUtils';
 
-// AVAILABLE CATEGORIES
 const CATEGORIES = ["Bridal", "Casual", "Party", "Festive", "Office","Everyday", "Limited Edition"];
 
 export default function ProductForm() {
@@ -18,14 +16,14 @@ export default function ProductForm() {
   const { userInfo } = useSelector((state) => state.auth);
   
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   
-  // --- FORM STATE ---
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     originalPrice: '',
-    categories: [], // Changed from 'category' (string) to 'categories' (array)
+    categories: [], 
     image: '', 
     images: [], 
     isNewArrival: false,
@@ -33,7 +31,6 @@ export default function ProductForm() {
     stock: [{ size: '', quantity: 0 }] 
   });
 
-  // --- FETCH DATA FOR EDIT MODE ---
   useEffect(() => {
     if (id) {
       const fetchProduct = async () => {
@@ -44,14 +41,9 @@ export default function ProductForm() {
             },
           });
           
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || "Failed to fetch");
-          }
-
+          if (!res.ok) throw new Error("Failed to fetch");
           const data = await res.json();
           
-          // Handle legacy data (if 'category' was a string, convert to array)
           let categoryArray = [];
           if (Array.isArray(data.category)) {
              categoryArray = data.category;
@@ -64,7 +56,7 @@ export default function ProductForm() {
             description: data.description,
             price: data.price,
             originalPrice: data.originalPrice || '',
-            categories: categoryArray, // Use the processed array
+            categories: categoryArray, 
             image: data.image,
             images: data.images || [],
             isNewArrival: data.isNewArrival || false,
@@ -80,22 +72,17 @@ export default function ProductForm() {
     }
   }, [id, userInfo.token]);
 
-  // --- HANDLERS ---
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
   };
 
-  // Toggle Category Selection
   const toggleCategory = (cat) => {
     setFormData(prev => {
         const exists = prev.categories.includes(cat);
-        let newCategories;
-        if (exists) {
-            newCategories = prev.categories.filter(c => c !== cat);
-        } else {
-            newCategories = [...prev.categories, cat];
-        }
+        const newCategories = exists 
+          ? prev.categories.filter(c => c !== cat) 
+          : [...prev.categories, cat];
         return { ...prev, categories: newCategories };
     });
   };
@@ -150,9 +137,10 @@ export default function ProductForm() {
       ...formData,
       price: Number(formData.price),
       originalPrice: Number(formData.originalPrice),
-      stock: formData.stock.map(s => ({ size: Number(s.size), quantity: Number(s.quantity) })),
+      // FIXED: Removed Number() wrap from s.size to allow text sizes
+      stock: formData.stock.map(s => ({ size: String(s.size), quantity: Number(s.quantity) })),
       totalStock, 
-      category: formData.categories, // Send as array (Backend must support this or send as main category string)
+      category: formData.categories, 
     };
 
     try {
@@ -172,7 +160,7 @@ export default function ProductForm() {
       });
 
       if (res.ok) {
-        toast.success(id ? "Product Updated" : "Product Created");
+        toast.success(id ? "Product Updated Successfully" : "Product Created Successfully");
         navigate('/admin/products'); 
       } else {
         const err = await res.json();
@@ -183,6 +171,33 @@ export default function ProductForm() {
       toast.error('Network Error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // --- DELETE ENTIRE PRODUCT HANDLER ---
+  const handleDeleteProduct = async () => {
+    if (!window.confirm("Warning: Are you sure you want to completely delete this product? This action cannot be undone.")) return;
+    
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/products/admin/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+
+      if (res.ok) {
+        toast.success("Product Deleted Permanently");
+        navigate('/admin/products');
+      } else {
+        const err = await res.json();
+        toast.error(err.message || "Failed to delete product");
+      }
+    } catch (error) {
+      toast.error("Network Error while deleting");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -331,7 +346,7 @@ export default function ProductForm() {
                    </div>
                    <div className="flex gap-3 items-center mt-6">
                      {url && <img src={getOptimizedImage(url, 100)} className="w-12 h-12 rounded object-cover" />}
-                     <button type="button" onClick={() => handleRemoveImage(index)} className="p-2 text-gray-400 hover:text-red-500">
+                     <button type="button" onClick={() => handleRemoveImage(index)} className="p-2 text-gray-400 hover:text-red-500" title="Remove image">
                        <Trash2 className="w-5 h-5" />
                      </button>
                    </div>
@@ -354,14 +369,14 @@ export default function ProductForm() {
                <div key={index} className="flex gap-4 items-end">
                   <div className="flex-1">
                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Size</label>
-                    <input type="text" value={item.size} onChange={(e) => handleStockChange(index, 'size', e.target.value)} className="w-full p-2 border rounded outline-none" />
+                    <input type="text" value={item.size} onChange={(e) => handleStockChange(index, 'size', e.target.value)} className="w-full p-2 border rounded outline-none" placeholder="e.g. XL, 38, Free Size" />
                   </div>
                   <div className="flex-1">
                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Qty</label>
                     <input type="number" value={item.quantity} onChange={(e) => handleStockChange(index, 'quantity', e.target.value)} className="w-full p-2 border rounded outline-none" />
                   </div>
-                  <button type="button" onClick={() => removeStockRow(index)} className="p-2.5 bg-gray-50 rounded-lg" disabled={formData.stock.length === 1}>
-                    <Trash2 className="w-4 h-4 text-gray-400" />
+                  <button type="button" onClick={() => removeStockRow(index)} className="p-2.5 bg-gray-50 rounded-lg hover:text-red-500 hover:bg-red-50 transition-colors" disabled={formData.stock.length === 1} title="Remove stock row">
+                    <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
                   </button>
                </div>
              ))}
@@ -383,10 +398,25 @@ export default function ProductForm() {
            </div>
         </div>
 
-        <div className="flex justify-end pt-4">
+        {/* SUBMIT & DELETE ACTIONS */}
+        <div className="flex flex-col sm:flex-row justify-between items-center pt-4 gap-4">
+           {/* Only show delete button if we are editing an existing product */}
+           {id ? (
+             <button 
+               type="button"
+               onClick={handleDeleteProduct}
+               disabled={deleteLoading || loading}
+               className="w-full sm:w-auto px-6 py-3 rounded-lg font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-all flex items-center justify-center gap-2"
+             >
+               {deleteLoading ? 'Deleting...' : <><AlertCircle className="w-5 h-5" /> Delete Product</>}
+             </button>
+           ) : (
+             <div /> 
+           )}
+           
            <button 
              type="submit"
-             disabled={loading}
+             disabled={loading || deleteLoading}
              className="w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-white bg-[#1C1917] hover:bg-[#FF2865] transition-all flex items-center justify-center gap-2 shadow-lg"
            >
              {loading ? 'Saving...' : <><Save className="w-5 h-5" /> {id ? 'Update Product' : 'Publish Product'}</>}

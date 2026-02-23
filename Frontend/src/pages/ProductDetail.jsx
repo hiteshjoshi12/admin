@@ -16,6 +16,7 @@ import {
   Heart,
   ChevronRight,
   Info,
+  Sparkles, // Importing Sparkles for a bit of flair in the description header
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -66,6 +67,9 @@ export default function ProductDetail() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [showMaxReached, setShowMaxReached] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
+  
+  // NEW STATE FOR DESCRIPTION ACCORDION
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
   // --- RECENTLY VIEWED LOGIC (SAFE) ---
   useEffect(() => {
@@ -325,6 +329,56 @@ export default function ProductDetail() {
                 <button onClick={handleBuyNow} className="flex-1 h-14 rounded-lg font-bold uppercase text-xs bg-[#1C1917] text-white flex items-center justify-center gap-2 hover:bg-[#FF2865]"><Zap className="w-4 h-4" /> Buy Now</button>
               </div>
             </div>
+
+            {/* ---- ENHANCED PRODUCT DESCRIPTION ACCORDION ---- */}
+            {currentProduct.description && (
+              <div className="border-t border-gray-100 pt-2">
+                <button 
+                  onClick={() => setIsDescriptionOpen(!isDescriptionOpen)} 
+                  className="w-full flex justify-between items-center py-4 group"
+                >
+                   <div className="flex items-center gap-2">
+                     <Sparkles className="w-4 h-4 text-[#FF2865]" /> {/* Added icon for flair */}
+                     <h3 className="text-xs font-bold uppercase tracking-widest text-[#1C1917] group-hover:text-[#FF2865] transition-colors">
+                       The Craft & Details
+                     </h3>
+                   </div>
+                   {/* Animated Icon Switcher */}
+                   <motion.div 
+                     initial={false} 
+                     animate={{ rotate: isDescriptionOpen ? 180 : 0 }}
+                     transition={{ duration: 0.3 }}
+                   >
+                     {isDescriptionOpen ? (
+                       <Minus className="w-4 h-4 text-gray-400 group-hover:text-[#FF2865]" />
+                     ) : (
+                       <Plus className="w-4 h-4 text-gray-400 group-hover:text-[#FF2865]" />
+                     )}
+                   </motion.div>
+                </button>
+                
+                <AnimatePresence initial={false}>
+                  {isDescriptionOpen && (
+                    <motion.div
+                      initial="collapsed"
+                      animate="open"
+                      exit="collapsed"
+                      variants={{
+                        open: { opacity: 1, height: "auto" },
+                        collapsed: { opacity: 0, height: 0 }
+                      }}
+                      transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }} // Smooth spring-like ease
+                    >
+                      <div className="pb-4 text-sm text-gray-600 leading-7 whitespace-pre-line">
+                        {currentProduct.description}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+            {/* ----------------------------------------------- */}
+
 
             {/* TRUST INFO */}
             <div className="space-y-4 pt-6 border-t border-gray-100">

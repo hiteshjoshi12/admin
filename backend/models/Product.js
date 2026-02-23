@@ -8,21 +8,18 @@ const productSchema = mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true, default: 0 },
   originalPrice: { type: Number, default: 0 },
-  
-  // 🚨 CHANGE 1: Array of Strings for Multi-Category Support
   category: { 
     type: [String], 
     required: true,
-    index: true // Adds an index for faster filtering by category
+    index: true 
   },
-  
   rating: { type: Number, required: true, default: 0 },
   numReviews: { type: Number, required: true, default: 0 },
   isNewArrival: { type: Boolean, default: false },
   isBestSeller: { type: Boolean, default: false },
   stock: [
     {
-      size: { type: Number, required: true },
+      size: { type: String, required: true }, // FIXED: Changed to String to allow "XL", "8.5", etc.
       quantity: { type: Number, required: true, default: 0 }
     }
   ],
@@ -31,17 +28,16 @@ const productSchema = mongoose.Schema({
   timestamps: true,
 });
 
-// ✅ Corrected Slug Generator
 productSchema.pre('save', function (next) {
-  // Only generate slug if name is provided and modified
   if (this.isModified('name')) {
     this.slug = this.name
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/[\s_]+/g, '-')  // Replace spaces with hyphens
-      .replace(/^-+|-+$/g, ''); // Trim extra hyphens
+      .replace(/[^\w\s-]/g, '') 
+      .replace(/[\s_]+/g, '-')  
+      .replace(/^-+|-+$/g, ''); 
   }
+  
 });
 
 const Product = mongoose.model('Product', productSchema);
