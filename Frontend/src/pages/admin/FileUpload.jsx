@@ -9,16 +9,16 @@ export default function FileUpload({
   value, 
   onUpload, 
   accept = "image/*", 
-  placeholder = "Upload Image" 
+  placeholder = "Upload Image",
+  folderName = "" // <--- 1. Add this new prop
 }) {
-  const [uploading, setUploading] = useState(false);
+ const [uploading, setUploading] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Optional: Frontend Size Validation (e.g. 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error("File is too large (Max 10MB)");
       return;
@@ -26,13 +26,18 @@ export default function FileUpload({
 
     const formData = new FormData();
     formData.append('file', file);
+    
+    // <--- 2. Append the folderName to the FormData if it exists
+    if (folderName) {
+      formData.append('folderName', folderName);
+    }
 
     setUploading(true);
     try {
       const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${userInfo.token}`, // Multer handles Content-Type automatically
+          Authorization: `Bearer ${userInfo.token}`,
         },
         body: formData,
       });
@@ -41,7 +46,6 @@ export default function FileUpload({
 
       if (!res.ok) throw new Error(data.message || "Upload failed");
 
-      // Pass the URL back to parent
       onUpload(data.url);
       toast.success("Upload successful!");
     } catch (error) {
@@ -49,7 +53,6 @@ export default function FileUpload({
       toast.error(error.message);
     } finally {
       setUploading(false);
-      // Reset input value to allow re-uploading same file if needed
       e.target.value = null;
     }
   };

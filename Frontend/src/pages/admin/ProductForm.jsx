@@ -346,6 +346,7 @@ export default function ProductForm() {
                   <FileUpload 
                     label="Main Display Image *"
                     value={formData.image}
+                    folderName={formData.name || "draft-product"}
                     onUpload={(url) => {
                         // 🔴 OPTIONAL: Delete the old main image if they replace it
                         // if (formData.image && formData.image !== url) {
@@ -379,6 +380,7 @@ export default function ProductForm() {
                      <FileUpload 
                        label={`Gallery Image #${index + 1}`}
                        value={url}
+                       folderName={formData.name || "draft-product"}
                        onUpload={(newUrl) => handleImageChange(index, newUrl)}
                      />
                    </div>

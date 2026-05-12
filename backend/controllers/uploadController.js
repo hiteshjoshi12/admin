@@ -17,12 +17,20 @@ const uploadFile = asyncHandler(async (req, res) => {
     throw new Error("No file uploaded");
   }
 
+  // 1. Get the dynamic folder name from the frontend request
+  // Sanitize it to remove spaces and special characters (e.g., "Red Jutti" -> "red-jutti")
+  let rawFolderName = req.body.folderName || "uncategorized";
+  const sanitizedFolder = rawFolderName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  
+  // 2. Construct the final path
+  const uploadPath = `/ecommerce_uploads/products/${sanitizedFolder}`;
+
   try {
     // Upload to ImageKit
     const result = await imagekit.upload({
       file: req.file.buffer, // Multer stores file in memory buffer
       fileName: req.file.originalname,
-      folder: "/ecommerce_uploads", // Optional: Organize your uploads
+      folder: uploadPath, // 3. Use the dynamic path here!
     });
 
     // Return the URL
