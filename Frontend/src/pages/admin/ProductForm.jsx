@@ -72,6 +72,24 @@ export default function ProductForm() {
     }
   }, [id, userInfo.token]);
 
+  // --- 🔴 NEW: CLOUD DELETE HELPER ---
+  const deleteImageFromCloud = async (url) => {
+    if (!url || !url.includes('imagekit.io')) return; // Safety check
+    
+    try {
+      await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+        body: JSON.stringify({ fileUrl: url })
+      });
+    } catch (error) {
+      console.error("Failed to delete from cloud", error);
+    }
+  };
+
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
@@ -109,7 +127,15 @@ export default function ProductForm() {
     setFormData({ ...formData, images: [...formData.images, ''] });
   };
 
+  // --- 🔴 UPDATED: Trigger Cloud Delete on Removal ---
   const handleRemoveImage = (index) => {
+    const urlToRemove = formData.images[index];
+    
+    // If there is an actual URL, delete it from ImageKit
+    if (urlToRemove) {
+        deleteImageFromCloud(urlToRemove);
+    }
+
     const newImages = formData.images.filter((_, i) => i !== index);
     setFormData({ ...formData, images: newImages });
   };
@@ -120,7 +146,6 @@ export default function ProductForm() {
     setFormData({ ...formData, images: newImages });
   };
 
-  // --- SUBMIT HANDLER ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -137,7 +162,6 @@ export default function ProductForm() {
       ...formData,
       price: Number(formData.price),
       originalPrice: Number(formData.originalPrice),
-      // FIXED: Removed Number() wrap from s.size to allow text sizes
       stock: formData.stock.map(s => ({ size: String(s.size), quantity: Number(s.quantity) })),
       totalStock, 
       category: formData.categories, 
@@ -174,9 +198,9 @@ export default function ProductForm() {
     }
   };
 
-  // --- DELETE ENTIRE PRODUCT HANDLER ---
+  // --- 🔴 UPDATED: Delete all images when deleting the product ---
   const handleDeleteProduct = async () => {
-    if (!window.confirm("Warning: Are you sure you want to completely delete this product? This action cannot be undone.")) return;
+    if (!window.confirm("Warning: Are you sure you want to completely delete this product? This will also delete its images from cloud storage.")) return;
     
     setDeleteLoading(true);
     try {
@@ -188,7 +212,15 @@ export default function ProductForm() {
       });
 
       if (res.ok) {
-        toast.success("Product Deleted Permanently");
+        // 1. Delete Main Image
+        if (formData.image) deleteImageFromCloud(formData.image);
+        
+        // 2. Delete all Gallery Images
+        formData.images.forEach(imgUrl => {
+            if (imgUrl) deleteImageFromCloud(imgUrl);
+        });
+
+        toast.success("Product and Images Deleted Permanently");
         navigate('/admin/products');
       } else {
         const err = await res.json();
@@ -314,7 +346,13 @@ export default function ProductForm() {
                   <FileUpload 
                     label="Main Display Image *"
                     value={formData.image}
-                    onUpload={(url) => setFormData({ ...formData, image: url })}
+                    onUpload={(url) => {
+                        // 🔴 OPTIONAL: Delete the old main image if they replace it
+                        // if (formData.image && formData.image !== url) {
+                        //     deleteImageFromCloud(formData.image);
+                        // }
+                        setFormData({ ...formData, image: url })
+                    }}
                   />
                 </div>
                 <div className="w-full md:w-32 h-40 md:h-32 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
@@ -400,7 +438,6 @@ export default function ProductForm() {
 
         {/* SUBMIT & DELETE ACTIONS */}
         <div className="flex flex-col sm:flex-row justify-between items-center pt-4 gap-4">
-           {/* Only show delete button if we are editing an existing product */}
            {id ? (
              <button 
                type="button"
