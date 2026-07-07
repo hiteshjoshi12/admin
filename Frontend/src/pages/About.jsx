@@ -58,14 +58,14 @@ export default function About() {
           <div className="relative h-[500px] md:h-[600px] hidden md:block animate-fade-up delay-300">
              <div className="absolute top-0 right-0 w-3/4 h-3/4 overflow-hidden rounded-t-[10rem] border border-white shadow-xl">
                <img 
-                 src="https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075245/IMG_9775_mebgcp.jpg" 
+                 src="https://ik.imagekit.io/beandandbloom/Media/IMG_9775_mebgcp.jpg" 
                  alt="Artisan embroidery" 
                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
                />
              </div>
              <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-white p-3 shadow-2xl rotate-[-3deg] z-10 rounded-lg">
                 <img 
-                  src="https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071597/IMG_0279_l2cibn.jpg" 
+                  src="https://ik.imagekit.io/beandandbloom/Media/IMG_0279_l2cibn.webp" 
                   alt="Hands working" 
                   className="w-full h-full object-cover rounded-sm"
                 />

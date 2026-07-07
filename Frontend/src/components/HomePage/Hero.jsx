@@ -7,7 +7,7 @@ import { getOptimizedImage } from '../../util/imageUtils';
 // 1. UPDATED FALLBACK - Set text to null if you want it hidden by default
 const fallbackSlide = {
   id: 'fallback-1',
-  image: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069487/banner1_viwl2e.png",
+  image: "banner1.jpg", // Ensure this image is in your public folder or adjust the path accordingly
   subtitle: "", // Empty strings won't render with the logic below
   titleLine1: "",
   titleLine2: "",

@@ -152,7 +152,7 @@ export default function Signup() {
       {/* --- RIGHT: IMAGE SECTION --- */}
       <div className="hidden lg:block w-1/2 relative bg-[#F9F8F6]">
         <img 
-          src="https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_600/v1769071597/IMG_0279_l2cibn.jpg" 
+          src="https://ik.imagekit.io/beandandbloom/Media/IMG_0279_l2cibn.webp" 
           alt="Fashion Details" 
           className="absolute inset-0 w-full h-full object-cover"
         />

@@ -8,9 +8,9 @@ import { getOptimizedVideo } from '../../util/videoUtils';
 
 // DEFAULT FALLBACK CONTENT
 const defaultContent = {
-  photo1: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img1_cwdqem.jpg", 
-  photo2: "https://res.cloudinary.com/dtnyrvshf/image/upload/v1769069569/img2_rssgsc.jpg", 
-  reel: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769071460/reel_sqyodd.mp4",
+  photo1: "https://ik.imagekit.io/beandandbloom/Media/img1_cwdqem.jpg", 
+  photo2: "https://ik.imagekit.io/beandandbloom/Media/img2_rssgsc.jpg", 
+  reel: "https://ik.imagekit.io/beandandbloom/Media/reel_sqyodd.mp4",
   handle: "@beadsnbloom.india",
   link: "https://www.instagram.com/beadsnbloom.india"
 };

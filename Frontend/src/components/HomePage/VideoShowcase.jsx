@@ -17,21 +17,21 @@ import { VideoScrollSkeleton } from '../loaders/SectionLoader';
 const fallbackVideos = [
   {
     _id: 1,
-    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069368/j5_ketdz3.mp4", 
+    videoUrl: "https://ik.imagekit.io/beandandbloom/Media/j5_ketdz3.mp4", 
     title: "Handcrafted Bridal Juttis", 
     ctaText: "Shop Bridal Edit",
     link: "/shop?category=Bridal"
   },
   {
     _id: 2,
-    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069341/j8_fjkfoe.mp4", 
+    videoUrl: "https://ik.imagekit.io/beandandbloom/Media/j8_fjkfoe.mp4", 
     title: "Daily Wear Punjabi Juttis", 
     ctaText: "View Collection",
     link: "/shop?category=Everyday"
   },
   {
     _id: 3,
-    videoUrl: "https://res.cloudinary.com/dtnyrvshf/video/upload/v1769069290/j2_hkesie.mp4", 
+    videoUrl: "https://ik.imagekit.io/beandandbloom/Media/j2_hkesie.mp4", 
     title: "Festive Embroidered Juttis", 
     ctaText: "Shop Festive",
     link: "/shop?category=Festive"

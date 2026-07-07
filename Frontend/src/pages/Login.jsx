@@ -73,7 +73,7 @@ export default function Login() {
       {/* --- LEFT: IMAGE SECTION --- */}
       <div className="hidden lg:block w-1/2 relative bg-[#F9F8F6]">
         <img
-          src="https://res.cloudinary.com/dtnyrvshf/image/upload/f_auto,q_auto,w_500/v1769075057/IMG_1050_bt6gdf.jpg"
+          src="https://ik.imagekit.io/beandandbloom/Media/IMG_9775_mebgcp.jpg"
           alt="Luxury Footwear"
           className="absolute inset-0 w-full h-full object-cover"
         />
