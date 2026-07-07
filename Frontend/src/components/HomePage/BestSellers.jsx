@@ -6,6 +6,7 @@ import { API_BASE_URL } from '../../util/config.js';
 import { getOptimizedImage } from '../../util/imageUtils';
 import { Skeleton } from '../ui/Skeleton.jsx';
 
+
 export default function BestSellers() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);

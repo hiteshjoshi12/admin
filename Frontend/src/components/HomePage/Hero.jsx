@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { API_BASE_URL } from '../../util/config';
 import { getOptimizedImage } from '../../util/imageUtils';
+import { ImageWithShimmer } from '../../util/ShimmerMedia';
 
 // 1. UPDATED FALLBACK - Set text to null if you want it hidden by default
 const fallbackSlide = {
@@ -81,7 +82,7 @@ export default function Hero() {
           <div className={`w-full h-full transition-transform duration-[8000ms] ease-linear ${
             index === current ? 'scale-110' : 'scale-100'
           }`}>
-             <img 
+             <ImageWithShimmer 
                 src={getOptimizedImage(slide.image, 1600)} 
                 alt={`${slide.titleLine1 || 'Hero'} ${slide.titleLine2 || 'Image'}`} 
                 className="w-full h-full object-cover"

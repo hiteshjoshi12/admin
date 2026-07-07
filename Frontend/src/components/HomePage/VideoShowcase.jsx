@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 
 // LOADER IMPORTS
 import { VideoScrollSkeleton } from '../loaders/SectionLoader';
+import { ImageWithShimmer, VideoWithShimmer } from "../../util/ShimmerMedia";
 
 // --- SEO OPTIMIZED FALLBACK DATA (JUTTI ONLY) ---
 const fallbackVideos = [
@@ -79,7 +80,7 @@ export default function VideoShowcase() {
       <Link to={video.link || '/shop'}>
         <Card className="relative w-[280px] md:w-[320px] aspect-[9/16] overflow-hidden border-0 rounded-2xl bg-black/5 group cursor-pointer snap-center">
           <CardContent className="p-0 h-full">
-            <video
+            <VideoWithShimmer
               ref={videoRef}
               src={getOptimizedVideo(video.videoUrl, 720)}
               className="w-full h-full object-cover pointer-events-none"
