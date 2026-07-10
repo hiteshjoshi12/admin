@@ -627,7 +627,7 @@ function RunwayCMS({ userInfo }) {
             <div key={v._id} className="relative group rounded-xl overflow-hidden aspect-[9/16] bg-black">
                {/* OPTIMIZED VIDEO PREVIEW */}
                <video 
-                 src={getOptimizedVideo(v.videoUrl, 400)} 
+                 src={getOptimizedVideo(v.videoUrl)} 
                  className="w-full h-full object-cover opacity-80" 
                  muted 
                  loop 

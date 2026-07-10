@@ -4,7 +4,6 @@ import { InstagramSkeleton } from "../loaders/SectionLoader";
 import { API_BASE_URL } from "../../util/config";
 // 1. IMPORT OPTIMIZERS
 import { getOptimizedImage } from "../../util/imageUtils";
-import { getOptimizedVideo } from "../../util/videoUtils";
 import { ImageWithShimmer, VideoWithShimmer } from "../../util/ShimmerMedia";
 
 // DEFAULT FALLBACK CONTENT
@@ -132,7 +131,7 @@ export default function InstagramFeed() {
               {/* 4. OPTIMIZE VIDEO (Width 500 for quality vertical video) */}
               <VideoWithShimmer
                 ref={videoRef}
-                src={getOptimizedVideo(feedData.reel, 500)}
+                src="instareel.webm"
                 className="w-full h-full"
                 autoPlay
                 muted

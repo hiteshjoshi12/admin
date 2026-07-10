@@ -1,19 +1,22 @@
 /**
  * Optimizes ImageKit Video URLs
  * @param {string} url - The original video URL
- * @param {number} width - Target width (default 720p for balance)
+ * @param {number} width - Target width (default 400 for 320px UI containers)
  * @returns {string} - The optimized video URL
  */
-export const getOptimizedVideo = (url, width = 720) => {
-  if (!url || typeof url !== 'string') return url || '';
+export const getOptimizedVideo = (url, width = 400) => {
+  if (!url || typeof url !== 'string') return '';
 
   // --- IMAGEKIT.IO OPTIMIZATION ---
   if (url.includes('ik.imagekit.io')) {
-    // ImageKit strictly requires an integer for quality (e.g., q-80).
-    // Passing 'q-auto' will trigger a 400 Bad Request.
-    
+    // Safety check: If the URL already contains a transformation, return it as-is 
+    // to avoid stacking parameters like ?tr=w-400&tr=w-720 which consumes extra VPUs.
+    if (url.includes('tr=')) return url; 
+
     const separator = url.includes('?') ? '&' : '?';
-    const transformation = `tr=w-${width},q-80,f-auto`;
+    
+    // Width matched to UI container + quality & format optimizations
+    const transformation = `tr=w-${width},q-60,f-auto`;
 
     return `${url}${separator}${transformation}`;
   }
