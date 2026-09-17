@@ -1,0 +1,1999 @@
+[{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd88376"
+  },
+  "name": "Silken Dabka Elegance",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Silken%20Dabka%20Elegance_04.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Silken%20Dabka%20Elegance_03.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Silken%20Dabka%20Elegance_02.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Silken%20Dabka%20Elegance_01.jpg"
+  ],
+  "description": "Handcrafted with pure silk and intricate dabka work, perfect for bridal wear.",
+  "price": 2699,
+  "originalPrice": 2699,
+  "category": [
+    "Casual",
+    "Office"
+  ],
+  "rating": 5,
+  "numReviews": 1,
+  "isNewArrival": true,
+  "isBestSeller": true,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69bef7cf7a89ab93f8a78346"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69bef7cf7a89ab93f8a78347"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69bef7cf7a89ab93f8a78348"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 3,
+      "_id": {
+        "$oid": "69bef7cf7a89ab93f8a78349"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 4,
+      "_id": {
+        "$oid": "69bef7cf7a89ab93f8a7834a"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69bef7cf7a89ab93f8a7834b"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 4,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.880Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-22T11:08:02.656Z"
+  },
+  "slug": "silken-dabka-elegance"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd8837d"
+  },
+  "name": "Blush Mirage",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Blush%20Mirage_05.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Blush%20Mirage_05.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Blush%20Mirage_16.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Blush%20Mirage_10.jpg"
+  ],
+  "description": "Premium velvet base with traditional Gota Patti work in gold.",
+  "price": 3499,
+  "originalPrice": 3499,
+  "category": "Festive",
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": false,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6985f547647174684dc48578"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f547647174684dc48579"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f547647174684dc4857a"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 3,
+      "_id": {
+        "$oid": "6985f547647174684dc4857b"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 4,
+      "_id": {
+        "$oid": "6985f547647174684dc4857c"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f547647174684dc4857d"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 2,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.884Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-06T14:05:59.511Z"
+  },
+  "slug": "blush-mirage"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd88384"
+  },
+  "name": "Noor-e-Hunar",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Hunar_28.jpg?updatedAt=1769400477472",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Hunar_29.jpg?updatedAt=1769400480019",
+    "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Hunar_25.jpg?updatedAt=1769400476387",
+    "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Hunar_20.jpg?updatedAt=1769400499935"
+  ],
+  "description": "Soft pastel hues embellished with elegant pearls and beads.",
+  "price": 2999,
+  "originalPrice": 2999,
+  "category": "Casual",
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6985f564647174684dc4858b"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f564647174684dc4858c"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f564647174684dc4858d"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 3,
+      "_id": {
+        "$oid": "6985f564647174684dc4858e"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 4,
+      "_id": {
+        "$oid": "6985f564647174684dc4858f"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f564647174684dc48590"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 2,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.884Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-06T14:06:28.579Z"
+  },
+  "slug": "noor-e-hunar"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd8838b"
+  },
+  "name": "Cobalt Sheesh",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Cobalt%20Sheesh_03.jpg?updatedAt=1769400488366",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Cobalt%20Sheesh_16.jpg?updatedAt=1769400480274",
+    "https://ik.imagekit.io/hiteshh12/Products/Cobalt%20Sheesh_10.jpg?updatedAt=1769400485957",
+    "https://ik.imagekit.io/hiteshh12/Products/Cobalt%20Sheesh_15.jpg?updatedAt=1769400478349"
+  ],
+  "description": "Heavy Zardosi embroidery on a golden base, ideal for weddings.",
+  "price": 3999,
+  "originalPrice": 3999,
+  "category": "Festive",
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": false,
+  "isBestSeller": true,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6985f460647174684dc484de"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f460647174684dc484df"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f460647174684dc484e0"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 3,
+      "_id": {
+        "$oid": "6985f460647174684dc484e1"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 4,
+      "_id": {
+        "$oid": "6985f460647174684dc484e2"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f460647174684dc484e3"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 4,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-06T14:02:08.564Z"
+  },
+  "slug": "cobalt-sheesh"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd88392"
+  },
+  "name": "Noorani Dabka",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Noorani%20Dabka_03.jpg?updatedAt=1769400482631",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Noorani%20Dabka_16.jpg?updatedAt=1769400484308",
+    "https://ik.imagekit.io/hiteshh12/Products/Noorani%20Dabka_12.jpg?updatedAt=1769400478923",
+    "https://ik.imagekit.io/hiteshh12/Products/Noorani%20Dabka_08.jpg?updatedAt=1769400490217"
+  ],
+  "description": "Shimmering sequins on a rose gold fabric, perfect for evening parties.",
+  "price": 1999,
+  "originalPrice": 1999,
+  "category": [
+    "Party",
+    "Bridal"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "698c7ddbb1878cd786fa6f18"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "698c7ddbb1878cd786fa6f19"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 2,
+      "_id": {
+        "$oid": "698c7ddbb1878cd786fa6f1a"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 2,
+      "_id": {
+        "$oid": "698c7ddbb1878cd786fa6f1b"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 5,
+      "_id": {
+        "$oid": "698c7ddbb1878cd786fa6f1c"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "698c7ddbb1878cd786fa6f1d"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 4,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-11T13:02:19.011Z"
+  },
+  "slug": "noorani-dabka"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd88399"
+  },
+  "name": "Ruby Heritage",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Ruby%20Heritage_12.jpg?updatedAt=1769400487026",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Ruby%20Heritage_13.jpg?updatedAt=1769400512348",
+    "https://ik.imagekit.io/hiteshh12/Products/Ruby%20Heritage_05.jpg?updatedAt=1769400495480",
+    "https://ik.imagekit.io/hiteshh12/Products/Ruby%20Heritage_01.jpg?updatedAt=1769400452413"
+  ],
+  "description": "Deep emerald green jutti with contrasting thread embroidery.",
+  "price": 3999,
+  "originalPrice": 3999,
+  "category": [
+    "Bridal"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": false,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "698a0060b1878cd786fa6d8d"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "698a0060b1878cd786fa6d8e"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 4,
+      "_id": {
+        "$oid": "698a0060b1878cd786fa6d8f"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 4,
+      "_id": {
+        "$oid": "698a0060b1878cd786fa6d90"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 5,
+      "_id": {
+        "$oid": "698a0060b1878cd786fa6d91"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "698a0060b1878cd786fa6d92"
+      }
+    }
+  ],
+  "totalStock": 18,
+  "__v": 3,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-09T15:42:24.474Z"
+  },
+  "slug": "ruby-heritage"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd883a0"
+  },
+  "name": "Noor-e-Aaina",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Aaina_10.jpg?updatedAt=1769400493945",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Aaina_11.jpg?updatedAt=1769400490284",
+    "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Aaina_19.jpg?updatedAt=1769400473320",
+    "https://ik.imagekit.io/hiteshh12/Products/Noor-e-Aaina_16.jpg?updatedAt=1769400485905"
+  ],
+  "description": "Traditional mirror work (Sheesha) on a vibrant fabric base.",
+  "price": 3599,
+  "originalPrice": 3599,
+  "category": [
+    "Party"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a36a86a088641958b9b2df9"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a36a86a088641958b9b2dfa"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a36a86a088641958b9b2dfb"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 3,
+      "_id": {
+        "$oid": "6a36a86a088641958b9b2dfc"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a36a86a088641958b9b2dfd"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a36a86a088641958b9b2dfe"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 5,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-20T14:49:14.465Z"
+  },
+  "slug": "noor-e-aaina"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd883a7"
+  },
+  "name": "Neel Pari",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Neel%20Pari_09.jpg?updatedAt=1769400463780",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Neel%20Pari_04.jpg?updatedAt=1769400476500",
+    "https://ik.imagekit.io/hiteshh12/Products/Neel%20Pari_02.jpg?updatedAt=1769400479305",
+    "https://ik.imagekit.io/hiteshh12/Products/Neel%20Pari_05.jpg?updatedAt=1769400467185"
+  ],
+  "description": "Elegant and simple beige jutti for everyday comfort.",
+  "price": 3799,
+  "originalPrice": 3799,
+  "category": [
+    "Festive",
+    "Party"
+  ],
+  "rating": 5,
+  "numReviews": 1,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69a46c4b012110d5491128e3"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69a46c4b012110d5491128e4"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69a46c4b012110d5491128e5"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": -1,
+      "_id": {
+        "$oid": "69a46c4b012110d5491128e6"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 4,
+      "_id": {
+        "$oid": "69a46c4b012110d5491128e7"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69a46c4b012110d5491128e8"
+      }
+    }
+  ],
+  "totalStock": 10,
+  "__v": 4,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-08T06:36:59.851Z"
+  },
+  "slug": "neel-pari"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd883ae"
+  },
+  "name": "Rose Aurum",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Rose%20Aurum_10.jpg?updatedAt=1769400465565",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Rose%20Aurum_01.jpg?updatedAt=1769400482678",
+    "https://ik.imagekit.io/hiteshh12/Products/Rose%20Aurum_08.jpg?updatedAt=1769400469670",
+    "https://ik.imagekit.io/hiteshh12/Products/Rose%20Aurum_05.jpg?updatedAt=1769400466096"
+  ],
+  "description": "Classic red bridal jutti with heavy stone and bead work.",
+  "price": 4099,
+  "originalPrice": 4099,
+  "category": [
+    "Bridal"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": true,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a36aa75088641958b9b2e6a"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a36aa75088641958b9b2e6b"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a36aa75088641958b9b2e6c"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 3,
+      "_id": {
+        "$oid": "6a36aa75088641958b9b2e6d"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 3,
+      "_id": {
+        "$oid": "6a36aa75088641958b9b2e6e"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a36aa75088641958b9b2e6f"
+      }
+    }
+  ],
+  "totalStock": 13,
+  "__v": 3,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-20T14:57:57.467Z"
+  },
+  "slug": "rose-aurum"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd883b5"
+  },
+  "name": "Peela Sitara",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Peela%20Sitara_03.jpg?updatedAt=1769400503758",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Peela%20Sitara_01.jpg?updatedAt=1769400503758",
+    "https://ik.imagekit.io/hiteshh12/Products/Peela%20Sitara_02.jpg?updatedAt=1769400503758",
+    "https://ik.imagekit.io/hiteshh12/Products/Peela%20Sitara_06.jpg?updatedAt=1769400503758"
+  ],
+  "description": "Contemporary silver finish with subtle sparkle elements.",
+  "price": 3799,
+  "originalPrice": 3799,
+  "category": "Festive",
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": false,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6985f510647174684dc48552"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f510647174684dc48553"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f510647174684dc48554"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 3,
+      "_id": {
+        "$oid": "6985f510647174684dc48555"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 4,
+      "_id": {
+        "$oid": "6985f510647174684dc48556"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f510647174684dc48557"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 2,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-06T14:05:04.726Z"
+  },
+  "slug": "peela-sitara"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd883bc"
+  },
+  "name": "Peacock Blush",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Peacock%20Blush_11.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Peacock%20Blush_10.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Peacock%20Blush_07.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Peacock%20Blush_12.jpg"
+  ],
+  "description": "Vibrant multi-colored floral embroidery inspired by Phulkari art.",
+  "price": 2799,
+  "originalPrice": 2799,
+  "category": "Party",
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6985f533647174684dc48565"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f533647174684dc48566"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f533647174684dc48567"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 3,
+      "_id": {
+        "$oid": "6985f533647174684dc48568"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 4,
+      "_id": {
+        "$oid": "6985f533647174684dc48569"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f533647174684dc4856a"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 2,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.885Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-06T14:05:39.213Z"
+  },
+  "slug": "peacock-blush"
+},
+{
+  "_id": {
+    "$oid": "69748bcf84b6ce8e0dd883c3"
+  },
+  "name": "Neel Noor",
+  "image": "https://ik.imagekit.io/hiteshh12/Products/Neel%20Noor_01.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/Products/Neel%20Noor_03.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Neel%20Noor_04.jpg",
+    "https://ik.imagekit.io/hiteshh12/Products/Neel%20Noor_01.jpg"
+  ],
+  "description": "Antique bronze tone with muted gold detailing for a vintage look.",
+  "price": 3499,
+  "originalPrice": 3498,
+  "category": "Festive",
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": false,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 36,
+      "quantity": 1,
+      "_id": {
+        "$oid": "6985f454647174684dc484cb"
+      }
+    },
+    {
+      "size": 37,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f454647174684dc484cc"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f454647174684dc484cd"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 3,
+      "_id": {
+        "$oid": "6985f454647174684dc484ce"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 4,
+      "_id": {
+        "$oid": "6985f454647174684dc484cf"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 2,
+      "_id": {
+        "$oid": "6985f454647174684dc484d0"
+      }
+    }
+  ],
+  "totalStock": 14,
+  "__v": 2,
+  "createdAt": {
+    "$date": "2026-01-24T09:07:27.886Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-06T14:01:57.003Z"
+  },
+  "slug": "neel-noor"
+},
+{
+  "_id": {
+    "$oid": "699b21828b14b5c11b70b995"
+  },
+  "name": "Shehenshah Heirloom ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1762_C2gioFejM.HEIC",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1777_2qP-ZjMPk.HEIC",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1783_9Zi9CjGq5.HEIC",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1764_3xGvTE2YR.HEIC"
+  ],
+  "description": "Pure georgette material used with hand work of intricate metallic threadwork for a timeless royal finish. 100% genuine leather used. ",
+  "price": 4000,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Limited Edition"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": 37,
+      "quantity": 1,
+      "_id": {
+        "$oid": "699b21d38b14b5c11b70b9d2"
+      }
+    },
+    {
+      "size": 38,
+      "quantity": 1,
+      "_id": {
+        "$oid": "699b21d38b14b5c11b70b9d3"
+      }
+    },
+    {
+      "size": 39,
+      "quantity": 1,
+      "_id": {
+        "$oid": "699b21d38b14b5c11b70b9d4"
+      }
+    },
+    {
+      "size": 40,
+      "quantity": 1,
+      "_id": {
+        "$oid": "699b21d38b14b5c11b70b9d5"
+      }
+    },
+    {
+      "size": 41,
+      "quantity": 1,
+      "_id": {
+        "$oid": "699b21d38b14b5c11b70b9d6"
+      }
+    }
+  ],
+  "totalStock": 5,
+  "createdAt": {
+    "$date": "2026-02-22T15:32:18.091Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-22T15:33:39.128Z"
+  },
+  "slug": "shehenshah-heirloom",
+  "__v": 2
+},
+{
+  "_id": {
+    "$oid": "699c60ba8b14b5c11b70bb3f"
+  },
+  "name": "Noor-e-Zareen",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1947_xqkL-n36I.JPG",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1944_7SeA-SMvj.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1939_B37oRMYBL.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1942_66780hPnu.JPG"
+  ],
+  "description": "Opulent zardozi artistry on pure georgette, radiating regal bridal grandeur. 100% genuine leather.",
+  "price": 3500,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Festive",
+    "Limited Edition"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "38",
+      "quantity": 1,
+      "_id": {
+        "$oid": "699c8686c56e998145f04435"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 1,
+      "_id": {
+        "$oid": "699c8686c56e998145f04436"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 1,
+      "_id": {
+        "$oid": "699c8686c56e998145f04437"
+      }
+    }
+  ],
+  "totalStock": 3,
+  "createdAt": {
+    "$date": "2026-02-23T14:14:18.500Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-23T16:55:34.560Z"
+  },
+  "slug": "noor-e-zareen",
+  "__v": 19
+},
+{
+  "_id": {
+    "$oid": "69a9215b7a89ab93f8a777a4"
+  },
+  "name": "Meher Sitara",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1722_BFlxJ0zx2.jpeg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1983_Z8FsgMD4R.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1984_H9pEPq9wS.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1988_xmQc_Sp-W.JPG"
+  ],
+  "description": "A gentle sparkle wrapped in refined zardozi and sitara accents. 100% genuine leather.",
+  "price": 2000,
+  "originalPrice": 0,
+  "category": [
+    "Limited Edition",
+    "Everyday",
+    "Office"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "38",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69a9215b7a89ab93f8a777a5"
+      }
+    }
+  ],
+  "totalStock": 2,
+  "createdAt": {
+    "$date": "2026-03-05T06:23:23.054Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-05T06:23:23.054Z"
+  },
+  "slug": "meher-sitara",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69ba79a17a89ab93f8a781b0"
+  },
+  "name": "Sitara Lattice ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1690_2_b8hh8qko7.jpeg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1694_2_JuT_fHaH0.jpeg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1698_2_2o-wamxzJ.jpeg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1680_2_P6rJoUx-8.jpeg"
+  ],
+  "description": "Delicate bead floral and shimmering zari in a perfectly structured grid- subtle,elegant and endlessly versatile. 100% genuine leather.",
+  "price": 2995,
+  "originalPrice": 0,
+  "category": [
+    "Everyday",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "40",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69ba79a17a89ab93f8a781b1"
+      }
+    }
+  ],
+  "totalStock": 1,
+  "createdAt": {
+    "$date": "2026-03-18T10:08:33.062Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-18T10:08:33.062Z"
+  },
+  "slug": "sitara-lattice",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69ba7b987a89ab93f8a781ba"
+  },
+  "name": "Tajvira Royale ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1822_cMxk4rPfx.jpeg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1825_3Hi8nstXN.jpeg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1833_MrR8PqsJl.jpeg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1837_BrlilJRMQP.jpeg"
+  ],
+  "description": "Rich bead,sequins,dabka and zari in a Mughal scalloped design. 100% genuine leather.",
+  "price": 2800,
+  "originalPrice": 0,
+  "category": [
+    "Festive",
+    "Party"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "40",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69ba7b987a89ab93f8a781bb"
+      }
+    }
+  ],
+  "totalStock": 1,
+  "createdAt": {
+    "$date": "2026-03-18T10:16:56.302Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-18T10:16:56.302Z"
+  },
+  "slug": "tajvira-royale",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69ca889e7a89ab93f8a789cf"
+  },
+  "name": "Firoza Bahar",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1715_2_J-RwI1TKg.jpeg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1972_hu9yzMJ9o.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1974_V3eOM1npZ.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1715_QkJACFz68.jpeg"
+  ],
+  "description": "Pure crepe in dusty pink. the gold embroidery uses zari threads. Small gold sequins are stitched within the floral design. Sea green sequins used inside the flower.",
+  "price": 1600,
+  "originalPrice": 0,
+  "category": [
+    "Limited Edition",
+    "Casual"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "38",
+      "quantity": 4,
+      "_id": {
+        "$oid": "69ca889e7a89ab93f8a789d0"
+      }
+    }
+  ],
+  "totalStock": 4,
+  "createdAt": {
+    "$date": "2026-03-30T14:28:46.733Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-30T14:28:46.733Z"
+  },
+  "slug": "firoza-bahar",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69ca8a6d7a89ab93f8a789d9"
+  },
+  "name": "Zar-e-Bahaar",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1867_zDyUavPbR.jpeg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1857_buEeqZA1X.HEIC",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1872_Xpys4aSF8.jpeg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1863_HM4X3dQMN.jpeg"
+  ],
+  "description": "Pure crepe in dusty pink. Zari threads ,forming leafy vines. Gold sequins and little pearls added.",
+  "price": 2000,
+  "originalPrice": 0,
+  "category": [
+    "Party",
+    "Festive",
+    "Limited Edition"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "39",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69ca8a6d7a89ab93f8a789da"
+      }
+    }
+  ],
+  "totalStock": 1,
+  "createdAt": {
+    "$date": "2026-03-30T14:36:29.786Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-30T14:36:29.786Z"
+  },
+  "slug": "zar-e-bahaar",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69ca8e3d7a89ab93f8a789e3"
+  },
+  "name": "Gul Mehar Dastkaar ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1816_jr3Quh3Wf.jpeg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1799_g37wHgGGD.HEIC",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1804_FYz1v6NG37.HEIC",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1810_ULRtAJO9s.jpeg"
+  ],
+  "description": "Pure crepe material. Zari, resham thread , sequins with some gold detailing.",
+  "price": 1500,
+  "originalPrice": 0,
+  "category": [
+    "Limited Edition",
+    "Casual",
+    "Everyday"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": false,
+  "isBestSeller": true,
+  "stock": [
+    {
+      "size": "39",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69ca8e3d7a89ab93f8a789e4"
+      }
+    }
+  ],
+  "totalStock": 1,
+  "createdAt": {
+    "$date": "2026-03-30T14:52:45.979Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-30T14:52:45.979Z"
+  },
+  "slug": "gul-mehar-dastkaar",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69d519997a89ab93f8a78ccc"
+  },
+  "name": "Gul Kairi Zari ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1737_-ldWw86Wn.jpeg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1742_umeVUP977.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/IMG_1745_GCRHF7mw9.jpeg",
+    ""
+  ],
+  "description": "Zari work includes paisleys (kairi motifs) and floral vines. Filled with dense thread work outlined with beads. ",
+  "price": 1796,
+  "originalPrice": 0,
+  "category": [
+    "Casual",
+    "Party",
+    "Festive",
+    "Limited Edition"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": false,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "37",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69d519997a89ab93f8a78ccd"
+      }
+    }
+  ],
+  "totalStock": 1,
+  "createdAt": {
+    "$date": "2026-04-07T14:50:01.710Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-07T14:50:01.710Z"
+  },
+  "slug": "gul-kairi-zari",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69f0b69fab4bd230f5fe87f2"
+  },
+  "name": "Sheesh Noir",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/DSC08514_10MB_v2_u4C-3uEIB2.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/DSC08520_10MB_B0bd9QL3SV.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/DSC08539_10MB_ooDrDAtUn.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/DSC08514_10MB_v2_u4C-3uEIB2_mgZXTdHTG4.jpg"
+  ],
+  "description": "A bold black canvas , adorned with mirror work in a geometric grid. 100% genuine leather. ",
+  "price": 3500,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Festive",
+    "Party"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69f0d07cab4bd230f5fe8c6e"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "69f0d07cab4bd230f5fe8c6f"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 4,
+      "_id": {
+        "$oid": "69f0d07cab4bd230f5fe8c70"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "69f0d07cab4bd230f5fe8c71"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69f0d07cab4bd230f5fe8c72"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 1,
+      "_id": {
+        "$oid": "69f0d07cab4bd230f5fe8c73"
+      }
+    }
+  ],
+  "totalStock": 13,
+  "createdAt": {
+    "$date": "2026-04-28T13:31:11.245Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-28T15:21:32.625Z"
+  },
+  "slug": "sheesh-noir",
+  "__v": 18
+},
+{
+  "_id": {
+    "$oid": "69fc2ed3ab3b0124d4c22844"
+  },
+  "name": "Rani Gul ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/uncategorized/compressed_image_under7mb_eyHxarsAh.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/uncategorized/compressed_image_hS2W9RnfR.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/uncategorized/compressed_image3_aJPzaeoYF.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rani-gul-/compressed_image_AzWiJQNMM.jpg"
+  ],
+  "description": "A rich rani pink velvet canvas , adorned with intricate zardozi embroidery and delicate sequin highlight. ",
+  "price": 3500,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Party",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a5de03080666ac291e5ff5c"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a5de03080666ac291e5ff5d"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 5,
+      "_id": {
+        "$oid": "6a5de03080666ac291e5ff5e"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a5de03080666ac291e5ff5f"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a5de03080666ac291e5ff60"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a5de03080666ac291e5ff61"
+      }
+    }
+  ],
+  "totalStock": 15,
+  "createdAt": {
+    "$date": "2026-05-07T06:18:59.214Z"
+  },
+  "updatedAt": {
+    "$date": "2026-07-20T08:45:36.449Z"
+  },
+  "slug": "rani-gul",
+  "__v": 18
+},
+{
+  "_id": {
+    "$oid": "6a0dc63e1f3420d41ba8a6ac"
+  },
+  "name": "Champagne Zeenat",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/champagne-zeenat/compressed_DSC08639_1__KTow5BxYv.JPG",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/champagne-zeenat/compressed_DSC08567_0DHkGxiJZ.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/champagne-zeenat/compressed_DSC08556_YDvySMeAC.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/champagne-zeenat/compressed_DSC08648_1__BjR5QVXoX.JPG"
+  ],
+  "description": "A luminous champagne gold canvas,adorned with intricate hand embroidery and delicate stone embellishments.",
+  "price": 3000,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Party",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a1459471f3420d41ba8a773"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a1459471f3420d41ba8a774"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 5,
+      "_id": {
+        "$oid": "6a1459471f3420d41ba8a775"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a1459471f3420d41ba8a776"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a1459471f3420d41ba8a777"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a1459471f3420d41ba8a778"
+      }
+    }
+  ],
+  "totalStock": 15,
+  "createdAt": {
+    "$date": "2026-05-20T14:33:34.037Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T14:14:31.770Z"
+  },
+  "slug": "champagne-zeenat",
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "6a145a541f3420d41ba8a781"
+  },
+  "name": "Surkh Aangan ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/surkh-aangan-/ChatGPT_Image_May_21__2026__10_01_37_PM_compressed_TpfAtpDzY.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/surkh-aangan-/ChatGPT_Image_May_22__2026__08_51_16_PM_compressed_KcnmpVDQh.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/surkh-aangan-/Copy_of_DSC00060_compressed_XGK-MeHlI.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/surkh-aangan-/DSC00116_1__compressed_xs94lk-hn_.jpg"
+  ],
+  "description": "Features a bold rede canvas adorned with intricate gold embroidery, delicate zardozi and shimmering bead work.",
+  "price": 2800,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Party",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a1461451f3420d41ba8a7d2"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a1461451f3420d41ba8a7d3"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 5,
+      "_id": {
+        "$oid": "6a1461451f3420d41ba8a7d4"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a1461451f3420d41ba8a7d5"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a1461451f3420d41ba8a7d6"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a1461451f3420d41ba8a7d7"
+      }
+    }
+  ],
+  "totalStock": 15,
+  "createdAt": {
+    "$date": "2026-05-25T14:19:00.400Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T14:48:37.168Z"
+  },
+  "slug": "surkh-aangan",
+  "__v": 2
+},
+{
+  "_id": {
+    "$oid": "6a2136b2faa13ea97dff988f"
+  },
+  "name": "Fuchsia Raqs ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/fuchsia-raqs-/compressed_DSC00285_Bh68OFDJz.JPG",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/fuchsia-raqs-/compressed_Copy_of_DSC00313_HqbhuH_Gn.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/fuchsia-raqs-/compressed_DSC00345_F1810NfQy.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/fuchsia-raqs-/compressed_DSC00360_LfPHLMD1R.JPG"
+  ],
+  "description": "Adorned with intricate zardozi-inspired embroidery , featuring hand placed metallic sequins , cut dana beads, and delicate gold - toned flowers. The rich fuchsia base beautifully highlights the detailed craftmanship. ",
+  "price": 3000,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Party",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36 ",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a2136b2faa13ea97dff9890"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a2136b2faa13ea97dff9891"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 5,
+      "_id": {
+        "$oid": "6a2136b2faa13ea97dff9892"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a2136b2faa13ea97dff9893"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a2136b2faa13ea97dff9894"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a2136b2faa13ea97dff9895"
+      }
+    }
+  ],
+  "totalStock": 15,
+  "createdAt": {
+    "$date": "2026-06-04T08:26:26.793Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-04T08:26:26.793Z"
+  },
+  "slug": "fuchsia-raqs",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2f92effaa13ea97dff9bad"
+  },
+  "name": "Silver Khwaab ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/silver-khwaab-/carousel_03_1__compressed_B0JN_Z_zQ.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/silver-khwaab-/carousel_01_1__compressed_F-gtC5XNV.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/silver-khwaab-/carousel_02_1__compressed_Xg4i_5Ewa.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/silver-khwaab-/carousel_03_1__compressed_wApLQgqvu.jpg"
+  ],
+  "description": "Handcrafted floral embroidery. Enhanced with hand-embellished beads , sequins and thread work. Genuine leather lining and sole. Cushioned for enhanced comfort.  ",
+  "price": 3600,
+  "originalPrice": 0,
+  "category": [
+    "Casual",
+    "Party",
+    "Festive",
+    "Office"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a2f92effaa13ea97dff9bae"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a2f92effaa13ea97dff9baf"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 5,
+      "_id": {
+        "$oid": "6a2f92effaa13ea97dff9bb0"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 0,
+      "_id": {
+        "$oid": "6a2f92effaa13ea97dff9bb1"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": -2,
+      "_id": {
+        "$oid": "6a2f92effaa13ea97dff9bb2"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": -1,
+      "_id": {
+        "$oid": "6a2f92effaa13ea97dff9bb3"
+      }
+    }
+  ],
+  "totalStock": 5,
+  "createdAt": {
+    "$date": "2026-06-15T05:51:43.058Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-15T05:51:43.058Z"
+  },
+  "slug": "silver-khwaab",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a353a4e59b2ef1a0d411a67"
+  },
+  "name": "Rose Goldleaf ",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rose-goldleaf-/IMG_2002_sWJvO8Bg9.JPG",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rose-goldleaf-/IMG_2006_bN6kOHtPK.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rose-goldleaf-/IMG_2010_v3BJxxpop.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rose-goldleaf-/IMG_2016_W6zM2HYOA.JPG"
+  ],
+  "description": "Delicate leaf motifs, hand-embroidered in shimmering rose gold tones — crafted to add a touch of understated luxury to every step.",
+  "price": 3100,
+  "originalPrice": 0,
+  "category": [
+    "Casual",
+    "Party",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a353a4e59b2ef1a0d411a68"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": -1,
+      "_id": {
+        "$oid": "6a353a4e59b2ef1a0d411a69"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 5,
+      "_id": {
+        "$oid": "6a353a4e59b2ef1a0d411a6a"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a353a4e59b2ef1a0d411a6b"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a353a4e59b2ef1a0d411a6c"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": -1,
+      "_id": {
+        "$oid": "6a353a4e59b2ef1a0d411a6d"
+      }
+    }
+  ],
+  "totalStock": 10,
+  "createdAt": {
+    "$date": "2026-06-19T12:47:10.368Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-19T12:47:10.368Z"
+  },
+  "slug": "rose-goldleaf",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a4b9f368e1614d4756c44bb"
+  },
+  "name": "Blush Mehar",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/blush-mehar/compressed_DSC00212_1__wz7Fk1mdA.JPG",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/blush-mehar/compressed_DSC00244_1__hmAWteqVn.JPG",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/blush-mehar/compressed_DSC00275_RtpOHGgGO.JPG"
+  ],
+  "description": "Soft as blush , crafted like a dream. Where delicate embroidery meets timeless elegance. ",
+  "price": 3500,
+  "originalPrice": 0,
+  "category": [
+    "Bridal",
+    "Party",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a4b9f368e1614d4756c44bc"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a4b9f368e1614d4756c44bd"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a4b9f368e1614d4756c44be"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a4b9f368e1614d4756c44bf"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a4b9f368e1614d4756c44c0"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 1,
+      "_id": {
+        "$oid": "6a4b9f368e1614d4756c44c1"
+      }
+    }
+  ],
+  "totalStock": 13,
+  "createdAt": {
+    "$date": "2026-07-06T12:27:34.329Z"
+  },
+  "updatedAt": {
+    "$date": "2026-07-06T12:27:34.329Z"
+  },
+  "slug": "blush-mehar",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a606cd5a1d97dafebd2cbac"
+  },
+  "name": "Rang-e-Bahaar",
+  "image": "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rang-e-bahaar/DSC00018__1__1__compressed_T73-gmAeW.jpg",
+  "images": [
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rang-e-bahaar/DSC00028_compressed_Yz4Tmjh74.jpg",
+    "https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/rang-e-bahaar/DSC00030_compressed_pJa6se0_b.jpg"
+  ],
+  "description": "A harmony of pastel tones , finished with handcrafted details that speak for themselves. ",
+  "price": 3996,
+  "originalPrice": 0,
+  "category": [
+    "Party",
+    "Festive"
+  ],
+  "rating": 0,
+  "numReviews": 0,
+  "isNewArrival": true,
+  "isBestSeller": false,
+  "stock": [
+    {
+      "size": "36",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a606cd5a1d97dafebd2cbad"
+      }
+    },
+    {
+      "size": "37",
+      "quantity": 3,
+      "_id": {
+        "$oid": "6a606cd5a1d97dafebd2cbae"
+      }
+    },
+    {
+      "size": "38",
+      "quantity": 5,
+      "_id": {
+        "$oid": "6a606cd5a1d97dafebd2cbaf"
+      }
+    },
+    {
+      "size": "39",
+      "quantity": 4,
+      "_id": {
+        "$oid": "6a606cd5a1d97dafebd2cbb0"
+      }
+    },
+    {
+      "size": "40",
+      "quantity": 3,
+      "_id": {
+        "$oid": "6a606cd5a1d97dafebd2cbb1"
+      }
+    },
+    {
+      "size": "41",
+      "quantity": 2,
+      "_id": {
+        "$oid": "6a606cd5a1d97dafebd2cbb2"
+      }
+    }
+  ],
+  "totalStock": 19,
+  "createdAt": {
+    "$date": "2026-07-22T07:10:13.685Z"
+  },
+  "updatedAt": {
+    "$date": "2026-07-22T07:10:13.685Z"
+  },
+  "slug": "rang-e-bahaar",
+  "__v": 0
+}]

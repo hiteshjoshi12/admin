@@ -9,20 +9,18 @@ const {
 } = require("../utils/sendEmail");
 const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
 
-// --- HELPER: Reduce Stock (Used in Verify & Webhook) ---
+// --- HELPER: Reduce Stock ---
 const reduceOrderStock = async (order) => {
   try {
     for (const item of order.orderItems) {
       const product = await Product.findById(item.product);
       if (product) {
-        const sizeVariant = product.stock.find((s) => s.size === Number(item.size));
+        // 🔴 FIX: Use String() instead of Number()
+        const sizeVariant = product.stock.find((s) => String(s.size) === String(item.size));
+        
         if (sizeVariant) {
-          // Decrement stock
           sizeVariant.quantity = Math.max(0, sizeVariant.quantity - item.quantity);
-          
-          // Recalculate total stock
           product.totalStock = product.stock.reduce((acc, s) => acc + s.quantity, 0);
-          
           await product.save();
         }
       }
@@ -30,7 +28,6 @@ const reduceOrderStock = async (order) => {
     console.log(`📉 Stock reduced for Order ${order._id}`);
   } catch (error) {
     console.error("Stock Reduction Failed:", error);
-    // Continue execution (don't block payment success for this)
   }
 };
 
@@ -69,8 +66,9 @@ const addOrderItems = async (req, res) => {
 
       if (!dbProduct) throw new Error(`Product not found: ${item.name}`);
 
-      // Check Stock
-      const sizeVariant = dbProduct.stock.find((s) => s.size === Number(item.size));
+      // 🔴 FIX: Use String() instead of Number() here too
+      const sizeVariant = dbProduct.stock.find((s) => String(s.size) === String(item.size));
+      
       if (!sizeVariant || sizeVariant.quantity < item.quantity) {
         throw new Error(`Out of stock: ${item.name}`);
       }
@@ -155,8 +153,6 @@ const addOrderItems = async (req, res) => {
     res.status(500).json({ message: error.message || "Order creation failed" });
   }
 };
-
-
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
