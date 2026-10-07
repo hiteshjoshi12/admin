@@ -48,11 +48,12 @@ app.use('/api/contact', contactRoutes);
 
 const distPath = path.join(__dirname, 'dist');
 
-// Serve static assets from 'dist'
+// Serve static assets from the 'dist' directory
 app.use(express.static(distPath));
 
 // Fallback for React Router (handles root '/', client subpaths, and prevents overriding /api)
-app.get('/(.*)', (req, res) => {
+// Uses generic middleware to completely bypass Express 5 strict route parsing
+app.use((req, res, next) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ message: 'API route not found' });
   }
@@ -65,7 +66,6 @@ module.exports = app;
 // Listen on Port
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
 
 
 // require('dotenv').config();
