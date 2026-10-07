@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/authSlice";
 import { setCart } from "../redux/cartSlice";
+import SEO from "../components/seo/SEO";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -70,6 +71,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-white pt-20">
+      <SEO
+        title="Sign In | Beads and Bloom"
+        description="Access your Beads and Bloom account, view orders, and track your wishlist."
+        canonical="/login"
+        robots="noindex, nofollow"
+      />
       {/* --- LEFT: IMAGE SECTION --- */}
       <div className="hidden lg:block w-1/2 relative bg-[#F9F8F6]">
         <img

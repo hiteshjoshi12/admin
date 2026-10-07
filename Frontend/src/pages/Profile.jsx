@@ -5,6 +5,7 @@ import { LogOut, Package, MapPin, Plus, Trash2, Edit2, X, CheckCircle } from 'lu
 import { logout, saveAddressToProfile, updateAddressInProfile, deleteAddressFromProfile } from '../redux/authSlice';
 import { clearCart } from '../redux/cartSlice';
 import toast from 'react-hot-toast';
+import SEO from '../components/seo/SEO';
 
 export default function Profile() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -93,6 +94,12 @@ export default function Profile() {
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12 relative">
+      <SEO
+        title="My Profile | Beads and Bloom"
+        description="Manage your account profile and addresses."
+        canonical="/profile"
+        robots="noindex, nofollow"
+      />
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Header */}

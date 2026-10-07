@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Heart, Anchor } from 'lucide-react';
+import SEO from '../components/seo/SEO';
+import { getOrganizationSchema, getBreadcrumbSchema } from '../components/seo/schemaUtils';
 
 export default function About() {
   
@@ -8,8 +10,33 @@ export default function About() {
     window.scrollTo(0, 0);
   }, []);
 
+  const aboutSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'AboutPage',
+        name: 'Our Heritage & Craft — Beads and Bloom',
+        url: 'https://beadsandbloom.in/about',
+        description:
+          'Honoring the generational artisans of Punjab, ancient zardosi embroidery, and modern comfort engineered for the discerning woman.',
+      },
+      getOrganizationSchema(),
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'About', url: '/about' },
+      ]),
+    ],
+  };
+
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-20">
+      <SEO
+        title="Our Heritage & Craft — Artisanal Jutti Makers | Beads and Bloom"
+        description="Learn the story behind Beads and Bloom. Honoring the generational artisans of Punjab, ancient zardosi embroidery, and modern comfort engineered for the discerning woman."
+        canonical="/about"
+        keywords="artisanal jutti makers, punjabi jutti heritage, zardosi embroidery shoes, beads and bloom story, traditional ethnic footwear craftsmanship"
+        schema={aboutSchema}
+      />
       
       {/* 1. LOAD ONE PREMIUM FONT (Playfair Display) */}
       <style>

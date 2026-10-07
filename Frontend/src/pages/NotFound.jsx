@@ -1,10 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, Home } from 'lucide-react';
+import SEO from '../components/seo/SEO';
 
 const NotFound = () => {
   return (
     <div className="min-h-screen bg-[#F9F8F6] flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
+      <SEO
+        title="404 — Page Not Found | Beads and Bloom"
+        description="The page you are looking for has been moved or does not exist. Explore our handcrafted jutti collection."
+        robots="noindex, nofollow"
+      />
       
       {/* Background Decor - Subtle circular gradient */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-white rounded-full blur-3xl opacity-60 pointer-events-none"></div>

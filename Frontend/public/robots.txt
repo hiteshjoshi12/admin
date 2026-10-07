@@ -1,12 +1,45 @@
+# ==========================================
+# Robots.txt for Beads and Bloom (https://beadsandbloom.in)
+# ==========================================
+
 User-agent: *
 Allow: /
 
-# Block private routes
+# Private Administrative & User Routes
 Disallow: /admin
+Disallow: /admin/*
 Disallow: /profile
 Disallow: /myorders
+Disallow: /order/
 Disallow: /cart
 Disallow: /checkout
+Disallow: /wishlist
 
-# Your actual sitemap URL
+# Authentication & Password Recovery Utilities
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /resetpassword/
+Disallow: /track-order
+
+# AI & Search Engine Crawlers (Explicitly Allowed for Generative Engine Discovery)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# Master Sitemap
 Sitemap: https://beadsandbloom.in/sitemap.xml

@@ -6,6 +6,7 @@ import {
   FileText, LogOut, Menu, X, MessageSquare, ChevronDown, Store, ShieldCheck
 } from 'lucide-react';
 import { logout } from '../../redux/authSlice';
+import SEO from '../../components/seo/SEO';
 
 export default function AdminLayout() {
   const dispatch = useDispatch();
@@ -52,6 +53,7 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex font-sans text-[#1C1917]">
+      <SEO title="Admin Console | Beads and Bloom" robots="noindex, nofollow" />
       
       {/* --- MOBILE OVERLAY --- */}
       <div 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import { API_BASE_URL } from '../util/config';
+import SEO from '../components/seo/SEO';
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -48,6 +49,12 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center px-4">
+      <SEO
+        title="Reset Password | Beads and Bloom"
+        description="Create a new secure password for your account."
+        canonical="/login"
+        robots="noindex, nofollow"
+      />
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
         
         <div className="text-center mb-8">

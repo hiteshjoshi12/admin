@@ -1,22 +1,66 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Ruler, Search, ShoppingBag } from 'lucide-react';
+import { Ruler, Search, ShoppingBag, HelpCircle } from 'lucide-react';
+import SEO from '../components/seo/SEO';
+import { getBreadcrumbSchema, getFAQSchema } from '../components/seo/schemaUtils';
 
 export default function SizeChart() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const sizingFaqs = [
+    {
+      question: "How do I measure my foot size for Beads & Bloom juttis?",
+      answer: "Place a measuring tape flat on the floor against a wall. Measure your foot length from the heel to the tip of your longest toe in centimeters. Compare this measurement with our EU size guide (sizes 36 to 41)."
+    },
+    {
+      question: "What size should I choose if I have broad feet?",
+      answer: "If you have broad feet or fall between two sizes, we recommend sizing up by one size for optimal comfort and fit."
+    },
+    {
+      question: "Do handcrafted Punjabi juttis stretch over time?",
+      answer: "Yes. Authentic handcrafted juttis with genuine leather or textile bases mold gently to the contours of your feet with wear, enhancing overall comfort over time."
+    },
+    {
+      question: "Can I exchange my juttis if the size does not fit?",
+      answer: "Yes, we accept exchanges for size within 48 hours of delivery, provided the juttis are unworn, in original packaging, and accompanied by a continuous unboxing video."
+    }
+  ];
+
+  const sizeChartSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Size Guide', url: '/size-chart' }
+      ]),
+      getFAQSchema(sizingFaqs)
+    ]
+  };
+
   // Replace this with your actual image URL from the chat
   const sizeChartImage = "size chart.jpeg";
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-24">
+      <SEO
+        title="Jutti Size Chart & Footwear Guide | Beads and Bloom"
+        description="Find your perfect fit with the Beads and Bloom footwear size chart. Step-by-step instructions on measuring foot length (EU 36-41) for bite-free jutti comfort."
+        canonical="/size-chart"
+        keywords="jutti size chart, punjabi jutti sizing, how to measure foot length, ethnic footwear size guide india, jutti size conversion"
+        schema={sizeChartSchema}
+      />
       
       {/* --- PAGE HEADER --- */}
       <div className="bg-white py-16 px-6 mb-16 text-center border-b border-gray-100">
-        <h1 className="text-4xl md:text-5xl font-serif text-[#1C1917] mb-4">Size Guide</h1>
-        <p className="text-gray-500 uppercase tracking-widest text-xs">Find your perfect fit</p>
+        <nav aria-label="Breadcrumb" className="mb-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-gray-400">
+          <Link to="/" className="hover:text-[#FF2865]">Home</Link>
+          <span>/</span>
+          <span className="text-gray-900 font-bold">Size Guide</span>
+        </nav>
+        <h1 className="text-4xl md:text-5xl font-serif text-[#1C1917] mb-4">Jutti Size Guide & Measurement</h1>
+        <p className="text-gray-500 uppercase tracking-widest text-xs">Find your perfect fit for all-day comfort</p>
       </div>
 
       <div className="max-w-6xl mx-auto px-6">
@@ -85,6 +129,29 @@ export default function SizeChart() {
           </div>
 
         </div>
+
+        {/* --- AEO / FAQ SECTION --- */}
+        <section className="mt-20 pt-16 border-t border-gray-200" aria-label="Frequently Asked Sizing Questions">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <h2 className="text-3xl font-serif text-[#1C1917] mb-3">Frequently Asked Sizing Questions</h2>
+            <p className="text-sm text-gray-500 font-light">Direct answers to help you choose the ideal size for maximum handcrafted comfort.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {sizingFaqs.map((faq, index) => (
+              <div key={index} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 className="font-serif text-lg text-[#1C1917] mb-2 flex items-start gap-2">
+                  <span className="text-[#FF2865] font-bold font-sans text-sm mt-0.5">Q.</span>
+                  {faq.question}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed pl-5">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
       </div>
 
     </div>

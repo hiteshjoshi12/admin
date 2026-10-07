@@ -8,6 +8,8 @@ import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleWishlistAPI, toggleWishlistLocal } from "../redux/wishlistSlice";
 import { API_BASE_URL } from "../util/config";
+import SEO from "../components/seo/SEO";
+import { getCollectionSchema, getBreadcrumbSchema } from "../components/seo/schemaUtils";
 
 // --- 🎨 COLLECTION CONFIGURATION ---
 // NOTE: Removed 'image' property as it is no longer needed.
@@ -72,16 +74,57 @@ export default function Collection() {
     return new Date(b.createdAt) - new Date(a.createdAt); // newest
   });
 
+  const isBridal = category?.toLowerCase() === 'bridal';
+  const isCasual = category?.toLowerCase() === 'casual';
+
+  const seoTitle = isBridal
+    ? "The Bridal Edit — Luxury Wedding Juttis & Mojris | Beads and Bloom"
+    : isCasual
+    ? "Everyday Chic — Casual & Office Wear Juttis | Beads and Bloom"
+    : `${config.title} — Handcrafted Juttis | Beads and Bloom`;
+
+  const seoDescription = isBridal
+    ? "Walk down the aisle in sublime comfort. Shop exquisite handcrafted bridal juttis featuring heavy zardosi, pearls, and double-padded soles for wedding ceremonies."
+    : isCasual
+    ? "Step into effortless elegance with our casual handcrafted juttis. Designed for daily wear and office rotations with lightweight, bite-free cushioned soles."
+    : config.description;
+
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getCollectionSchema(config.title, config.description, `/collection/${category}`),
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Shop', url: '/shop' },
+        { name: config.title, url: `/collection/${category}` },
+      ]),
+    ],
+  };
+
   return (
     // The main container sets the solid background color based on the theme
     <div className={`min-h-screen mt-23 ${config.theme} transition-colors duration-700`}>
-      
-      {/* --- HERO SECTION (Clean, No Image) --- */}
-      {/* Adjusted height slightly as it's now a solid color block */}
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        canonical={`/collection/${category}`}
+        schema={collectionSchema}
+      />
+
+      {/* --- HERO SECTION --- */}
       <div className="relative w-full h-[40vh] md:h-[50vh] flex items-end pb-12 justify-center overflow-hidden">
        
-        {/* Hero Content - Updated text color to use config.text instead of white */}
+        {/* Hero Content */}
         <div className={`relative z-10 text-center px-6 max-w-4xl ${config.text} animate-fade-up`}>
+          {/* Visual Breadcrumb for UX & Internal Linking */}
+          <nav aria-label="Breadcrumb" className="mb-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest opacity-70">
+            <Link to="/" className="hover:underline">Home</Link>
+            <span>/</span>
+            <Link to="/shop" className="hover:underline">Shop</Link>
+            <span>/</span>
+            <span className="font-bold opacity-100">{config.title}</span>
+          </nav>
+
           <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4 block opacity-80">
             {config.subtitle}
           </span>

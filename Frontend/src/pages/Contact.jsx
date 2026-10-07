@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Mail, Clock, Instagram, MessageCircle, ArrowRight, MapPin } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from '../util/config'; // Ensure you have this config
+import SEO from '../components/seo/SEO';
+import { getOrganizationSchema, getBreadcrumbSchema } from '../components/seo/schemaUtils';
 
 export default function Contact() {
   
@@ -55,8 +57,32 @@ export default function Contact() {
     }
   };
 
+  const contactSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ContactPage',
+        name: 'Contact Beads and Bloom',
+        url: 'https://beadsandbloom.in/contact',
+        description: 'Contact Beads and Bloom for order inquiries, sizing assistance, and custom requests.',
+      },
+      getOrganizationSchema(),
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Contact', url: '/contact' },
+      ]),
+    ],
+  };
+
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-24">
+      <SEO
+        title="Contact Customer Support & Inquiries | Beads and Bloom"
+        description="Have questions regarding jutti sizing, custom orders, or your delivery? Reach out to Beads and Bloom support via email or Instagram DM. We reply promptly."
+        canonical="/contact"
+        keywords="contact beads and bloom, customer support ethnic footwear, jutti inquiry, punjabi jutti sizing help"
+        schema={contactSchema}
+      />
       
       {/* --- PAGE HEADER --- */}
       <div className="text-center mb-16 px-6 mt-10">

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../util/config';
+import SEO from '../components/seo/SEO';
 
 export default function OrderDetails() {
   const { id } = useParams();
@@ -82,6 +83,7 @@ export default function OrderDetails() {
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12">
+      <SEO title="Order Details | Beads and Bloom" robots="noindex, nofollow" />
       <div className="max-w-5xl mx-auto px-4 md:px-6">
         
         {/* HEADER */}

@@ -1,7 +1,7 @@
 import { useState, forwardRef } from 'react';
 
 // --- IMAGE WRAPPER ---
-export const ImageWithShimmer = ({ src, alt, className }) => {
+export const ImageWithShimmer = ({ src, alt, className, loading = 'lazy', priority = false }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
@@ -13,7 +13,8 @@ export const ImageWithShimmer = ({ src, alt, className }) => {
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={priority ? 'eager' : loading}
+        fetchPriority={priority ? 'high' : 'auto'}
         onLoad={() => setIsLoaded(true)}
         className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
           isLoaded ? 'opacity-100' : 'opacity-0'

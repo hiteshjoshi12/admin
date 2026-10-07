@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Package, ChevronRight, ShoppingBag, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../util/config';
+import SEO from '../components/seo/SEO';
 
 export default function MyOrders() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -47,6 +48,12 @@ export default function MyOrders() {
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12">
+      <SEO
+        title="My Orders | Beads and Bloom"
+        description="Review your past orders and shipments."
+        canonical="/myorders"
+        robots="noindex, nofollow"
+      />
       <div className="max-w-4xl mx-auto px-6">
         
         <h1 className="text-3xl font-serif text-[#1C1917] mb-2">My Orders</h1>

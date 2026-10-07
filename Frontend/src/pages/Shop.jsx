@@ -17,6 +17,8 @@ import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../redux/productSlice";
 import { toggleWishlistAPI, toggleWishlistLocal } from "../redux/wishlistSlice";
+import SEO from "../components/seo/SEO";
+import { getCollectionSchema, getBreadcrumbSchema } from "../components/seo/schemaUtils";
 
 export default function Shop() {
   const dispatch = useDispatch();
@@ -93,14 +95,37 @@ export default function Shop() {
 
   if (error) return <div className="min-h-screen flex items-center justify-center"><p className="text-red-500">Error loading products.</p></div>;
 
+  const shopSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getCollectionSchema(
+        'The Collection — Handcrafted Juttis',
+        'Explore our handcrafted collection of premium footwear designed for elegance and all-day comfort.',
+        '/shop'
+      ),
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Shop', url: '/shop' }
+      ])
+    ]
+  };
+
   return (
     <div className="bg-white min-h-screen pt-20" ref={topRef}>
+      <SEO
+        title="The Collection — Handcrafted Juttis & Mojris | Beads and Bloom"
+        description="Explore our complete catalog of handcrafted juttis. From opulent bridal zardosi to chic everyday ethnic flats, find your perfect pair with cushioned comfort."
+        canonical="/shop"
+        keywords="handcrafted juttis collection, designer juttis, bridal mojris, everyday ethnic flats, punjabi jutti shop, double cushioned flats"
+        schema={shopSchema}
+      />
       
       {/* HEADER HERO - Clean & Minimal */}
       <div className="bg-[#fffdf9] py-16 px-6 text-center relative overflow-hidden">
         <div className="max-w-2xl mx-auto animate-fade-up">
             <span className="text-[#8B5E3C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4 block">Handcrafted Luxury</span>
-            <h1 className="text-4xl md:text-6xl font-serif text-[#1C1917] mb-6">The Collection</h1>
+            <h1 className="text-4xl md:text-6xl font-serif text-[#1C1917] mb-3">The Handcrafted Jutti Collection</h1>
+            <p className="text-sm text-gray-500 font-light max-w-md mx-auto mb-6">Artisanal Punjabi juttis and ethnic footwear crafted with double-cushioned comfort.</p>
             <div className="w-16 h-[1px] bg-[#1C1917] mx-auto opacity-20"></div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import { addToCart } from '../redux/cartSlice';
 import { toggleWishlistAPI, toggleWishlistLocal } from '../redux/wishlistSlice';
 import { getOptimizedImage } from '../util/imageUtils';
+import SEO from '../components/seo/SEO';
 
 export default function Wishlist() {
   const dispatch = useDispatch();
@@ -67,6 +68,12 @@ export default function Wishlist() {
 
   return (
     <div className="bg-white min-h-screen pt-24 pb-20">
+      <SEO
+        title="My Wishlist | Beads and Bloom"
+        description="Your curated wishlist of handcrafted luxury juttis and ethnic footwear."
+        canonical="/wishlist"
+        robots="noindex, nofollow"
+      />
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         <div className="flex items-center gap-3 mb-10">
             <Heart className="w-6 h-6 text-[#FF2865] fill-[#FF2865]" />

@@ -5,14 +5,14 @@ import { API_BASE_URL } from '../../util/config';
 import { getOptimizedImage } from '../../util/imageUtils';
 import { ImageWithShimmer } from '../../util/ShimmerMedia';
 
-// 1. UPDATED FALLBACK - Set text to null if you want it hidden by default
+// 1. UPDATED FALLBACK - Provides valid image & semantic text defaults
 const fallbackSlide = {
   id: 'fallback-1',
-  image: "banner1.jpg", // Ensure this image is in your public folder or adjust the path accordingly
-  subtitle: "", // Empty strings won't render with the logic below
-  titleLine1: "",
-  titleLine2: "",
-  cta: "",
+  image: "banner1.png",
+  subtitle: "Handcrafted Luxury",
+  titleLine1: "Beads &",
+  titleLine2: "Bloom",
+  cta: "Shop The Collection",
   link: "/shop"
 };
 
@@ -33,11 +33,11 @@ export default function Hero() {
              id: slide._id || idx,
              image: slide.image,
              // Split title safely; handles case where title might be missing
-             titleLine1: slide.title ? slide.title.split(' ')[0] : '',
-             titleLine2: slide.title ? slide.title.split(' ').slice(1).join(' ') : '',
-             subtitle: slide.subtitle || '',
-             cta: slide.cta || '',
-             link: slide.link || '#'
+             titleLine1: slide.title ? slide.title.split(' ')[0] : 'Handcrafted',
+             titleLine2: slide.title ? slide.title.split(' ').slice(1).join(' ') : 'Juttis',
+             subtitle: slide.subtitle || 'Artisanal Footwear',
+             cta: slide.cta || 'Shop Now',
+             link: slide.link || '/shop'
           }));
           setSlides(formattedSlides);
         } else {
@@ -69,7 +69,7 @@ export default function Hero() {
   const hasContent = slides[current].subtitle || slides[current].titleLine1 || slides[current].cta;
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-[#1C1917]">
+    <section className="relative h-screen w-full overflow-hidden bg-[#1C1917]" aria-label="Hero Showcase">
       
       {/* 1. IMAGE LAYER */}
       {slides.map((slide, index) => (
@@ -84,8 +84,9 @@ export default function Hero() {
           }`}>
              <ImageWithShimmer 
                 src={getOptimizedImage(slide.image, 1600)} 
-                alt={`${slide.titleLine1 || 'Hero'} ${slide.titleLine2 || 'Image'}`} 
+                alt={`${slide.titleLine1 || 'Beads and Bloom'} ${slide.titleLine2 || 'Handcrafted Juttis'}`} 
                 className="w-full h-full object-cover"
+                priority={index === 0}
              />
           </div>
           {/* Only show gradient overlay if there is text to make readable */}
@@ -95,8 +96,8 @@ export default function Hero() {
         </div>
       ))}
 
-      {/* 2. TEXT CONTENT LAYER - Only renders container if content exists */}
-      {hasContent && (
+      {/* 2. TEXT CONTENT LAYER */}
+      {hasContent ? (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4 pt-20">
           <div key={current} className="flex flex-col items-center max-w-5xl">
             
@@ -107,26 +108,20 @@ export default function Hero() {
               </p>
             )}
 
-            {/* Title Rendering */}
-            {(slides[current].titleLine1 || slides[current].titleLine2) && (
-              <h1 className="animate-fade-up delay-100 font-serif leading-[0.85] drop-shadow-xl">
-                {slides[current].titleLine1 && (
-                  <span className="block text-5xl md:text-8xl lg:text-[160px] tracking-tight text-white">
-                    {slides[current].titleLine1}
-                  </span>
-                )}
-                {slides[current].titleLine2 && (
-                  <span 
-                    className="block text-5xl md:text-8xl lg:text-[160px] italic font-light mt-2 md:mt-4"
-                    style={{ color: brandPink }} 
-                  >
-                    {slides[current].titleLine2}
-                  </span>
-                )}
-              </h1>
-            )}
+            {/* Title Rendering - Semantic H1 */}
+            <h1 className="animate-fade-up delay-100 font-serif leading-[0.85] drop-shadow-xl">
+              <span className="block text-5xl md:text-8xl lg:text-[160px] tracking-tight text-white">
+                {slides[current].titleLine1 || 'Handcrafted'}
+              </span>
+              <span 
+                className="block text-5xl md:text-8xl lg:text-[160px] italic font-light mt-2 md:mt-4"
+                style={{ color: brandPink }} 
+              >
+                {slides[current].titleLine2 || 'Juttis'}
+              </span>
+            </h1>
 
-            {/* CTA Button Rendering - This was the "white rectangle" source */}
+            {/* CTA Button Rendering */}
             {slides[current].cta && (
               <Link 
                 to={slides[current].link} 
@@ -146,6 +141,8 @@ export default function Hero() {
             )}
           </div>
         </div>
+      ) : (
+        <h1 className="sr-only">Handcrafted Punjabi Juttis & Ethnic Footwear | Beads and Bloom</h1>
       )}
 
       {/* 3. CONTROLS */}

@@ -36,6 +36,8 @@ import { getOptimizedImage } from "../util/imageUtils";
 import { ProductDetailSkeleton } from "../components/loaders/SectionLoader";
 import ReviewSection from "../components/ReviewSection";
 import RelatedProducts from "../components/RelatedProducts";
+import SEO from "../components/seo/SEO";
+import { getProductSchema, getBreadcrumbSchema } from "../components/seo/schemaUtils";
 
 // CONFIG
 const SITE_URL = "https://beadsandbloom.in";
@@ -210,12 +212,33 @@ export default function ProductDetail() {
 
   const optimizedImages = currentProduct.images.map((img) => getOptimizedImage(img, 1000));
   const productUrl = `${SITE_URL}/product/${currentProduct.slug}`;
+  const mainImage = optimizedImages[0] || (currentProduct.image ? getOptimizedImage(currentProduct.image, 1000) : `${SITE_URL}/logo.png`);
+  const primaryCategory = Array.isArray(currentProduct.category) && currentProduct.category.length > 0 ? currentProduct.category[0] : null;
+
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getProductSchema(currentProduct),
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Shop', url: '/shop' },
+        ...(primaryCategory ? [{ name: primaryCategory, url: `/shop?category=${encodeURIComponent(primaryCategory)}` }] : []),
+        { name: currentProduct.name, url: `/product/${currentProduct.slug}` }
+      ])
+    ]
+  };
 
   return (
     <div className="bg-white min-h-screen pt-20">
-      <title>{currentProduct.name} | Handcrafted Jutis | Beads and Bloom</title>
-      <meta name="description" content={`Shop ${currentProduct.name}. Premium handcrafted ethnic footwear.`} />
-      <link rel="canonical" href={productUrl} />
+      <SEO
+        title={`${currentProduct.name} Handcrafted Jutti | Beads and Bloom`}
+        description={`Shop ${currentProduct.name}. Premium handcrafted Indian ethnic footwear featuring intricate embroidery and plush double-cushioned comfort in sizes 36-41.`}
+        canonical={`/product/${currentProduct.slug}`}
+        type="product"
+        image={mainImage}
+        keywords={`${currentProduct.name}, handcrafted jutti, bridal mojri, ethnic footwear, punjabi juttis, double cushioned flats`}
+        schema={productSchema}
+      />
 
       <AnimatePresence>
         {isLightboxOpen && (
@@ -235,19 +258,25 @@ export default function ProductDetail() {
           <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
             {optimizedImages.map((img, idx) => (
               <div key={idx} className="w-full flex-shrink-0 snap-center relative">
-                <img src={img} alt={currentProduct.name} className="w-full aspect-[3/4] object-cover" onClick={() => { setActiveImage(idx); setIsLightboxOpen(true); }} />
+                <img src={img} alt={`${currentProduct.name} - View ${idx + 1}`} className="w-full aspect-[3/4] object-cover" onClick={() => { setActiveImage(idx); setIsLightboxOpen(true); }} />
               </div>
             ))}
           </div>
 
           {/* DESKTOP GRID */}
           <div className="hidden lg:grid grid-cols-2 gap-4 relative">
-            <nav className="col-span-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-2">
+            <nav aria-label="Breadcrumb" className="col-span-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-2">
               <Link to="/" className="hover:text-[#FF2865]">Home</Link>
               <ChevronRight className="w-3 h-3" />
               <Link to="/shop" className="hover:text-[#FF2865]">Shop</Link>
+              {primaryCategory && (
+                <>
+                  <ChevronRight className="w-3 h-3" />
+                  <Link to={`/shop?category=${encodeURIComponent(primaryCategory)}`} className="hover:text-[#FF2865]">{primaryCategory}</Link>
+                </>
+              )}
               <ChevronRight className="w-3 h-3" />
-              <span className="text-gray-900">{currentProduct.name}</span>
+              <span className="text-gray-900 font-bold">{currentProduct.name}</span>
             </nav>
 
             {/* DESKTOP WISHLIST HEART */}

@@ -1,4 +1,6 @@
 import React, { Suspense, lazy } from "react";
+import SEO from "../components/seo/SEO";
+import { getOrganizationSchema, getWebSiteSchema } from "../components/seo/schemaUtils";
 
 // --- 1. CRITICAL IMPORTS (Load Immediately) ---
 // These are "Above the Fold". We want them to show up instantly.
@@ -27,8 +29,20 @@ import {
 const SectionSpacer = () => <div className="h-96 w-full bg-[#F9F8F6] animate-pulse" />;
 
 const HomePage = () => {
+  const homeSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [getOrganizationSchema(), getWebSiteSchema()]
+  };
+
   return (
     <div className="bg-white">
+      <SEO
+        title="Handcrafted Juttis & Ethnic Footwear | Beads and Bloom"
+        description="Discover luxurious handcrafted Punjabi juttis and bridal mojris at Beads and Bloom. Meticulous hand embroidery, double-cushioned soles, and timeless heritage."
+        canonical="/"
+        keywords="handcrafted juttis, bridal mojris, punjabi juttis online, ethnic footwear India, double cushioned juttis, zardosi embroidery"
+        schema={homeSchema}
+      />
       {/* Load Instantly */}
       <Hero />
       <FeaturedOffers />

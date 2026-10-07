@@ -23,6 +23,7 @@ import { saveShippingAddress, clearCart } from "../redux/cartSlice";
 import { createOrder, resetOrder } from "../redux/orderSlice";
 import { saveAddressToProfile } from "../redux/authSlice";
 import { API_BASE_URL } from "../util/config";
+import SEO from "../components/seo/SEO";
 
 const INDIAN_STATES = [
   "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
@@ -289,6 +290,12 @@ export default function Checkout() {
   // --- RENDER CHECKOUT FORM ---
   return (
     <div className="bg-[#F8F9FA] min-h-screen pt-24 pb-20">
+      <SEO
+        title="Secure Checkout | Beads and Bloom"
+        description="Encrypted and secure checkout for Beads and Bloom handcrafted footwear."
+        canonical="/checkout"
+        robots="noindex, nofollow"
+      />
       
       {/* 🔒 SECURITY HEADER */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 mb-8">

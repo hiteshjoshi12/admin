@@ -4,6 +4,7 @@ import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ArrowLeft, Tag, X, MapPin
 import { motion, AnimatePresence } from 'framer-motion'; 
 import confetti from 'canvas-confetti';
 import { toast } from 'react-hot-toast'; 
+import SEO from '../components/seo/SEO';
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from 'react-redux';
@@ -181,6 +182,12 @@ export default function Cart() {
 
   return (
     <div className="bg-[#F8F9FA] min-h-screen pt-24 pb-24">
+      <SEO
+        title="Shopping Bag | Beads and Bloom"
+        description="Review your handcrafted jutti selections and proceed to secure checkout."
+        canonical="/cart"
+        robots="noindex, nofollow"
+      />
       
       {/* HEADER */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 mb-8">

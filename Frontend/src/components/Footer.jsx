@@ -16,16 +16,33 @@ export default function Footer() {
             Handcrafted luxury footwear blending ancient heritage with modern elegance.
           </p>
           <div className="flex gap-4">
-            {[Instagram, Facebook, Twitter].map((Icon, i) => (
-              <a 
-                key={i} 
-                href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" 
-                // Social Icons: White border/icon default -> White bg / Black icon on hover
-                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white transition-all duration-300 hover:bg-white hover:text-black hover:border-white"
-              >
-                <Icon className="w-4 h-4" />
-              </a>
-            ))}
+            <a 
+              href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Follow Beads and Bloom on Instagram"
+              className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white transition-all duration-300 hover:bg-white hover:text-black hover:border-white"
+            >
+              <Instagram className="w-4 h-4" />
+            </a>
+            <a 
+              href="https://facebook.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Visit Beads and Bloom on Facebook"
+              className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white transition-all duration-300 hover:bg-white hover:text-black hover:border-white"
+            >
+              <Facebook className="w-4 h-4" />
+            </a>
+            <a 
+              href="https://twitter.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Follow Beads and Bloom on Twitter"
+              className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-white transition-all duration-300 hover:bg-white hover:text-black hover:border-white"
+            >
+              <Twitter className="w-4 h-4" />
+            </a>
           </div>
         </div>
 
@@ -34,19 +51,21 @@ export default function Footer() {
           <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Shop</h4>
           <ul className="space-y-4 text-sm text-gray-400">
             <li><Link to="/shop" className="hover:text-white transition-colors">The Collection</Link></li>
-            <li><Link to="/collection/casual" className="hover:text-white transition-colors">Best Sellers</Link></li>
             <li><Link to="/collection/bridal" className="hover:text-white transition-colors">Bridal Collection</Link></li>
+            <li><Link to="/collection/casual" className="hover:text-white transition-colors">Everyday Chic</Link></li>
+            <li><Link to="/sale" className="hover:text-white transition-colors">Archive Sale</Link></li>
           </ul>
         </div>
 
         {/* Links Column 2 */}
         <div>
-          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Support</h4>
+          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">About & Support</h4>
           <ul className="space-y-4 text-sm text-gray-400">
-            {/* LINKED THESE TO /terms PAGE */}
-            <li><Link to="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
+            <li><Link to="/about" className="hover:text-white transition-colors">Our Story & Heritage</Link></li>
             <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide</Link></li>
+            <li><Link to="/terms" className="hover:text-white transition-colors">Shipping & Exchanges</Link></li>
             <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+            <li><Link to="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
           </ul>
         </div>
 

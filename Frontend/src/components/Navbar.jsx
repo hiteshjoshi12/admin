@@ -39,7 +39,8 @@ export default function Navbar() {
   const navLinks = [
     { name: 'The Collection', path: '/shop?sort=newest', badge: 'NEW' },
     { name: 'Bridal', path: '/collection/bridal' }, 
-  { name: 'Casual', path: '/collection/casual' },
+    { name: 'Casual', path: '/collection/casual' },
+    { name: 'Our Story', path: '/about' },
     { name: 'Sale', path: '/sale', isSpecial: true },
   ];
 

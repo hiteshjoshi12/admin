@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'; // 1. Import Toast
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../redux/authSlice';
 import { setCart } from '../redux/cartSlice';
+import SEO from '../components/seo/SEO';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -58,7 +59,12 @@ export default function Signup() {
   };
   return (
     <div className="min-h-screen flex bg-white pt-24">
-      
+      <SEO
+        title="Create Account | Beads and Bloom"
+        description="Join the Beads and Bloom family for exclusive access to handcrafted juttis and order history."
+        canonical="/signup"
+        robots="noindex, nofollow"
+      />
       {/* --- LEFT: FORM SECTION --- */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 bg-white relative">
         <div className="w-full max-w-md animate-fade-up">

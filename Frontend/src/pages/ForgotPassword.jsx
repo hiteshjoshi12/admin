@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowRight, ArrowLeft } from 'lucide-react';
 import { API_BASE_URL } from '../util/config';
+import SEO from '../components/seo/SEO';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -37,6 +38,12 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center px-4">
+      <SEO
+        title="Forgot Password | Beads and Bloom"
+        description="Reset your account password securely."
+        canonical="/forgot-password"
+        robots="noindex, nofollow"
+      />
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
         
         <div className="text-center mb-8">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Package, Truck, CheckCircle, Clock, AlertTriangle } from 'lucide-react'; // Added AlertTriangle for RTO
 import { API_BASE_URL } from '../util/config'; 
 import { getOptimizedImage } from '../util/imageUtils'; 
+import SEO from '../components/seo/SEO';
 
 export default function TrackOrder() {
   const [formData, setFormData] = useState({ orderId: '', email: '' });
@@ -59,6 +60,12 @@ export default function TrackOrder() {
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] pt-28 pb-12 px-4">
+      <SEO
+        title="Track Your Order | Beads and Bloom"
+        description="Real-time order tracking for your Beads and Bloom handcrafted footwear."
+        canonical="/track-order"
+        robots="noindex, nofollow"
+      />
       <div className="max-w-3xl mx-auto">
         
         {/* HEADER */}

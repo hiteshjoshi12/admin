@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import { API_BASE_URL } from '../util/config';
 import { getOptimizedImage } from '../util/imageUtils';
+import SEO from '../components/seo/SEO';
+import { getCollectionSchema, getBreadcrumbSchema } from '../components/seo/schemaUtils';
 
 export default function Sale() {
   const dispatch = useDispatch();
@@ -173,9 +175,31 @@ export default function Sale() {
      );
   }
 
+  const saleSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getCollectionSchema(
+        'The Archive Sale — Handcrafted Juttis',
+        'Exclusive access to our handcrafted favorites at exceptional prices. Quantities are limited.',
+        '/sale'
+      ),
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Archive Sale', url: '/sale' }
+      ])
+    ]
+  };
+
   return (
     <div className="bg-white min-h-screen pt-20" ref={topRef}>
-      
+      <SEO
+        title="Archive Sale — Exclusive Offers on Handcrafted Juttis | Beads and Bloom"
+        description="Limited-time archive event. Enjoy exceptional prices on handcrafted juttis and artisanal mojris. Use code INAUGURAL10 for an extra 10% discount while stocks last."
+        canonical="/sale"
+        keywords="juttis on sale, ethnic footwear discount, bridal jutti offers, clearance mojris, designer jutti coupon INAUGURAL10"
+        schema={saleSchema}
+      />
+
       {/* HERO SECTION - Minimal & Classy */}
       <section className="bg-[#fcf8f5] py-20 px-6 text-center relative overflow-hidden border-b border-[#f0ebe0]">
         {/* Background Pattern */}
@@ -183,7 +207,7 @@ export default function Sale() {
         
         <div className="relative z-10 max-w-2xl mx-auto animate-fade-up">
           <span className="text-[#FF2865] text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block">Limited Time Event</span>
-          <h1 className="text-5xl md:text-7xl font-serif text-[#1C1917] mb-6 tracking-tight">The Archive Sale</h1>
+          <h1 className="text-5xl md:text-7xl font-serif text-[#1C1917] mb-6 tracking-tight">The Archive Sale — Handcrafted Juttis</h1>
           <p className="text-gray-500 text-sm md:text-base font-light mb-10 max-w-md mx-auto">
             Exclusive access to our handcrafted favorites at exceptional prices. Quantities are limited.
           </p>

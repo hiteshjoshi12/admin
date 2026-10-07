@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ScrollText, Truck, RefreshCcw, Shield, Mail, AlertCircle } from 'lucide-react';
+import SEO from '../components/seo/SEO';
+import { getBreadcrumbSchema, getFAQSchema } from '../components/seo/schemaUtils';
 
 export default function Terms() {
   const [activeTab, setActiveTab] = useState('terms');
@@ -139,13 +142,49 @@ export default function Terms() {
     }
   ];
 
+  const termsSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      getBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Legal & Policies', url: '/terms' }
+      ]),
+      getFAQSchema([
+        {
+          question: "What is the mandatory unboxing video requirement for exchanges?",
+          answer: "Customers must record a clear, continuous unboxing video from the moment the package is opened. This video is strictly mandatory for any exchange, damage, or missing-item claims."
+        },
+        {
+          question: "How long do I have to request an exchange for footwear?",
+          answer: "Exchanges are accepted only for damaged, defective, or incorrect products and must be reported within 48 hours of delivery with packaging intact."
+        },
+        {
+          question: "Does Beads and Bloom issue monetary refunds?",
+          answer: "No. Beads and Bloom follows a strict no-refund policy. Refunds will not be issued under any circumstances, including size issues or change of mind; eligible claims receive an exchange."
+        }
+      ])
+    ]
+  };
+
   return (
     <div className="bg-white min-h-screen pt-24 pb-24">
-      
+      <SEO
+        title="Terms of Service, Shipping & Exchange Policy | Beads and Bloom"
+        description="Read Beads and Bloom policies covering nationwide delivery, 48-hour exchange window, mandatory unboxing video requirements, and footwear care instructions."
+        canonical="/terms"
+        keywords="beads and bloom terms, jutti return policy, exchange policy mandatory unboxing video, ethnic footwear shipping policy"
+        schema={termsSchema}
+      />
+
       {/* Header */}
       <div className="bg-[#F9F8F6] py-16 px-6 mb-16 text-center">
-        <h1 className="text-4xl md:text-5xl font-serif text-[#1C1917] mb-4">Legal & Support</h1>
-        <p className="text-gray-500 uppercase tracking-widest text-xs">Everything you need to know</p>
+        <nav aria-label="Breadcrumb" className="mb-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-gray-400">
+          <Link to="/" className="hover:text-[#FF2865]">Home</Link>
+          <span>/</span>
+          <span className="text-gray-900 font-bold">Legal & Policies</span>
+        </nav>
+        <h1 className="text-4xl md:text-5xl font-serif text-[#1C1917] mb-4">Terms, Shipping & Return Policies</h1>
+        <p className="text-gray-500 uppercase tracking-widest text-xs">Everything you need to know about our service & standards</p>
       </div>
 
       <div className="max-w-6xl mx-auto px-6">
