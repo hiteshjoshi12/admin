@@ -3,16 +3,16 @@ name: Build and Deploy Frontend
 on:
   push:
     branches:
-      - main
+      - main  # Ensure this matches your default branch name
     paths:
-      - 'Frontend/**'  # Changed to capital F
+      - 'Frontend/**'  # Matches exact capital 'F' folder name
+  workflow_dispatch:  # Allows manual runs from GitHub Actions UI
 
 jobs:
   web-deploy:
-    name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -21,7 +21,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies and build
-        working-directory: ./Frontend  # Changed to capital F
+        working-directory: ./Frontend
         run: |
           npm install
           npm run build
@@ -32,5 +32,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./Frontend/dist/  # Changed to capital F
+          local-dir: ./Frontend/dist/
           server-dir: ./public_html/
