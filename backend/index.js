@@ -52,7 +52,7 @@ const distPath = path.join(__dirname, 'dist');
 app.use(express.static(distPath));
 
 // Fallback for React Router (handles root '/', client subpaths, and prevents overriding /api)
-app.get('*', (req, res) => {
+app.get('/(.*)', (req, res) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ message: 'API route not found' });
   }
