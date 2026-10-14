@@ -154,7 +154,7 @@ const authUser = async (req, res) => {
             }
         });
 
-        await user.save();
+        await User.updateOne({ _id: user._id }, { $set: { cart: user.cart } });
       }
       // -----------------------------
 
@@ -173,7 +173,7 @@ const authUser = async (req, res) => {
              size: item.size,
              quantity: item.quantity
          }));
-         await user.save();
+         await User.updateOne({ _id: user._id }, { $set: { cart: user.cart } });
       }
 
       res.json({
