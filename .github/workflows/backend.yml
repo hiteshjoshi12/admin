@@ -15,6 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Trigger Passenger App Restart
+        run: |
+          mkdir -p backend/tmp
+          echo "Restart triggered at $(date -u)" > backend/tmp/restart.txt
+
       - name: Deploy Backend Files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

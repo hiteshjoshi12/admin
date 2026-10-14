@@ -6,13 +6,26 @@ const getContent = async (req, res) => {
     let content = await SiteContent.findOne();
     if (content) {
       // Ensure shippingSettings has defaults if missing in existing doc
-      if (!content.shippingSettings || typeof content.shippingSettings.standardShipping !== 'number') {
+      if (!content.shippingSettings) {
         content.shippingSettings = {
           standardShipping: 150,
           ncrShipping: 100,
           freeShippingThreshold: 5000,
           ncrPincodePrefixes: "11,12,201"
         };
+      } else {
+        if (typeof content.shippingSettings.standardShipping !== 'number') {
+          content.shippingSettings.standardShipping = 150;
+        }
+        if (typeof content.shippingSettings.ncrShipping !== 'number') {
+          content.shippingSettings.ncrShipping = 100;
+        }
+        if (typeof content.shippingSettings.freeShippingThreshold !== 'number') {
+          content.shippingSettings.freeShippingThreshold = 5000;
+        }
+        if (!content.shippingSettings.ncrPincodePrefixes) {
+          content.shippingSettings.ncrPincodePrefixes = "11,12,201";
+        }
       }
       res.json(content);
     } else {
@@ -49,6 +62,7 @@ const updateContent = async (req, res) => {
           freeShippingThreshold: Number(req.body.shippingSettings.freeShippingThreshold) >= 0 ? Number(req.body.shippingSettings.freeShippingThreshold) : 5000,
           ncrPincodePrefixes: req.body.shippingSettings.ncrPincodePrefixes || "11,12,201"
         };
+        content.markModified('shippingSettings');
       }
       const updatedContent = await content.save();
       res.json(updatedContent);

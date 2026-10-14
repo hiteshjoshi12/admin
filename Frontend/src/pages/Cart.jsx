@@ -58,7 +58,7 @@ export default function Cart() {
 
   // Helper to calculate shipping cost
   const calculateShippingRate = (pin, cartTotal, settings) => {
-    if (cartTotal > settings.freeShippingThreshold) {
+    if (cartTotal >= settings.freeShippingThreshold) {
       return 0;
     }
     if (pin && pin.length >= 2) {
@@ -353,7 +353,7 @@ export default function Cart() {
 
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Shipping</span>
-                  {totalAmount > shippingSettings.freeShippingThreshold ? (
+                  {shippingCost === 0 || totalAmount >= shippingSettings.freeShippingThreshold ? (
                       <span className="text-green-600 font-bold text-xs uppercase">Free</span>
                   ) : (
                       <div className="text-right">

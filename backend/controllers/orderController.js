@@ -133,13 +133,20 @@ const addOrderItems = async (req, res) => {
     }
 
     let shippingPrice = standardShipping;
-    if (calculatedItemsPrice > freeThreshold) {
+    let isNCRLocation = false;
+    const rawPincode = shippingAddress ? (shippingAddress.postalCode || shippingAddress.pincode || "") : "";
+    const pCode = String(rawPincode).trim();
+
+    if (calculatedItemsPrice >= freeThreshold) {
       shippingPrice = 0;
-    } else if (shippingAddress && shippingAddress.postalCode) {
-      const pCode = String(shippingAddress.postalCode).trim();
-      const isNCR = ncrPrefixes.some((prefix) => pCode.startsWith(prefix));
-      if (isNCR) shippingPrice = ncrShipping;
+    } else if (pCode && pCode.length >= 2) {
+      isNCRLocation = ncrPrefixes.some((prefix) => pCode.startsWith(prefix));
+      if (isNCRLocation) {
+        shippingPrice = ncrShipping;
+      }
     }
+
+    console.log(`[Order Calculation] Subtotal: ₹${calculatedItemsPrice}, Pincode: "${pCode}", isNCR: ${isNCRLocation}, dynamic ncrShipping: ₹${ncrShipping}, Final Shipping: ₹${shippingPrice}`);
 
     // 🚨 5. APPLY THE DISCOUNT HERE (SERVER-SIDE VALIDATION) 🚨
     let finalDiscount = 0;

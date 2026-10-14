@@ -255,7 +255,7 @@ export default function Checkout() {
     let shipping = shippingSettings.standardShipping;
     let label = "(Pan India)";
 
-    if (totalAmount > shippingSettings.freeShippingThreshold) {
+    if (totalAmount >= shippingSettings.freeShippingThreshold) {
       shipping = 0;
       label = "Free Shipping";
     } else if (formData.postalCode && formData.postalCode.length >= 2) {
