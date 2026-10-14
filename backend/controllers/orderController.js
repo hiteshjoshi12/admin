@@ -1,5 +1,6 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const Coupon = require("../models/Coupon");
 const { createShiprocketOrder } = require("../utils/shiprocket");
 const crypto = require("crypto");
 const razorpay = require("../utils/razorpay");
@@ -9,25 +10,50 @@ const {
 } = require("../utils/sendEmail");
 const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
 
-// --- HELPER: Reduce Stock ---
+// --- HELPER: Reduce Stock (Atomic) ---
 const reduceOrderStock = async (order) => {
   try {
     for (const item of order.orderItems) {
-      const product = await Product.findById(item.product);
-      if (product) {
-        // 🔴 FIX: Use String() instead of Number()
-        const sizeVariant = product.stock.find((s) => String(s.size) === String(item.size));
-        
-        if (sizeVariant) {
-          sizeVariant.quantity = Math.max(0, sizeVariant.quantity - item.quantity);
-          product.totalStock = product.stock.reduce((acc, s) => acc + s.quantity, 0);
-          await product.save();
+      await Product.updateOne(
+        {
+          _id: item.product,
+          "stock.size": String(item.size),
+          "stock.quantity": { $gte: item.quantity }
+        },
+        {
+          $inc: {
+            "stock.$.quantity": -item.quantity,
+            totalStock: -item.quantity
+          }
         }
-      }
+      );
     }
-    console.log(`📉 Stock reduced for Order ${order._id}`);
+    console.log(`📉 Stock reduced atomically for Order ${order._id}`);
   } catch (error) {
-    console.error("Stock Reduction Failed:", error);
+    console.error("Atomic Stock Reduction Failed:", error);
+  }
+};
+
+// --- HELPER: Restore Stock (Atomic On Cancellation / RTO) ---
+const restoreOrderStock = async (order) => {
+  try {
+    for (const item of order.orderItems) {
+      await Product.updateOne(
+        {
+          _id: item.product,
+          "stock.size": String(item.size)
+        },
+        {
+          $inc: {
+            "stock.$.quantity": item.quantity,
+            totalStock: item.quantity
+          }
+        }
+      );
+    }
+    console.log(`📈 Stock restored atomically for Order ${order._id}`);
+  } catch (error) {
+    console.error("Atomic Stock Restoration Failed:", error);
   }
 };
 
@@ -66,18 +92,11 @@ const addOrderItems = async (req, res) => {
 
       if (!dbProduct) throw new Error(`Product not found: ${item.name}`);
 
-      // 🔴 FIX: Use String() instead of Number() here too
+      // Size check
       const sizeVariant = dbProduct.stock.find((s) => String(s.size) === String(item.size));
       
       if (!sizeVariant || sizeVariant.quantity < item.quantity) {
-        throw new Error(`Out of stock: ${item.name}`);
-      }
-      
-      // Stock Reduction for COD happens here (optional, keeping your logic)
-      if (paymentMethod === 'cod') {
-          sizeVariant.quantity -= item.quantity;
-          dbProduct.totalStock = dbProduct.stock.reduce((acc, s) => acc + s.quantity, 0);
-          if (!productsToUpdate.includes(dbProduct)) productsToUpdate.push(dbProduct);
+        throw new Error(`Out of stock: ${item.name} (Size ${item.size})`);
       }
 
       calculatedItemsPrice += dbProduct.price * item.quantity;
@@ -92,16 +111,62 @@ const addOrderItems = async (req, res) => {
       if (isNCR) shippingPrice = 100;
     }
 
-    // 🚨 5. APPLY THE DISCOUNT HERE 🚨
-    const finalDiscount = Number(discountAmount) || 0;
+    // 🚨 5. APPLY THE DISCOUNT HERE (SERVER-SIDE VALIDATION) 🚨
+    let finalDiscount = 0;
+    let validatedCouponCode = null;
+
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ 
+        code: String(couponCode).trim().toUpperCase(), 
+        isActive: true 
+      });
+
+      if (coupon) {
+        const isNotExpired = !coupon.expirationDate || new Date() <= new Date(coupon.expirationDate);
+        if (isNotExpired) {
+          if (coupon.discountType === 'percentage') {
+            finalDiscount = Math.round((calculatedItemsPrice * coupon.discountAmount) / 100);
+          } else {
+            finalDiscount = Math.round(coupon.discountAmount);
+          }
+          if (finalDiscount > calculatedItemsPrice) {
+            finalDiscount = calculatedItemsPrice;
+          }
+          validatedCouponCode = coupon.code;
+        }
+      }
+    }
     
     // Total = Items + Shipping - Discount
     // We use Math.max(0, ...) to ensure total never goes negative
     const totalPrice = Math.max(0, calculatedItemsPrice + shippingPrice - finalDiscount);
 
-    // Save stock updates (if COD)
-    if (productsToUpdate.length > 0) {
-      await Promise.all(productsToUpdate.map((product) => product.save()));
+    // Safeguard: COD order value cap (standard e-commerce anti-RTO practice)
+    if (paymentMethod === 'cod' && totalPrice > 15000) {
+      return res.status(400).json({ message: "Cash on delivery is only available on orders up to ₹15,000. Please select Online Payment / UPI." });
+    }
+
+    // Atomic Stock Reduction for COD
+    if (paymentMethod === 'cod') {
+      for (const item of orderItems) {
+        const productId = (item.product || item.id || item._id).toString();
+        const updateRes = await Product.updateOne(
+          {
+            _id: productId,
+            "stock.size": String(item.size),
+            "stock.quantity": { $gte: item.quantity }
+          },
+          {
+            $inc: {
+              "stock.$.quantity": -item.quantity,
+              totalStock: -item.quantity
+            }
+          }
+        );
+        if (updateRes.modifiedCount === 0) {
+          throw new Error(`Size ${item.size} of "${item.name}" was just claimed by another customer. Please refresh.`);
+        }
+      }
     }
 
     // 6. Create Order Object
@@ -119,7 +184,7 @@ const addOrderItems = async (req, res) => {
       
       // 🚨 SAVE THESE TO DATABASE 🚨
       discountAmount: finalDiscount,
-      couponCode: couponCode || null,
+      couponCode: validatedCouponCode,
       totalPrice: totalPrice, 
       
       isPaid: false,
@@ -163,11 +228,18 @@ const getOrderById = async (req, res) => {
       "user",
       "name email",
     );
-    if (order) res.json(order);
-    else {
-      res.status(404);
-      throw new Error("Order not found");
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
+
+    // Security check: if user is logged in, ensure only order owner or admin can view
+    if (req.user && !req.user.isAdmin) {
+      if (order.user && !order.user._id.equals(req.user._id)) {
+        return res.status(403).json({ message: "Not authorized to view this order" });
+      }
+    }
+
+    res.json(order);
   } catch (error) {
     res.status(404).json({ message: "Order not found" });
   }
@@ -281,11 +353,24 @@ const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (order) {
+      const prevStatus = order.orderStatus;
       order.orderStatus = status;
-      // Auto-sync Delivered flag
+
+      // Restock inventory if cancelled or returned from active status
+      if (["Cancelled", "Returned"].includes(status) && !["Cancelled", "Returned"].includes(prevStatus)) {
+        await restoreOrderStock(order);
+      } else if (!["Cancelled", "Returned"].includes(status) && ["Cancelled", "Returned"].includes(prevStatus)) {
+        await reduceOrderStock(order);
+      }
+
+      // Auto-sync Delivered flag & COD payment
       if (status === "Delivered") {
         order.isDelivered = true;
         order.deliveredAt = Date.now();
+        if (order.paymentMethod === 'cod' && !order.isPaid) {
+          order.isPaid = true;
+          order.paidAt = Date.now();
+        }
       } else if (status !== "Delivered" && order.isDelivered) {
         order.isDelivered = false;
         order.deliveredAt = null;
@@ -477,7 +562,8 @@ const handleRazorpayWebhook = async (req, res) => {
   const signature = req.headers["x-razorpay-signature"];
 
   try {
-    const isValid = validateWebhookSignature(JSON.stringify(req.body), signature, secret);
+    const rawPayload = req.rawBody ? req.rawBody.toString('utf8') : JSON.stringify(req.body);
+    const isValid = validateWebhookSignature(rawPayload, signature, secret);
 
     if (isValid) {
       console.log("✅ Webhook Signature Verified");
@@ -531,6 +617,16 @@ const handleRazorpayWebhook = async (req, res) => {
 // @route   POST /api/orders/delivery-update
 const handleShiprocketWebhook = async (req, res) => {
   try {
+    // 🔐 Webhook Authentication
+    const expectedToken = process.env.SHIPROCKET_WEBHOOK_TOKEN;
+    if (expectedToken) {
+      const receivedToken = req.headers['x-shiprocket-token'] || req.headers['x-api-key'] || req.query.token;
+      if (receivedToken !== expectedToken) {
+        console.error("❌ Unauthorized Shiprocket Webhook attempt");
+        return res.status(401).json({ message: "Unauthorized webhook" });
+      }
+    }
+
     const { order_id, channel_order_id, current_status, awb, courier_name } = req.body;
 
     console.log(`🚚 Shiprocket Event: ${current_status} for SR-ID: ${order_id}`);
@@ -597,6 +693,7 @@ const handleShiprocketWebhook = async (req, res) => {
     else if (status === "CANCELED" || status === "CANCELLED") {
        if(order.orderStatus !== "Cancelled") {
           order.orderStatus = "Cancelled";
+          await restoreOrderStock(order);
           statusChanged = true;
        }
     }
@@ -604,6 +701,7 @@ const handleShiprocketWebhook = async (req, res) => {
     else if (status === "RTO INITIATED" || status === "RETURNED") {
        if(order.orderStatus !== "Returned") {
           order.orderStatus = "Returned"; 
+          await restoreOrderStock(order);
           statusChanged = true;
        }
     }

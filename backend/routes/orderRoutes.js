@@ -15,11 +15,12 @@ const {
   handleRazorpayWebhook,
   handleShiprocketWebhook
 } = require('../controllers/orderController');
-const { protect, admin, optionalProtect, } = require('../middleware/authMiddleware');
+const { protect, admin, optionalProtect } = require('../middleware/authMiddleware');
+const { orderLimiter } = require('../middleware/rateLimiter');
 
 // 1. Create & Get All
 router.route('/')
-  .post(optionalProtect, addOrderItems) // <--- CHANGED THIS
+  .post(orderLimiter, optionalProtect, addOrderItems)
   .get(protect, admin, getOrders);
 
 // 2. User Specific (Must remain protected)
@@ -32,7 +33,7 @@ router.post('/delivery-update', handleShiprocketWebhook);
 
 // 4. Single Order Operations
 // 🚨 REMOVED 'protect' from getOrderById so Guests can view their order status/receipt
-router.route('/:id').get(getOrderById); 
+router.route('/:id').get(optionalProtect, getOrderById); 
 
 // Legacy manual payment update (keep protected if used by admin/user dashboard only)
 router.route('/:id/pay').put(protect, updateOrderToPaid); 

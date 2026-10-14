@@ -28,16 +28,23 @@ const productSchema = mongoose.Schema({
   timestamps: true,
 });
 
-productSchema.pre('save', function (next) {
+productSchema.pre('save', async function () {
   if (this.isModified('name')) {
-    this.slug = this.name
+    const baseSlug = this.name
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '') 
       .replace(/[\s_]+/g, '-')  
       .replace(/^-+|-+$/g, ''); 
+
+    let slug = baseSlug;
+    let count = 1;
+    while (await mongoose.models.Product?.findOne({ slug, _id: { $ne: this._id } })) {
+      slug = `${baseSlug}-${count}`;
+      count++;
+    }
+    this.slug = slug;
   }
-  
 });
 
 const Product = mongoose.model('Product', productSchema);

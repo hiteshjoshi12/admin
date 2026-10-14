@@ -34,14 +34,14 @@ const createShiprocketOrder = async (mongoOrder) => {
       // --- FIX #1: MATCHES YOUR SCREENSHOT NICKNAME ---
       pickup_location: "Home", 
       
-      billing_customer_name: mongoOrder.user?.name || "Customer",
+      billing_customer_name: mongoOrder.user?.name || mongoOrder.guestInfo?.name || mongoOrder.shippingAddress?.name || "Customer",
       billing_last_name: "",
       billing_address: mongoOrder.shippingAddress.address,
       billing_city: mongoOrder.shippingAddress.city,
       billing_pincode: mongoOrder.shippingAddress.postalCode,
       billing_state: mongoOrder.shippingAddress.state,
       billing_country: "India",
-      billing_email: mongoOrder.user?.email || "customer@example.com",
+      billing_email: mongoOrder.user?.email || mongoOrder.guestInfo?.email || "customer@example.com",
       billing_phone: mongoOrder.shippingAddress.phoneNumber,
       shipping_is_billing: true,
       

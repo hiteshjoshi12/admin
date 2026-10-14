@@ -21,10 +21,12 @@ export default function OrderDetails() {
 
     const fetchOrder = async () => {
       try {
+        const headers = {};
+        if (userInfo && userInfo.token) {
+          headers.Authorization = `Bearer ${userInfo.token}`;
+        }
         const res = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
+          headers,
         });
 
         if (!res.ok) throw new Error('Order not found');
@@ -38,7 +40,7 @@ export default function OrderDetails() {
       }
     };
 
-    if (userInfo) {
+    if (id) {
       fetchOrder();
     }
   }, [id, userInfo]);
@@ -239,7 +241,7 @@ export default function OrderDetails() {
               {order.shippingAddress ? (
                 <div className="text-sm text-gray-600 leading-relaxed">
                   <p className="font-bold text-gray-900 mb-1 flex items-center gap-2">
-                    <User className="w-3 h-3" /> {order.user?.name || 'Guest'}
+                    <User className="w-3 h-3" /> {order.user?.name || order.guestInfo?.name || order.shippingAddress?.name || 'Customer'}
                   </p>
                   <p>{order.shippingAddress.address}</p>
                   <p>{order.shippingAddress.city}, {order.shippingAddress.postalCode}</p>

@@ -18,16 +18,24 @@ const wishlistRoutes = require('./routes/wishlistRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const sitemapRoutes = require('./routes/sitemapRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
 // Middleware
 app.use(compression());
 enableCors(app);
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 
 // Database Connection
 connectDB();
+
+// Global API Rate Limiting
+app.use('/api', apiLimiter);
 
 // API Routes
 app.use('/', sitemapRoutes);

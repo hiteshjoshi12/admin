@@ -23,8 +23,8 @@ const sendContactEmail = async (req, res) => {
 
     // 2. Define email options
     const mailOptions = {
-      from: `"${name}" <${email}>`, // Sender address
-      to: 'connect@beadsandbloom.in', // 🚨 TARGET EMAIL
+      from: `"Beads & Bloom Web Inquiry" <${process.env.EMAIL_USERNAME}>`,
+      to: 'connect@beadsandbloom.in',
       replyTo: email,
       subject: `New Inquiry: ${subject}`,
       html: `

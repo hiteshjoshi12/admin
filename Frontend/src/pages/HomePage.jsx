@@ -18,11 +18,11 @@ const InstagramFeed = lazy(() => import("../components/HomePage/InstagramFeed"))
 
 // --- 3. LOADING SKELETONS ---
 // We use the skeletons you already built as placeholders
-import { 
-  GridSkeleton, 
-  BestSellerSkeleton, 
-  VideoScrollSkeleton, 
-  InstagramSkeleton 
+import {
+  GridSkeleton,
+  BestSellerSkeleton,
+  VideoScrollSkeleton,
+  InstagramSkeleton
 } from "../components/loaders/SectionLoader";
 
 // A generic spacer for sections without specific skeletons (like BrandStory)
@@ -48,7 +48,7 @@ const HomePage = () => {
       <FeaturedOffers />
 
       {/* Load in Background */}
-      <Suspense fallback={<div className="py-24 px-4"><GridSkeleton count={3} type="arch"/></div>}>
+      <Suspense fallback={<div className="py-24 px-4"><GridSkeleton count={3} type="arch" /></div>}>
         <CollectionTiles />
       </Suspense>
 

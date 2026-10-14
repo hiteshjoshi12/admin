@@ -13,18 +13,19 @@ const {
   syncCart
 } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // 1. ROOT ROUTE ('/api/users')
 // - POST: Register a new user (Public)
 // - GET:  Get all users (Admin Only)
 router.route('/')
-  .post(registerUser)
+  .post(authLimiter, registerUser)
   .get(protect, admin, getUsers);
 
 // 2. AUTHENTICATION ROUTES
-router.post('/login', authUser);
-router.post('/forgotpassword', forgotPassword);
-router.put('/resetpassword/:resetToken', resetPassword);
+router.post('/login', authLimiter, authUser);
+router.post('/forgotpassword', authLimiter, forgotPassword);
+router.put('/resetpassword/:resetToken', authLimiter, resetPassword);
 
 // 3. CART ROUTE
 router.put('/cart', protect, syncCart);

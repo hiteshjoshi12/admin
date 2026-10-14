@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react'; 
-import { Routes, Route, Outlet, useLocation } from 'react-router-dom'; 
+import { Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'; 
 import { useDispatch, useSelector } from 'react-redux';
 import { syncCartToBackend } from './redux/cartSlice';
 import { fetchWishlist } from './redux/wishlistSlice'; // 1. Import fetchWishlist Action
@@ -95,6 +95,7 @@ function App() {
       <Routes>
         <Route path="/admin" element={<AdminRoute />}>
            <Route element={<AdminLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<DashboardHome />} />
               <Route path="product/add" element={<ProductForm />} />
               <Route path="product/edit/:id" element={<ProductForm />} />
@@ -125,11 +126,11 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/product/:slug" element={<ProductDetail />} />
             <Route path="/collection/:category" element={<Collection />} />
+            <Route path="/order/:id" element={<OrderDetails />} />
             
             <Route element={<PrivateRoute />}>
                <Route path="/profile" element={<Profile />} />
                <Route path="/myorders" element={<MyOrders />} />
-               <Route path="/order/:id" element={<OrderDetails />} />
             </Route>
             <Route path="*" element={<NotFound />} />
         </Route>

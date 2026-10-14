@@ -174,7 +174,7 @@ export default function ProductDetail() {
     return {
       id: currentProduct._id,
       name: currentProduct.name,
-      image: currentProduct.images[0],
+      image: currentProduct.images?.[0] || currentProduct.image || '',
       price: currentProduct.price,
       quantity,
       size: selectedSize,

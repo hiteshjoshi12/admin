@@ -219,6 +219,9 @@ export default function Checkout() {
   const handlePlaceOrder = async () => {
     if (loading || paymentProcessing) return;
     if (cartItems.length === 0) return toast.error("Your cart is empty");
+    if (paymentMethod === "cod" && finalTotal > 15000) {
+      return toast.error("COD is only available on orders up to ₹15,000. Please choose Online Payment.");
+    }
 
     const orderData = {
       orderItems: cartItems.map((item) => ({
@@ -429,16 +432,31 @@ export default function Checkout() {
                   </div>
 
                   {/* Option 2: COD */}
-                  <div onClick={() => setPaymentMethod("cod")} 
-                       className={`cursor-pointer p-5 rounded-xl border-2 transition-all flex items-center gap-4 ${paymentMethod === "cod" ? "border-[#1C1917] bg-white shadow-md" : "border-gray-100 hover:border-gray-200 bg-white"}`}>
-                    
+                  <div 
+                    onClick={() => {
+                      if (finalTotal > 15000) {
+                        toast.error("COD is available on orders up to ₹15,000. Please choose Online Payment.");
+                        return;
+                      }
+                      setPaymentMethod("cod");
+                    }} 
+                    className={`p-5 rounded-xl border-2 transition-all flex items-center gap-4 ${
+                      finalTotal > 15000
+                        ? "opacity-50 cursor-not-allowed border-gray-100 bg-gray-50"
+                        : paymentMethod === "cod"
+                        ? "cursor-pointer border-[#1C1917] bg-white shadow-md"
+                        : "cursor-pointer border-gray-100 hover:border-gray-200 bg-white"
+                    }`}
+                  >
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${paymentMethod === "cod" ? "border-[#1C1917]" : "border-gray-300"}`}>
                       {paymentMethod === "cod" && <div className="w-2.5 h-2.5 rounded-full bg-[#1C1917]" />}
                     </div>
                     
                     <div className="flex-1">
                       <p className="font-bold text-sm text-[#1C1917]">Cash on Delivery</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Pay in cash when order arrives</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {finalTotal > 15000 ? "Unavailable for orders over ₹15,000" : "Pay in cash when order arrives"}
+                      </p>
                     </div>
                     <Banknote size={24} className="text-gray-400" />
                   </div>

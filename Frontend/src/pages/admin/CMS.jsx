@@ -69,11 +69,17 @@ function HomeCMS({ userInfo }) {
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/content`).then(res => res.json()).then(content => {
       if (content) {
-        // FIX: Ensure every slide has a string-based "id" immediately
-        const sanitizedSlides = (content.heroSlides || []).map((slide, idx) => ({
-          ...slide,
-          id: slide._id ? String(slide._id) : `init-${idx}`
-        }));
+        const isVideoUrl = (url) => typeof url === 'string' && (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url) || url.includes('/video/'));
+        const sanitizedSlides = (content.heroSlides || []).map((slide, idx) => {
+          const detectedType = slide.mediaType || (slide.video || isVideoUrl(slide.image) ? 'video' : 'image');
+          return {
+            ...slide,
+            id: slide._id ? String(slide._id) : `init-${idx}`,
+            mediaType: detectedType,
+            video: slide.video || (isVideoUrl(slide.image) ? slide.image : ''),
+            image: isVideoUrl(slide.image) ? (slide.video ? slide.image : '') : (slide.image || '')
+          };
+        });
 
         setData(prev => ({ 
           heroSlides: sanitizedSlides, 
@@ -93,7 +99,16 @@ function HomeCMS({ userInfo }) {
     const newId = `new-${Date.now()}`;
     setData({ 
       ...data, 
-      heroSlides: [...data.heroSlides, { id: newId, image: '', title: 'New', subtitle: '', cta: 'Shop Now', link: '/shop' }] 
+      heroSlides: [...data.heroSlides, { 
+        id: newId, 
+        mediaType: 'image',
+        image: '', 
+        video: '',
+        title: 'New', 
+        subtitle: 'Handcrafted Luxury', 
+        cta: 'Shop Now', 
+        link: '/shop' 
+      }] 
     });
   };
   
@@ -166,7 +181,10 @@ function HomeCMS({ userInfo }) {
          <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
             <div className="flex items-center gap-2">
                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Layout className="w-5 h-5" /></div>
-               <h3 className="text-lg font-bold text-gray-800">Home Page Slider</h3>
+               <div>
+                  <h3 className="text-lg font-bold text-gray-800">Home Page Slider</h3>
+                  <p className="text-xs text-gray-500">Supports both high-resolution Images & MP4/WebM Videos</p>
+               </div>
             </div>
             <div className="flex gap-3 w-full md:w-auto">
                <button onClick={addSlide} className="flex-1 md:flex-none justify-center text-[#FF2865] text-sm font-bold flex items-center gap-1 bg-pink-50 px-3 py-2 md:py-1.5 rounded hover:bg-pink-100 transition-colors">
@@ -210,42 +228,122 @@ function HomeCMS({ userInfo }) {
                             </div>
 
                             <div className="flex-1 relative">
-                              <button onClick={() => removeSlide(i)} className="absolute -top-2 -right-2 text-gray-300 hover:text-red-500 transition-colors p-2">
+                              <button onClick={() => removeSlide(i)} className="absolute -top-2 -right-2 text-gray-300 hover:text-red-500 transition-colors p-2" title="Remove slide">
                                   <Trash2 className="w-5 h-5"/>
                               </button>
                               
-                              <span className="text-[10px] font-bold bg-gray-200 text-gray-600 px-2 py-0.5 rounded mb-4 inline-block uppercase tracking-wider">
-                                Slide Position: {i + 1}
-                              </span>
+                              <div className="flex flex-wrap items-center gap-2 mb-4">
+                                <span className="text-[10px] font-bold bg-gray-200 text-gray-600 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                  Slide #{i + 1}
+                                </span>
+
+                                {/* Media Type Switcher */}
+                                <div className="inline-flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200 text-xs">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleHeroChange(i, 'mediaType', 'image')}
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all ${
+                                      slide.mediaType !== 'video'
+                                        ? 'bg-white text-gray-900 shadow-xs font-semibold'
+                                        : 'text-gray-500 hover:text-gray-800'
+                                    }`}
+                                  >
+                                    <ImageIcon className="w-3.5 h-3.5 text-[#FD61A7]" /> Image
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleHeroChange(i, 'mediaType', 'video')}
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all ${
+                                      slide.mediaType === 'video'
+                                        ? 'bg-white text-gray-900 shadow-xs font-semibold'
+                                        : 'text-gray-500 hover:text-gray-800'
+                                    }`}
+                                  >
+                                    <Video className="w-3.5 h-3.5 text-blue-600" /> Video
+                                  </button>
+                                </div>
+                              </div>
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="md:col-span-2">
-                                   <FileUpload 
-                                      label="Slide Image"
-                                      value={slide.image}
-                                      onUpload={(url) => handleHeroChange(i, 'image', url)}
-                                   />
-                                   {slide.image && (
-                                     <div className="mt-2">
-                                        <img src={getOptimizedImage(slide.image, 200)} alt="prev" className="w-32 h-20 rounded object-cover border shadow-inner" />
-                                     </div>
-                                   )}
-                                </div>
+                                {slide.mediaType === 'video' ? (
+                                  <div className="md:col-span-2 space-y-4 bg-blue-50/30 p-4 rounded-xl border border-blue-100">
+                                    <div>
+                                      <FileUpload 
+                                         label="Slide Video (.mp4, .webm - Max 50MB)"
+                                         value={slide.video}
+                                         accept="video/*"
+                                         placeholder="Upload or paste video URL..."
+                                         folderName="hero-videos"
+                                         maxSizeMB={50}
+                                         onUpload={(url) => handleHeroChange(i, 'video', url)}
+                                      />
+                                      {slide.video && (
+                                        <div className="mt-3 flex items-start gap-4">
+                                          <video 
+                                            src={getOptimizedVideo(slide.video, 400)} 
+                                            controls 
+                                            muted 
+                                            className="w-48 h-28 rounded-lg object-cover border bg-black shadow-sm" 
+                                          />
+                                          <div className="text-xs text-gray-500 space-y-1">
+                                            <p className="font-semibold text-emerald-600">✓ Video uploaded ready</p>
+                                            <p>Will loop seamlessly in background on home page.</p>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div>
+                                      <FileUpload 
+                                         label="Poster / Fallback Image (Optional - preview before video plays)"
+                                         value={slide.image}
+                                         accept="image/*"
+                                         placeholder="Upload optional poster image..."
+                                         folderName="hero-posters"
+                                         maxSizeMB={15}
+                                         onUpload={(url) => handleHeroChange(i, 'image', url)}
+                                      />
+                                      {slide.image && (
+                                        <div className="mt-2">
+                                          <img src={getOptimizedImage(slide.image, 200)} alt="Poster Preview" className="w-32 h-20 rounded-lg object-cover border shadow-sm" />
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="md:col-span-2 bg-pink-50/20 p-4 rounded-xl border border-pink-100">
+                                     <FileUpload 
+                                        label="Slide Image (High Resolution - Max 15MB)"
+                                        value={slide.image}
+                                        accept="image/*"
+                                        placeholder="Upload hero banner image..."
+                                        folderName="hero-images"
+                                        maxSizeMB={15}
+                                        onUpload={(url) => handleHeroChange(i, 'image', url)}
+                                     />
+                                     {slide.image && (
+                                       <div className="mt-2.5">
+                                          <img src={getOptimizedImage(slide.image, 300)} alt="Preview" className="w-40 h-24 rounded-lg object-cover border shadow-sm" />
+                                       </div>
+                                     )}
+                                  </div>
+                                )}
+
                                 <div>
                                    <label className="text-xs font-bold text-gray-500 uppercase">Title</label>
-                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Main Headline" value={slide.title} onChange={e=>handleHeroChange(i,'title',e.target.value)} />
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Main Headline" value={slide.title || ''} onChange={e=>handleHeroChange(i,'title',e.target.value)} />
                                 </div>
                                 <div>
                                    <label className="text-xs font-bold text-gray-500 uppercase">Subtitle</label>
-                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Top small text" value={slide.subtitle} onChange={e=>handleHeroChange(i,'subtitle',e.target.value)} />
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Top small text" value={slide.subtitle || ''} onChange={e=>handleHeroChange(i,'subtitle',e.target.value)} />
                                 </div>
                                 <div>
                                    <label className="text-xs font-bold text-gray-500 uppercase">Button Text</label>
-                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Shop Now" value={slide.cta} onChange={e=>handleHeroChange(i,'cta',e.target.value)} />
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="Shop Now" value={slide.cta || ''} onChange={e=>handleHeroChange(i,'cta',e.target.value)} />
                                 </div>
                                 <div>
                                    <label className="text-xs font-bold text-gray-500 uppercase">Link URL</label>
-                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="/shop" value={slide.link} onChange={e=>handleHeroChange(i,'link',e.target.value)} />
+                                   <input className="w-full border p-2 rounded mt-1 text-sm bg-white focus:ring-1 focus:ring-[#FD61A7] outline-none" placeholder="/shop" value={slide.link || ''} onChange={e=>handleHeroChange(i,'link',e.target.value)} />
                                 </div>
                               </div>
                             </div>

@@ -4,7 +4,9 @@ const siteContentSchema = mongoose.Schema({
   // Changed from single 'hero' object to 'heroSlides' array
   heroSlides: [
     {
-      image: { type: String, required: true },
+      mediaType: { type: String, enum: ['image', 'video'], default: 'image' },
+      image: { type: String, default: '' },
+      video: { type: String, default: '' },
       title: { type: String, default: "Handcrafted Luxury" },
       subtitle: { type: String, default: "New Collection" },
       cta: { type: String, default: "Shop Now" },

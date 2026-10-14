@@ -2,7 +2,7 @@ const cors = require('cors');
 
 module.exports = (app) => {
   const allowedOrigins = process.env.FRONTEND_URL 
-    ? process.env.FRONTEND_URL.split(',') 
+    ? process.env.FRONTEND_URL.split(',').map(url => url.trim().replace(/\/$/, '')) 
     : ['http://localhost:5173'];
 
   const corsOptions = {

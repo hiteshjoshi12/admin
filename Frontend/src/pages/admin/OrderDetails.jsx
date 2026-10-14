@@ -134,6 +134,24 @@ export default function OrderDetails() {
     }
   };
 
+  const handleMarkAsPaid = async () => {
+    if (!window.confirm("Confirm: Mark this order as PAID? Ensure cash or offline payment has been received.")) return;
+    setUpdateLoading(true);
+    try {
+      const { data } = await axios.put(
+        `${API_BASE_URL}/api/orders/${id}/pay`,
+        { status: "completed", id: `manual_admin_${Date.now()}` },
+        { headers: { Authorization: `Bearer ${userInfo.token}` } },
+      );
+      setOrder(data);
+      toast.success("Order marked as Paid!");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Payment update failed");
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied!");
@@ -305,6 +323,17 @@ export default function OrderDetails() {
                          {shipLoading ? <Clock className="animate-spin w-4 h-4"/> : isShipped ? <CheckCircle className="w-4 h-4"/> : <Package className="w-4 h-4"/>}
                          {shipLoading ? "Processing..." : isShipped ? "Shipped via Shiprocket" : "Generate Label"}
                       </button>
+
+                      {/* MARK AS PAID BUTTON (FOR UNPAID / COD ORDERS) */}
+                      {!order.isPaid && (
+                         <button
+                           onClick={handleMarkAsPaid}
+                           disabled={updateLoading}
+                           className="w-full py-2.5 px-4 rounded-lg font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-sm"
+                         >
+                            <CheckCircle className="w-4 h-4" /> Mark as Paid (Cash / Offline)
+                         </button>
+                      )}
 
                       <hr className="border-gray-100" />
 

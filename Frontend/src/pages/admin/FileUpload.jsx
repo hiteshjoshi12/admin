@@ -9,8 +9,9 @@ export default function FileUpload({
   value, 
   onUpload, 
   accept = "image/*", 
-  placeholder = "Upload Image",
-  folderName = "" // <--- 1. Add this new prop
+  placeholder = "File URL will appear here...",
+  folderName = "",
+  maxSizeMB = 50
 }) {
  const [uploading, setUploading] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
@@ -19,8 +20,8 @@ export default function FileUpload({
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("File is too large (Max 10MB)");
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      toast.error(`File is too large (Max ${maxSizeMB}MB)`);
       return;
     }
 
