@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const productSchema = mongoose.Schema({
   name: { type: String, required: true },
   slug: { type: String, unique: true }, 
+  oldSlugs: [{ type: String, index: true }], // Preserve old slugs for SEO redirects & zero-404 fallback
   image: { type: String, required: true },
   images: [{ type: String }],
   description: { type: String, required: true },
@@ -40,7 +41,7 @@ productSchema.pre('save', async function () {
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '') 
-      .replace(/[\s_]+/g, '-')  
+      .replace(/[\s_-]+/g, '-')  
       .replace(/^-+|-+$/g, ''); 
 
     let slug = baseSlug;
@@ -48,6 +49,13 @@ productSchema.pre('save', async function () {
     while (await mongoose.models.Product?.findOne({ slug, _id: { $ne: this._id } })) {
       slug = `${baseSlug}-${count}`;
       count++;
+    }
+    // Retain previous slug in oldSlugs for backwards compatibility
+    if (this.slug && this.slug !== slug) {
+      if (!this.oldSlugs) this.oldSlugs = [];
+      if (!this.oldSlugs.includes(this.slug)) {
+        this.oldSlugs.push(this.slug);
+      }
     }
     this.slug = slug;
   }

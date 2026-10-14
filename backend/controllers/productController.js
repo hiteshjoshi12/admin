@@ -1,11 +1,24 @@
 const Product = require("../models/Product");
 const NodeCache = require("node-cache");
 
+const mongoose = require("mongoose");
+
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 320 });
 
 const getProductBySlug = async (req, res) => {
   try {
-    const product = await Product.findOne({ slug: req.params.slug }).lean();
+    const slugOrId = req.params.slug;
+    const isObjectId = mongoose.Types.ObjectId.isValid(slugOrId);
+
+    const query = {
+      $or: [
+        { slug: slugOrId },
+        { oldSlugs: slugOrId },
+        ...(isObjectId ? [{ _id: slugOrId }] : [])
+      ]
+    };
+
+    const product = await Product.findOne(query).lean();
     if (product) {
       res.json(product);
     } else {
