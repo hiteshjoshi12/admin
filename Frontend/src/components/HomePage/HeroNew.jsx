@@ -11,7 +11,7 @@ const fallbackSlides = [
   {
     id: 'fallback-1',
     mediaType: 'video',
-    video: 'https://ik.imagekit.io/beandandbloom/Media/j5_ketdz3.mp4',
+    video: 'https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/uncategorized/banner3_beah8o_LnFLRXA-U.webp',
     image: 'banner1.png',
     subtitle: 'Artisanal Punjabi Juttis',
     titleLine1: 'Beads &',
@@ -36,10 +36,10 @@ const brandPink = "#FD61A7";
 // Helper component for rendering individual slide media (Video or Image)
 function SlideMedia({ slide, isActive, isMuted }) {
   const videoRef = useRef(null);
-  const isVideo = slide.mediaType === 'video' || 
-    Boolean(slide.video) || 
+  const isVideo = slide.mediaType === 'video' ||
+    Boolean(slide.video) ||
     (typeof slide.image === 'string' && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(slide.image));
-  
+
   const videoUrl = slide.video || slide.image;
 
   useEffect(() => {
@@ -78,9 +78,8 @@ function SlideMedia({ slide, isActive, isMuted }) {
   }
 
   return (
-    <div className={`w-full h-full transition-transform duration-[7000ms] ease-out ${
-      isActive ? 'scale-105' : 'scale-100'
-    }`}>
+    <div className={`w-full h-full transition-transform duration-[7000ms] ease-out ${isActive ? 'scale-105' : 'scale-100'
+      }`}>
       <ImageWithShimmer
         src={getOptimizedImage(slide.image || 'banner1.png', 1920)}
         alt={`${slide.titleLine1 || 'Beads and Bloom'} ${slide.titleLine2 || 'Handcrafted Juttis'}`}
@@ -104,7 +103,7 @@ export default function HeroNew() {
         const data = await res.json();
 
         if (data && data.heroSlides && data.heroSlides.length > 0) {
-          const isVideoUrl = (url) => 
+          const isVideoUrl = (url) =>
             typeof url === 'string' && (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url) || url.includes('/video/'));
 
           const formattedSlides = data.heroSlides.map((slide, idx) => {
@@ -164,12 +163,12 @@ export default function HeroNew() {
 
   const currentSlide = slides[current] || slides[0] || fallbackSlides[0];
   const hasContent = Boolean(currentSlide?.subtitle || currentSlide?.titleLine1 || currentSlide?.cta);
-  const currentIsVideo = currentSlide?.mediaType === 'video' || 
-    Boolean(currentSlide?.video) || 
+  const currentIsVideo = currentSlide?.mediaType === 'video' ||
+    Boolean(currentSlide?.video) ||
     (typeof currentSlide?.image === 'string' && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(currentSlide.image));
 
   return (
-    <section 
+    <section
       className="relative h-[88vh] md:h-screen w-full overflow-hidden bg-[#1C1917]"
       aria-label="Hero Showcase"
       onMouseEnter={() => setIsPaused(true)}
@@ -181,14 +180,13 @@ export default function HeroNew() {
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              isActive ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none -z-10'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none -z-10'
+              }`}
           >
-            <SlideMedia 
-              slide={slide} 
-              isActive={isActive} 
-              isMuted={isMuted} 
+            <SlideMedia
+              slide={slide}
+              isActive={isActive}
+              isMuted={isMuted}
             />
 
             {/* Subtle luxury gradient overlay - preserves video vibrancy while making text crystal clear */}
@@ -206,7 +204,7 @@ export default function HeroNew() {
       {hasContent ? (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4 pt-16 md:pt-20 pointer-events-none">
           <div key={current} className="flex flex-col items-center max-w-4xl px-2">
-            
+
             {/* Refined Subtitle Pill Badge */}
             {currentSlide.subtitle && (
               <div className="animate-fade-up inline-flex items-center gap-2 px-3.5 py-1 md:py-1.5 rounded-full bg-black/35 backdrop-blur-md border border-white/20 text-[10px] md:text-xs font-sans font-semibold tracking-[0.28em] uppercase text-white/95 mb-4 md:mb-5 shadow-lg">
@@ -220,7 +218,7 @@ export default function HeroNew() {
               <span className="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white">
                 {currentSlide.titleLine1 || 'Handcrafted'}
               </span>
-              <span 
+              <span
                 className="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl italic font-light mt-1 md:mt-2"
                 style={{ color: brandPink }}
               >
@@ -231,8 +229,8 @@ export default function HeroNew() {
             {/* Redesigned Refined CTA Button */}
             {currentSlide.cta && (
               <div className="pointer-events-auto">
-                <Link 
-                  to={currentSlide.link || '/shop'} 
+                <Link
+                  to={currentSlide.link || '/shop'}
                   className="animate-fade-up delay-200 mt-6 md:mt-8 inline-flex items-center gap-2.5 bg-white text-[#1C1917] px-6 py-2.5 md:px-8 md:py-3.5 text-[11px] md:text-xs font-bold uppercase tracking-[0.2em] rounded-full shadow-2xl border border-white/40 hover:bg-[#FD61A7] hover:text-white hover:border-[#FD61A7] hover:shadow-[#FD61A7]/30 transition-all duration-300 hover:scale-105 active:scale-95 group cursor-pointer"
                 >
                   <span>{currentSlide.cta}</span>
@@ -270,8 +268,8 @@ export default function HeroNew() {
       {length > 1 && (
         <>
           {/* Left Arrow */}
-          <button 
-            onClick={prevSlide} 
+          <button
+            onClick={prevSlide}
             aria-label="Previous Slide"
             className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/25 hover:bg-white text-white hover:text-[#FD61A7] backdrop-blur-md border border-white/15 transition-all duration-300 shadow-lg cursor-pointer group"
           >
@@ -279,27 +277,26 @@ export default function HeroNew() {
           </button>
 
           {/* Right Arrow */}
-          <button 
-            onClick={nextSlide} 
+          <button
+            onClick={nextSlide}
             aria-label="Next Slide"
             className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/25 hover:bg-white text-white hover:text-[#FD61A7] backdrop-blur-md border border-white/15 transition-all duration-300 shadow-lg cursor-pointer group"
           >
             <ChevronRight className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
-          
+
           {/* Slide Indicator Capsules */}
           <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md border border-white/15">
             {slides.map((_, index) => (
-              <button 
-                key={index} 
-                onClick={() => setCurrent(index)} 
+              <button
+                key={index}
+                onClick={() => setCurrent(index)}
                 aria-label={`Go to slide ${index + 1}`}
                 className="py-1 px-0.5 cursor-pointer"
               >
-                <div 
-                  className={`h-1.5 rounded-full transition-all duration-500 ${
-                    index === current ? 'w-8 shadow-sm' : 'w-2.5 bg-white/40 hover:bg-white/70'
-                  }`}
+                <div
+                  className={`h-1.5 rounded-full transition-all duration-500 ${index === current ? 'w-8 shadow-sm' : 'w-2.5 bg-white/40 hover:bg-white/70'
+                    }`}
                   style={{ backgroundColor: index === current ? brandPink : undefined }}
                 />
               </button>
