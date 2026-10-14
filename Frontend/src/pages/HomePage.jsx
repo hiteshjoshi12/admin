@@ -4,7 +4,7 @@ import { getOrganizationSchema, getWebSiteSchema } from "../components/seo/schem
 
 // --- 1. CRITICAL IMPORTS (Load Immediately) ---
 // These are "Above the Fold". We want them to show up instantly.
-import Hero from "../components/HomePage/Hero";
+import Hero from "../components/HomePage/HeroNew";
 import FeaturedOffers from "../components/FeaturedOffers";
 
 // --- 2. LAZY IMPORTS (Load on Demand) ---
