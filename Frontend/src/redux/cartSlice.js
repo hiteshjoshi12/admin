@@ -34,6 +34,7 @@ const calculateTotals = (state) => {
 };
 
 const itemsFromStorage = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
+const couponFromStorage = localStorage.getItem('appliedCoupon') ? JSON.parse(localStorage.getItem('appliedCoupon')) : null;
 
 const initialState = {
   items: itemsFromStorage,
@@ -41,7 +42,7 @@ const initialState = {
   totalAmount: 0,
   shippingAddress: localStorage.getItem('shippingAddress') ? JSON.parse(localStorage.getItem('shippingAddress')) : {},
   paymentMethod: 'Razorpay',
-  coupon: null,
+  coupon: couponFromStorage,
   // 🟢 DIRTY FLAG: Defaults to false. 
   // True = User changed something, needs sync. 
   // False = Data is fresh from DB or empty, DO NOT SYNC.
@@ -111,12 +112,23 @@ const cartSlice = createSlice({
       state.coupon = null; // ✅ Clear coupon on manual clear
       state.isDirty = false; 
       localStorage.removeItem('cartItems');
+      localStorage.removeItem('appliedCoupon');
     },
 
     saveShippingAddress: (state, action) => { state.shippingAddress = action.payload; },
     savePaymentMethod: (state, action) => { state.paymentMethod = action.payload; },
-    applyDiscount: (state, action) => { state.coupon = action.payload; },
-    removeDiscount: (state) => { state.coupon = null; },
+    applyDiscount: (state, action) => { 
+      state.coupon = action.payload; 
+      if (action.payload) {
+        localStorage.setItem('appliedCoupon', JSON.stringify(action.payload));
+      } else {
+        localStorage.removeItem('appliedCoupon');
+      }
+    },
+    removeDiscount: (state) => { 
+      state.coupon = null; 
+      localStorage.removeItem('appliedCoupon');
+    },
   },
   
   // 🚨 CRASH FIX: Use String Literals. No Imports needed.
@@ -141,6 +153,7 @@ const cartSlice = createSlice({
          state.coupon = null; // ✅ FIXED: Clear coupon on logout
          state.isDirty = false; 
          localStorage.removeItem('cartItems');
+         localStorage.removeItem('appliedCoupon');
       });
   }
 });

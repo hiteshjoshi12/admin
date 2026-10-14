@@ -102,11 +102,7 @@ export default function Cart() {
 
   const checkoutHandler = () => {
     const stateData = { estimatedShipping: shippingCost };
-    if (userInfo) {
-      navigate('/checkout', { state: stateData });
-    } else {
-      navigate('/login?redirect=checkout', { state: stateData });
-    }
+    navigate('/checkout', { state: stateData });
   };
 
   const handleUpdateQty = (id, size, newQty, maxStock) => {
@@ -117,12 +113,14 @@ export default function Cart() {
       return;
     }
     dispatch(updateQuantity({ id, size, quantity: newQty }));
-    if (appliedCoupon) dispatch(removeDiscount());
+    // Coupon is re-validated automatically by the useEffect below when totalAmount updates
   };
 
   const handleRemove = (id, size) => {
     dispatch(removeFromCart({ id, size }));
-    if (appliedCoupon) dispatch(removeDiscount());
+    if (cartItems.length <= 1) {
+      dispatch(removeDiscount());
+    }
     toast.success("Item removed");
   };
 
@@ -141,9 +139,14 @@ export default function Cart() {
       const data = await res.json();
 
       if (res.ok) {
-        dispatch(applyDiscount({ code: data.code, discountAmount: data.discountAmount }));
+        dispatch(applyDiscount({ 
+          code: data.code, 
+          discountAmount: data.discountAmount,
+          type: data.type,
+          value: data.value
+        }));
         setCouponCode('');
-        toast.success("Coupon Applied!");
+        toast.success(`Coupon "${data.code}" Applied!`);
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FF2865', '#1C1917', '#ffffff'] });
       } else {
         setError(data.message);

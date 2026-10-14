@@ -13,13 +13,17 @@ import {
   Banknote,
   Lock,
   ShieldCheck,
-  BadgeCheck
+  BadgeCheck,
+  Tag,
+  X,
+  Sparkles
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import confetti from "canvas-confetti";
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from "react-redux";
-import { saveShippingAddress, clearCart } from "../redux/cartSlice";
+import { saveShippingAddress, clearCart, applyDiscount, removeDiscount } from "../redux/cartSlice";
 import { createOrder, resetOrder } from "../redux/orderSlice";
 import { saveAddressToProfile } from "../redux/authSlice";
 import { API_BASE_URL } from "../util/config";
@@ -49,6 +53,119 @@ export default function Checkout() {
   const [showSummaryMobile, setShowSummaryMobile] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [createdOrderId, setCreatedOrderId] = useState(null); 
+
+  // --- COUPON STATE & ACTIONS ---
+  const [couponCodeInput, setCouponCodeInput] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+  const [showAvailableCoupons, setShowAvailableCoupons] = useState(false);
+
+  // 1. Fetch available store coupons so user can see and click-to-apply
+  useEffect(() => {
+    const fetchActiveCoupons = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/coupons/active`);
+        if (res.ok) {
+          const data = await res.json();
+          setAvailableCoupons(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Failed to load active coupons", err);
+      }
+    };
+    fetchActiveCoupons();
+  }, []);
+
+  // 2. Background Re-validation of applied coupon (e.g. on page refresh or total change)
+  useEffect(() => {
+    if (coupon && totalAmount > 0) {
+      const validateCurrentCoupon = async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/coupons/verify`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(userInfo?.token && { Authorization: `Bearer ${userInfo.token}` }),
+            },
+            body: JSON.stringify({ code: coupon.code, cartTotal: totalAmount }),
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            dispatch(removeDiscount());
+            toast.error(`Coupon ${coupon.code} is no longer valid or has expired.`);
+          } else if (data.discountAmount !== coupon.discountAmount) {
+            dispatch(
+              applyDiscount({
+                code: data.code,
+                discountAmount: data.discountAmount,
+                type: data.type,
+                value: data.value,
+              })
+            );
+          }
+        } catch (err) {
+          console.error("Coupon verification error", err);
+        }
+      };
+      validateCurrentCoupon();
+    }
+  }, [coupon?.code, totalAmount, dispatch, userInfo?.token]);
+
+  // 3. Apply coupon handler
+  const handleApplyCoupon = async (codeToApply) => {
+    const code = (codeToApply || couponCodeInput).trim().toUpperCase();
+    if (!code) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+    setCouponLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/coupons/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(userInfo?.token && { Authorization: `Bearer ${userInfo.token}` }),
+        },
+        body: JSON.stringify({ code, cartTotal: totalAmount }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        dispatch(
+          applyDiscount({
+            code: data.code,
+            discountAmount: data.discountAmount,
+            type: data.type,
+            value: data.value,
+          })
+        );
+        setCouponCodeInput("");
+        setShowAvailableCoupons(false);
+        toast.success(`Coupon "${data.code}" applied! Saved ₹${data.discountAmount.toLocaleString()}`);
+        try {
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            origin: { y: 0.6 },
+            colors: ['#10B981', '#1C1917', '#F59E0B']
+          });
+        } catch (e) {}
+      } else {
+        toast.error(data.message || "Invalid coupon code");
+      }
+    } catch (err) {
+      toast.error("Failed to verify coupon. Please try again.");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  // 4. Remove coupon handler
+  const handleRemoveCoupon = () => {
+    dispatch(removeDiscount());
+    toast("Coupon removed");
+  };
   
   // 1. ✅ GET PRIMARY ADDRESS (Prioritize 'isPrimary', fallback to first index)
   const getPrimaryAddress = (addresses) => {
@@ -320,7 +437,23 @@ export default function Checkout() {
           </button>
           {showSummaryMobile && (
             <div className="bg-white border-x border-b border-gray-200 p-4 rounded-b-xl animate-fade-down">
-              <OrderSummaryContent items={cartItems} itemsPrice={itemsPrice} shippingCost={shippingCost} discount={discountAmount} total={finalTotal} coupon={coupon} label={shippingLabel} />
+              <OrderSummaryContent
+                items={cartItems}
+                itemsPrice={itemsPrice}
+                shippingCost={shippingCost}
+                discount={discountAmount}
+                total={finalTotal}
+                coupon={coupon}
+                label={shippingLabel}
+                couponCodeInput={couponCodeInput}
+                setCouponCodeInput={setCouponCodeInput}
+                couponLoading={couponLoading}
+                handleApplyCoupon={handleApplyCoupon}
+                handleRemoveCoupon={handleRemoveCoupon}
+                availableCoupons={availableCoupons}
+                showAvailableCoupons={showAvailableCoupons}
+                setShowAvailableCoupons={setShowAvailableCoupons}
+              />
             </div>
           )}
         </div>
@@ -487,7 +620,23 @@ export default function Checkout() {
           {/* --- RIGHT SIDE: SUMMARY --- */}
           <div className="hidden lg:block w-1/3 sticky top-32">
             <div className="bg-white p-6 rounded-2xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] border border-gray-100">
-              <OrderSummaryContent items={cartItems} itemsPrice={itemsPrice} shippingCost={shippingCost} discount={discountAmount} total={finalTotal} coupon={coupon} label={shippingLabel} />
+              <OrderSummaryContent
+                items={cartItems}
+                itemsPrice={itemsPrice}
+                shippingCost={shippingCost}
+                discount={discountAmount}
+                total={finalTotal}
+                coupon={coupon}
+                label={shippingLabel}
+                couponCodeInput={couponCodeInput}
+                setCouponCodeInput={setCouponCodeInput}
+                couponLoading={couponLoading}
+                handleApplyCoupon={handleApplyCoupon}
+                handleRemoveCoupon={handleRemoveCoupon}
+                availableCoupons={availableCoupons}
+                showAvailableCoupons={showAvailableCoupons}
+                setShowAvailableCoupons={setShowAvailableCoupons}
+              />
             </div>
             
             {/* Security Badge Below Summary */}
@@ -504,39 +653,164 @@ export default function Checkout() {
   );
 }
 
-function OrderSummaryContent({ items, itemsPrice, shippingCost, discount, total, coupon, label }) {
+function OrderSummaryContent({
+  items,
+  itemsPrice,
+  shippingCost,
+  discount,
+  total,
+  coupon,
+  label,
+  couponCodeInput,
+  setCouponCodeInput,
+  couponLoading,
+  handleApplyCoupon,
+  handleRemoveCoupon,
+  availableCoupons,
+  showAvailableCoupons,
+  setShowAvailableCoupons
+}) {
   return (
     <>
       <h3 className="font-serif text-lg mb-4 flex items-center gap-2 border-b border-gray-100 pb-4 text-[#1C1917]">
          <ShoppingBag size={18} /> Order Summary
       </h3>
-      <div className="space-y-4 mb-6 max-h-60 overflow-y-auto pr-2 scrollbar-thin">
+      <div className="space-y-4 mb-4 max-h-56 overflow-y-auto pr-2 scrollbar-thin">
         {items.map((item) => (
-          <div key={item._id} className="flex gap-4 items-center">
-            <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden">
+          <div key={item._id || `${item.id}-${item.size}`} className="flex gap-3 items-center">
+            <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
                <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
             </div>
-            <div className="flex-1">
-              <p className="text-xs font-bold line-clamp-1 text-[#1C1917]">{item.name}</p>
-              <p className="text-[10px] text-gray-500">Size: {item.size} x {item.quantity}</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold truncate text-[#1C1917]">{item.name}</p>
+              <p className="text-[10px] text-gray-500">Size: {item.size} • Qty: {item.quantity}</p>
             </div>
-            <p className="text-xs font-bold text-[#1C1917]">₹{(item.price * item.quantity).toLocaleString()}</p>
+            <p className="text-xs font-bold text-[#1C1917] flex-shrink-0">₹{(item.price * item.quantity).toLocaleString()}</p>
           </div>
         ))}
       </div>
-      <div className="space-y-3 text-sm border-t border-gray-100 pt-4">
+
+      {/* --- COUPON INPUT & MANAGEMENT --- */}
+      <div className="py-3 border-t border-gray-100">
+        {!coupon ? (
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="COUPON CODE"
+                  value={couponCodeInput}
+                  onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleApplyCoupon();
+                    }
+                  }}
+                  className="w-full bg-[#F9F8F6] border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-xs font-mono font-bold tracking-wider text-[#1C1917] placeholder:font-sans placeholder:font-normal placeholder:text-gray-400 focus:border-[#1C1917] focus:bg-white outline-none transition-all uppercase"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleApplyCoupon()}
+                disabled={couponLoading || !couponCodeInput?.trim()}
+                className="bg-[#1C1917] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-800 disabled:opacity-40 transition-all flex items-center justify-center min-w-[70px] shadow-sm"
+              >
+                {couponLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  "Apply"
+                )}
+              </button>
+            </div>
+
+            {/* View Available Offers */}
+            {availableCoupons && availableCoupons.length > 0 && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowAvailableCoupons(!showAvailableCoupons)}
+                  className="text-[11px] font-semibold text-amber-800 hover:text-amber-900 flex items-center gap-1 transition-colors"
+                >
+                  <Sparkles className="w-3 h-3 text-amber-600" />
+                  <span>{showAvailableCoupons ? "Hide available offers" : "View available offers"} ({availableCoupons.length})</span>
+                </button>
+                {showAvailableCoupons && (
+                  <div className="mt-2 space-y-1.5 p-2 bg-amber-50/70 rounded-xl border border-amber-200/60 max-h-36 overflow-y-auto">
+                    {availableCoupons.map((c) => (
+                      <div
+                        key={c._id || c.code}
+                        className="flex items-center justify-between py-1 px-2 bg-white/80 rounded-lg border border-amber-100"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-[10px] tracking-wider bg-white px-1.5 py-0.5 rounded border border-gray-200 text-[#1C1917]">
+                            {c.code}
+                          </span>
+                          <span className="text-[10px] text-gray-600">
+                            {c.discountType === "percentage" ? `${c.discountAmount}% OFF` : `₹${c.discountAmount} OFF`}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyCoupon(c.code)}
+                          disabled={couponLoading}
+                          className="text-[10px] font-bold uppercase tracking-wider text-green-700 hover:text-green-800 hover:underline"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-emerald-50/90 border border-emerald-200 rounded-xl p-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0 text-emerald-700">
+                <Tag className="w-3.5 h-3.5" />
+              </div>
+              <div className="truncate">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono font-bold text-xs uppercase tracking-wider text-[#1C1917]">
+                    {coupon.code}
+                  </span>
+                  <span className="text-[9px] bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                    Applied
+                  </span>
+                </div>
+                <p className="text-[10px] text-emerald-700 font-medium">
+                  ₹{discount.toLocaleString()} savings applied to order
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemoveCoupon}
+              title="Remove coupon"
+              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-white rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2.5 text-sm border-t border-gray-100 pt-3">
         <div className="flex justify-between text-gray-500 text-xs"><span>Subtotal</span><span>₹{itemsPrice.toLocaleString()}</span></div>
         <div className="flex justify-between text-gray-500 text-xs">
           <span>Shipping <span className="text-[10px] text-gray-400">{label}</span></span>
           <span>{shippingCost === 0 ? <span className="text-green-600 font-bold">FREE</span> : `₹${shippingCost}`}</span>
         </div>
         {coupon && (
-          <div className="flex justify-between text-green-600 font-bold text-xs">
-              <span className="flex items-center gap-1"><BadgeCheck size={12}/> Discount</span>
+          <div className="flex justify-between text-emerald-600 font-bold text-xs">
+              <span className="flex items-center gap-1"><BadgeCheck size={12}/> Coupon Discount ({coupon.code})</span>
               <span>-₹{discount.toLocaleString()}</span>
           </div>
         )}
-        <div className="flex justify-between text-base font-bold pt-3 border-t border-gray-200 text-[#1C1917] mt-2">
+        <div className="flex justify-between text-base font-bold pt-3 border-t border-gray-200 text-[#1C1917] mt-1">
             <span>Total to Pay</span>
             <span>₹{total.toLocaleString()}</span>
         </div>
