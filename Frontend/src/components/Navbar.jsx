@@ -22,6 +22,18 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(5000);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/content`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.shippingSettings?.freeShippingThreshold) {
+          setFreeShippingThreshold(Number(data.shippingSettings.freeShippingThreshold));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
 
@@ -104,7 +116,7 @@ export default function Navbar() {
   return (
     <>
       <div className={`bg-[#1C1917] text-white text-[10px] md:text-xs font-bold tracking-widest text-center py-2 transition-all duration-500 overflow-hidden ${isScrolled ? 'h-0 opacity-0' : 'h-8 opacity-100'}`}>
-        FREE SHIPPING ON ALL PREPAID ORDERS ABOVE ₹5000
+        FREE SHIPPING ON ALL ORDERS ABOVE ₹{freeShippingThreshold.toLocaleString()}
       </div>
 
       <div className={`fixed left-0 right-0 z-50 flex justify-center transition-all duration-500 ease-in-out ${isScrolled ? "top-0 pt-0 px-0" : "top-8 pt-2 px-3"}`}>

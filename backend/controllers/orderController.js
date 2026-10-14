@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Coupon = require("../models/Coupon");
+const SiteContent = require("../models/SiteContent");
 const { createShiprocketOrder } = require("../utils/shiprocket");
 const crypto = require("crypto");
 const razorpay = require("../utils/razorpay");
@@ -102,13 +103,42 @@ const addOrderItems = async (req, res) => {
       calculatedItemsPrice += dbProduct.price * item.quantity;
     }
 
-    // 4. Calculate Shipping (Standard Logic)
-    let shippingPrice = 150;
-    if (calculatedItemsPrice > 5000) {
+    // 4. Calculate Shipping (Dynamic Admin Settings)
+    let standardShipping = 150;
+    let ncrShipping = 100;
+    let freeThreshold = 5000;
+    let ncrPrefixes = ["11", "12", "201"];
+
+    try {
+      const siteContent = await SiteContent.findOne().lean();
+      if (siteContent && siteContent.shippingSettings) {
+        if (typeof siteContent.shippingSettings.standardShipping === 'number') {
+          standardShipping = siteContent.shippingSettings.standardShipping;
+        }
+        if (typeof siteContent.shippingSettings.ncrShipping === 'number') {
+          ncrShipping = siteContent.shippingSettings.ncrShipping;
+        }
+        if (typeof siteContent.shippingSettings.freeShippingThreshold === 'number') {
+          freeThreshold = siteContent.shippingSettings.freeShippingThreshold;
+        }
+        if (siteContent.shippingSettings.ncrPincodePrefixes) {
+          ncrPrefixes = siteContent.shippingSettings.ncrPincodePrefixes
+            .split(',')
+            .map((p) => p.trim())
+            .filter(Boolean);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load dynamic shipping settings, using fallback:", err);
+    }
+
+    let shippingPrice = standardShipping;
+    if (calculatedItemsPrice > freeThreshold) {
       shippingPrice = 0;
     } else if (shippingAddress && shippingAddress.postalCode) {
-      const isNCR = /^(11|12|201)/.test(String(shippingAddress.postalCode));
-      if (isNCR) shippingPrice = 100;
+      const pCode = String(shippingAddress.postalCode).trim();
+      const isNCR = ncrPrefixes.some((prefix) => pCode.startsWith(prefix));
+      if (isNCR) shippingPrice = ncrShipping;
     }
 
     // 🚨 5. APPLY THE DISCOUNT HERE (SERVER-SIDE VALIDATION) 🚨

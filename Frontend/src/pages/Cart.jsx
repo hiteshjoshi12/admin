@@ -25,23 +25,64 @@ export default function Cart() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // --- NEW: SHIPPING & PINCODE STATE ---
-  const [pincode, setPincode] = useState('');
-  const [shippingCost, setShippingCost] = useState(150); // Default Pan India
+  // --- DYNAMIC SHIPPING & PINCODE STATE ---
+  const [shippingSettings, setShippingSettings] = useState({
+    standardShipping: 150,
+    ncrShipping: 100,
+    freeShippingThreshold: 5000,
+    ncrPincodePrefixes: "11,12,201"
+  });
+
+  const [pincode, setPincode] = useState(() => {
+    return localStorage.getItem('checkedPincode') || '';
+  });
+  const [shippingCost, setShippingCost] = useState(150);
   const [isPincodeChecked, setIsPincodeChecked] = useState(false);
 
-  // --- 1. NEW: LOGIC TO CALCULATE SHIPPING ---
+  // Fetch dynamic shipping rules from API
   useEffect(() => {
-    // Priority 1: Free Shipping on high value
-    if (totalAmount > 5000) {
-      setShippingCost(0);
-    } 
-    // Priority 2: If we haven't checked pincode yet, default to 150
-    else if (!isPincodeChecked) {
-      setShippingCost(150);
+    fetch(`${API_BASE_URL}/api/content`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.shippingSettings) {
+          setShippingSettings({
+            standardShipping: Number(data.shippingSettings.standardShipping) >= 0 ? Number(data.shippingSettings.standardShipping) : 150,
+            ncrShipping: Number(data.shippingSettings.ncrShipping) >= 0 ? Number(data.shippingSettings.ncrShipping) : 100,
+            freeShippingThreshold: Number(data.shippingSettings.freeShippingThreshold) >= 0 ? Number(data.shippingSettings.freeShippingThreshold) : 5000,
+            ncrPincodePrefixes: data.shippingSettings.ncrPincodePrefixes || "11,12,201"
+          });
+        }
+      })
+      .catch((err) => console.error("Failed to load storefront shipping settings", err));
+  }, []);
+
+  // Helper to calculate shipping cost
+  const calculateShippingRate = (pin, cartTotal, settings) => {
+    if (cartTotal > settings.freeShippingThreshold) {
+      return 0;
     }
-    // Priority 3: Retain the calculated cost (handled by checkPincode)
-  }, [totalAmount, isPincodeChecked]);
+    if (pin && pin.length >= 2) {
+      const prefixes = (settings.ncrPincodePrefixes || "").split(',').map((p) => p.trim()).filter(Boolean);
+      const isNCR = prefixes.some((prefix) => String(pin).startsWith(prefix));
+      if (isNCR) return settings.ncrShipping;
+    }
+    return settings.standardShipping;
+  };
+
+  // Recalculate shipping when totalAmount, shippingSettings, or pincode change
+  useEffect(() => {
+    if (pincode && pincode.length === 6) {
+      const cost = calculateShippingRate(pincode, totalAmount, shippingSettings);
+      setShippingCost(cost);
+      setIsPincodeChecked(true);
+    } else {
+      if (totalAmount > shippingSettings.freeShippingThreshold) {
+        setShippingCost(0);
+      } else {
+        setShippingCost(shippingSettings.standardShipping);
+      }
+    }
+  }, [totalAmount, shippingSettings, pincode]);
 
   const handleCheckPincode = () => {
     if (pincode.length !== 6) {
@@ -49,20 +90,18 @@ export default function Cart() {
       return;
     }
 
-    // Logic: Delhi (11), Gurgaon/Faridabad (12), Noida/Ghaziabad (201)
-    const isNCR = /^(11|12|201)/.test(pincode);
-
-    if (totalAmount > 5000) {
-      setShippingCost(0);
-      toast.success("Free shipping applied on orders over ₹5000!");
-    } else if (isNCR) {
-      setShippingCost(100);
-      toast.success(`Delhi NCR Location detected: Shipping ₹100`);
-    } else {
-      setShippingCost(150);
-      toast.success(`Pan India Location: Shipping ₹150`);
-    }
+    localStorage.setItem('checkedPincode', pincode);
+    const cost = calculateShippingRate(pincode, totalAmount, shippingSettings);
+    setShippingCost(cost);
     setIsPincodeChecked(true);
+
+    if (totalAmount > shippingSettings.freeShippingThreshold) {
+      toast.success(`Free shipping applied on orders over ₹${shippingSettings.freeShippingThreshold.toLocaleString()}!`);
+    } else if (cost === shippingSettings.ncrShipping) {
+      toast.success(`Delhi NCR Location detected: Shipping ₹${cost}`);
+    } else {
+      toast.success(`Pan India Location: Shipping ₹${cost}`);
+    }
   };
 
   // --- 2. EXISTING: RE-VALIDATE COUPON ---
@@ -101,7 +140,13 @@ export default function Cart() {
   }, [appliedCoupon?.code, totalAmount, userInfo, dispatch]);
 
   const checkoutHandler = () => {
-    const stateData = { estimatedShipping: shippingCost };
+    if (pincode && pincode.length === 6) {
+      localStorage.setItem('checkedPincode', pincode);
+    }
+    const stateData = { 
+      estimatedShipping: shippingCost,
+      estimatedPincode: pincode 
+    };
     navigate('/checkout', { state: stateData });
   };
 
@@ -308,7 +353,7 @@ export default function Cart() {
 
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Shipping</span>
-                  {totalAmount > 5000 ? (
+                  {totalAmount > shippingSettings.freeShippingThreshold ? (
                       <span className="text-green-600 font-bold text-xs uppercase">Free</span>
                   ) : (
                       <div className="text-right">

@@ -18,6 +18,12 @@ const siteContentSchema = mongoose.Schema({
     photo2: { type: String },
     reel: { type: String },
     handle: { type: String, default: "@beadsnbloom.india" }
+  },
+  shippingSettings: {
+    standardShipping: { type: Number, default: 150 },
+    ncrShipping: { type: Number, default: 100 },
+    freeShippingThreshold: { type: Number, default: 5000 },
+    ncrPincodePrefixes: { type: String, default: "11,12,201" }
   }
 }, {
   timestamps: true,

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Check,
   CreditCard,
@@ -41,6 +41,7 @@ const INDIAN_STATES = [
 export default function Checkout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // --- REDUX STATE ---
   const { userInfo } = useSelector((state) => state.auth);
@@ -53,6 +54,30 @@ export default function Checkout() {
   const [showSummaryMobile, setShowSummaryMobile] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [createdOrderId, setCreatedOrderId] = useState(null); 
+
+  // --- DYNAMIC SHIPPING SETTINGS ---
+  const [shippingSettings, setShippingSettings] = useState({
+    standardShipping: 150,
+    ncrShipping: 100,
+    freeShippingThreshold: 5000,
+    ncrPincodePrefixes: "11,12,201"
+  });
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/content`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.shippingSettings) {
+          setShippingSettings({
+            standardShipping: Number(data.shippingSettings.standardShipping) >= 0 ? Number(data.shippingSettings.standardShipping) : 150,
+            ncrShipping: Number(data.shippingSettings.ncrShipping) >= 0 ? Number(data.shippingSettings.ncrShipping) : 100,
+            freeShippingThreshold: Number(data.shippingSettings.freeShippingThreshold) >= 0 ? Number(data.shippingSettings.freeShippingThreshold) : 5000,
+            ncrPincodePrefixes: data.shippingSettings.ncrPincodePrefixes || "11,12,201"
+          });
+        }
+      })
+      .catch((err) => console.error("Failed to load storefront shipping settings", err));
+  }, []);
 
   // --- COUPON STATE & ACTIONS ---
   const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -176,58 +201,77 @@ export default function Checkout() {
 
   const dbAddress = getPrimaryAddress(userInfo?.addresses);
 
+  const getInitialPincode = () => {
+    return (
+      dbAddress.postalCode ||
+      location.state?.estimatedPincode ||
+      localStorage.getItem('checkedPincode') ||
+      ""
+    );
+  };
+
   const [formData, setFormData] = useState({
     email: userInfo?.email || "",
     name: userInfo?.name || "",
-    // Populate strictly from DB profile
+    // Populate strictly from DB profile, fallback to cart/saved postal code
     address: dbAddress.address || "",
     city: dbAddress.city || "",
     state: dbAddress.state || "",
-    postalCode: dbAddress.postalCode || "",
+    postalCode: getInitialPincode(),
     phoneNumber: dbAddress.phoneNumber || "",
     country: "India",
   });
 
-  // 2. ✅ SYNC ON LOAD (With Primary Check)
+  // 2. ✅ SYNC ON LOAD (With Primary Check & Cart Pincode Auto-population)
   useEffect(() => {
-    if (userInfo && userInfo.addresses && userInfo.addresses.length > 0) {
-        const addr = getPrimaryAddress(userInfo.addresses);
-        
-        setFormData(prev => ({
-            ...prev,
-            address: addr.address || "",
-            city: addr.city || "",
-            state: addr.state || "",
-            postalCode: addr.postalCode || "",
-            phoneNumber: addr.phoneNumber || "",
-            name: userInfo.name || prev.name,
-            email: userInfo.email || prev.email
-        }));
-    }
-  }, [userInfo]);
+    const candidatePincode =
+      location.state?.estimatedPincode ||
+      localStorage.getItem('checkedPincode') ||
+      "";
 
-  // --- DYNAMIC SHIPPING LOGIC ---
+    if (userInfo && userInfo.addresses && userInfo.addresses.length > 0) {
+      const addr = getPrimaryAddress(userInfo.addresses);
+      setFormData((prev) => ({
+        ...prev,
+        address: addr.address || prev.address || "",
+        city: addr.city || prev.city || "",
+        state: addr.state || prev.state || "",
+        postalCode: addr.postalCode || prev.postalCode || candidatePincode,
+        phoneNumber: addr.phoneNumber || prev.phoneNumber || "",
+        name: userInfo.name || prev.name,
+        email: userInfo.email || prev.email,
+      }));
+    } else if (candidatePincode) {
+      setFormData((prev) => ({
+        ...prev,
+        postalCode: prev.postalCode || candidatePincode,
+      }));
+    }
+  }, [userInfo, location.state]);
+
+  // --- DYNAMIC SHIPPING LOGIC (Configured by Admin in CMS) ---
   const { itemsPrice, shippingCost, discountAmount, finalTotal, shippingLabel } = useMemo(() => {
     const itemsPrice = totalAmount;
-    let shipping = 150;
+    let shipping = shippingSettings.standardShipping;
     let label = "(Pan India)";
 
-    if (totalAmount > 5000) {
+    if (totalAmount > shippingSettings.freeShippingThreshold) {
       shipping = 0;
       label = "Free Shipping";
-    } else if (formData.postalCode && formData.postalCode.length === 6) {
-      const isNCR = /^(11|12|201)/.test(formData.postalCode);
+    } else if (formData.postalCode && formData.postalCode.length >= 2) {
+      const prefixes = (shippingSettings.ncrPincodePrefixes || "").split(',').map((p) => p.trim()).filter(Boolean);
+      const isNCR = prefixes.some((prefix) => String(formData.postalCode).startsWith(prefix));
       if (isNCR) {
-        shipping = 100;
+        shipping = shippingSettings.ncrShipping;
         label = "Delhi NCR Rate";
       }
     }
 
     const discount = coupon ? coupon.discountAmount : 0;
-    const total = Math.round(itemsPrice + shipping - discount);
+    const total = Math.max(0, Math.round(itemsPrice + shipping - discount));
 
     return { itemsPrice, shippingCost: shipping, discountAmount: discount, finalTotal: total, shippingLabel: label };
-  }, [totalAmount, coupon, formData.postalCode]);
+  }, [totalAmount, coupon, formData.postalCode, shippingSettings]);
 
   // --- LIFECYCLE ---
   useEffect(() => { dispatch(resetOrder()); }, [dispatch]);
@@ -510,8 +554,19 @@ export default function Checkout() {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <input type="text" maxLength={6} required placeholder="Pincode" value={formData.postalCode} onChange={(e) => setFormData({ ...formData, postalCode: e.target.value.replace(/\D/g, "") })} 
-                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
+                    <input 
+                      type="text" 
+                      maxLength={6} 
+                      required 
+                      placeholder="Pincode" 
+                      value={formData.postalCode} 
+                      onChange={(e) => {
+                        const pin = e.target.value.replace(/\D/g, "");
+                        setFormData({ ...formData, postalCode: pin });
+                        localStorage.setItem('checkedPincode', pin);
+                      }} 
+                      className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" 
+                    />
                     <input type="text" maxLength={10} required placeholder="Phone Number" value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value.replace(/\D/g, "") })} 
                         className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 outline-none focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] transition-all text-sm" />
                   </div>

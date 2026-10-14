@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { 
   Save, Layout, Instagram, Image as ImageIcon, Plus, 
-  Trash2, Star, Grid, Video, PlayCircle, GripVertical 
+  Trash2, Star, Grid, Video, PlayCircle, GripVertical, Truck 
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
@@ -31,12 +31,14 @@ export default function CMS() {
         <TabButton active={activeTab === 'bestsellers'} onClick={() => setActiveTab('bestsellers')} icon={Star} label="Best Sellers" />
         <TabButton active={activeTab === 'collections'} onClick={() => setActiveTab('collections')} icon={Grid} label="Collections" />
         <TabButton active={activeTab === 'runway'} onClick={() => setActiveTab('runway')} icon={Video} label="Runway" />
+        <TabButton active={activeTab === 'shipping'} onClick={() => setActiveTab('shipping')} icon={Truck} label="Shipping Rates" />
       </div>
 
       {activeTab === 'home' && <HomeCMS userInfo={userInfo} />}
       {activeTab === 'bestsellers' && <BestSellersCMS userInfo={userInfo} />}
       {activeTab === 'collections' && <CollectionsCMS userInfo={userInfo} />}
       {activeTab === 'runway' && <RunwayCMS userInfo={userInfo} />}
+      {activeTab === 'shipping' && <ShippingCMS userInfo={userInfo} />}
     </div>
   );
 }
@@ -748,12 +750,244 @@ function RunwayCMS({ userInfo }) {
             </div>
           ))}
           
-          {videos.length === 0 && (
+           {videos.length === 0 && (
             <div className="col-span-full text-center py-12 text-gray-400 italic bg-gray-50 rounded-xl border border-dashed">
               No videos added yet.
             </div>
           )}
        </div>
+    </div>
+  );
+}
+
+// ==========================================
+// 5. SHIPPING RATES CMS COMPONENT
+// ==========================================
+function ShippingCMS({ userInfo }) {
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [settings, setSettings] = useState({
+    standardShipping: 150,
+    ncrShipping: 100,
+    freeShippingThreshold: 5000,
+    ncrPincodePrefixes: "11,12,201"
+  });
+
+  // Simulator State
+  const [simCartTotal, setSimCartTotal] = useState(3000);
+  const [simPincode, setSimPincode] = useState("110001");
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API_BASE_URL}/api/content`)
+      .then(res => res.json())
+      .then(content => {
+        if (content && content.shippingSettings) {
+          setSettings({
+            standardShipping: Number(content.shippingSettings.standardShipping) >= 0 ? content.shippingSettings.standardShipping : 150,
+            ncrShipping: Number(content.shippingSettings.ncrShipping) >= 0 ? content.shippingSettings.ncrShipping : 100,
+            freeShippingThreshold: Number(content.shippingSettings.freeShippingThreshold) >= 0 ? content.shippingSettings.freeShippingThreshold : 5000,
+            ncrPincodePrefixes: content.shippingSettings.ncrPincodePrefixes || "11,12,201"
+          });
+        }
+      })
+      .catch(err => console.error("Failed to load shipping rates", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/content`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo?.token}`
+        },
+        body: JSON.stringify({
+          shippingSettings: settings
+        })
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to update shipping settings");
+      }
+
+      toast.success("Shipping rates updated successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to update shipping rates");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Simulator Calculation
+  const simNcrPrefixes = (settings.ncrPincodePrefixes || "").split(',').map(p => p.trim()).filter(Boolean);
+  const isSimNCR = simNcrPrefixes.some(prefix => String(simPincode).startsWith(prefix));
+  let calculatedSimShipping = Number(settings.standardShipping);
+  let simReason = "Pan India Standard Delivery";
+
+  if (Number(simCartTotal) > Number(settings.freeShippingThreshold)) {
+    calculatedSimShipping = 0;
+    simReason = `Free Shipping (Cart total > ₹${Number(settings.freeShippingThreshold).toLocaleString()})`;
+  } else if (isSimNCR) {
+    calculatedSimShipping = Number(settings.ncrShipping);
+    simReason = `Delhi NCR Regional Delivery (Matched prefix in '${settings.ncrPincodePrefixes}')`;
+  }
+
+  if (loading) {
+    return (
+      <div className="py-20 flex justify-center items-center text-gray-400">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1C1917]"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex items-center justify-between pb-6 border-b border-gray-100 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-[#1C1917]">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-800">Storefront Shipping Rates</h2>
+              <p className="text-xs text-gray-500">Configure customer delivery charges and free shipping rules</p>
+            </div>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-[#1C1917] text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+          >
+            {saving ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            Save Changes
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Standard Shipping */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
+              Pan India Standard Delivery Fee (₹)
+            </label>
+            <p className="text-[11px] text-gray-400">Base shipping charged across India for orders under the free threshold.</p>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₹</span>
+              <input
+                type="number"
+                min="0"
+                value={settings.standardShipping}
+                onChange={(e) => setSettings({ ...settings, standardShipping: Math.max(0, Number(e.target.value)) })}
+                className="w-full bg-[#F9F8F6] border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-sm font-semibold text-[#1C1917] focus:bg-white focus:border-[#1C1917] outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Delhi NCR Shipping */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
+              Delhi NCR Regional Delivery Fee (₹)
+            </label>
+            <p className="text-[11px] text-gray-400">Discounted shipping for nearby Delhi NCR customers.</p>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₹</span>
+              <input
+                type="number"
+                min="0"
+                value={settings.ncrShipping}
+                onChange={(e) => setSettings({ ...settings, ncrShipping: Math.max(0, Number(e.target.value)) })}
+                className="w-full bg-[#F9F8F6] border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-sm font-semibold text-[#1C1917] focus:bg-white focus:border-[#1C1917] outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Free Shipping Minimum */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
+              Free Shipping Order Threshold (₹)
+            </label>
+            <p className="text-[11px] text-gray-400">Orders with cart value strictly greater than this amount receive 100% Free Shipping.</p>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₹</span>
+              <input
+                type="number"
+                min="0"
+                value={settings.freeShippingThreshold}
+                onChange={(e) => setSettings({ ...settings, freeShippingThreshold: Math.max(0, Number(e.target.value)) })}
+                className="w-full bg-[#F9F8F6] border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-sm font-semibold text-[#1C1917] focus:bg-white focus:border-[#1C1917] outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          {/* NCR Pincode Prefixes */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
+              Delhi NCR Pincode Prefixes
+            </label>
+            <p className="text-[11px] text-gray-400">Comma-separated starting digits (e.g. 11 for Delhi, 12 for Gurgaon/Faridabad, 201 for Noida/Ghaziabad).</p>
+            <input
+              type="text"
+              value={settings.ncrPincodePrefixes}
+              onChange={(e) => setSettings({ ...settings, ncrPincodePrefixes: e.target.value })}
+              placeholder="11,12,201"
+              className="w-full bg-[#F9F8F6] border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold font-mono text-[#1C1917] focus:bg-white focus:border-[#1C1917] outline-none transition-all"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Live Rate Simulator */}
+      <div className="bg-gradient-to-br from-gray-50 to-amber-50/30 p-6 rounded-2xl border border-gray-200">
+        <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-2 flex items-center gap-2">
+          <Truck className="w-4 h-4 text-amber-700" /> Live Rate Calculator & Preview
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">
+          Test any customer scenario with your current values above to see how they calculate in the cart and checkout.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label className="text-[10px] uppercase font-bold text-gray-500 mb-1 block">Test Cart Total (₹)</label>
+            <input
+              type="number"
+              value={simCartTotal}
+              onChange={(e) => setSimCartTotal(Number(e.target.value))}
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-bold outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-[10px] uppercase font-bold text-gray-500 mb-1 block">Test Pincode</label>
+            <input
+              type="text"
+              maxLength={6}
+              value={simPincode}
+              onChange={(e) => setSimPincode(e.target.value)}
+              placeholder="e.g. 110001 or 400001"
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs font-bold outline-none"
+            />
+          </div>
+
+          <div className="bg-white p-3 rounded-xl border border-gray-200 flex flex-col justify-center">
+            <span className="text-[10px] uppercase font-bold text-gray-400">Customer Shipping Cost</span>
+            <span className="text-lg font-bold text-[#1C1917]">
+              {calculatedSimShipping === 0 ? (
+                <span className="text-green-600 font-bold">FREE</span>
+              ) : (
+                `₹${calculatedSimShipping.toLocaleString()}`
+              )}
+            </span>
+            <span className="text-[10px] text-gray-500 mt-0.5 truncate">{simReason}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
