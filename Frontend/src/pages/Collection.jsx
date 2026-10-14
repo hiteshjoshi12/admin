@@ -108,6 +108,9 @@ export default function Collection() {
         title={seoTitle}
         description={seoDescription}
         canonical={`/collection/${category}`}
+        keywords={isBridal 
+          ? "bridal juttis, wedding juttis online, bridal mojaris, punjabi bridal jutti, dulhan footwear, embroidered wedding juttis, bridal shoes india" 
+          : "casual juttis, everyday juttis, daily wear footwear women, ethnic flat juttis, soft leather punjabi juttis, comfortable work flats"}
         schema={collectionSchema}
       />
 

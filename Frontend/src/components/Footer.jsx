@@ -11,10 +11,15 @@ export default function Footer() {
         
         {/* Brand Column */}
         <div className="md:col-span-1">
-          <h3 className="text-2xl font-serif mb-6 tracking-wide">BEADS & BLOOM</h3>
-          <p className="text-gray-400 text-sm leading-relaxed mb-6">
-            Handcrafted luxury footwear blending ancient heritage with modern elegance.
+          <h3 className="text-2xl font-serif mb-4 tracking-wide">BEADS & BLOOM</h3>
+          <p className="text-gray-400 text-sm leading-relaxed mb-4">
+            Handcrafted luxury footwear blending Punjabi heritage with double-cushioned modern elegance.
           </p>
+          <div className="text-xs text-gray-400 space-y-1 mb-6 border-l-2 border-[#C5A059] pl-3">
+            <p><span className="text-white font-medium">Studio:</span> Sector 15, Gurgaon, HR 122001</p>
+            <p><span className="text-white font-medium">Delivery:</span> Worldwide Express Shipping</p>
+            <p><span className="text-white font-medium">Payments:</span> COD & 100% Secure Online</p>
+          </div>
           <div className="flex gap-4">
             <a 
               href="https://www.instagram.com/beadsnbloom.india?igsh=MXhjdDBoeTN3ZGMxOA%3D%3D&utm_source=qr" 
@@ -48,12 +53,12 @@ export default function Footer() {
 
         {/* Links Column 1 */}
         <div>
-          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Shop</h4>
+          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Handcrafted Juttis</h4>
           <ul className="space-y-4 text-sm text-gray-400">
-            <li><Link to="/shop" className="hover:text-white transition-colors">The Collection</Link></li>
-            <li><Link to="/collection/bridal" className="hover:text-white transition-colors">Bridal Collection</Link></li>
-            <li><Link to="/collection/casual" className="hover:text-white transition-colors">Everyday Chic</Link></li>
-            <li><Link to="/sale" className="hover:text-white transition-colors">Archive Sale</Link></li>
+            <li><Link to="/shop" className="hover:text-white transition-colors">Complete Jutti Range</Link></li>
+            <li><Link to="/collection/bridal" className="hover:text-white transition-colors">Bridal & Wedding Juttis</Link></li>
+            <li><Link to="/collection/casual" className="hover:text-white transition-colors">Casual Everyday Chic</Link></li>
+            <li><Link to="/sale" className="hover:text-white transition-colors">Archive Festive Sale</Link></li>
           </ul>
         </div>
 
@@ -63,16 +68,16 @@ export default function Footer() {
           <ul className="space-y-4 text-sm text-gray-400">
             <li><Link to="/about" className="hover:text-white transition-colors">Our Story & Heritage</Link></li>
             <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide</Link></li>
-            <li><Link to="/terms" className="hover:text-white transition-colors">Shipping & Exchanges</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-            <li><Link to="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
+            <li><Link to="/terms" className="hover:text-white transition-colors">Worldwide Shipping & COD</Link></li>
+            <li><Link to="/contact" className="hover:text-white transition-colors">Gurgaon Studio & Contact</Link></li>
+            <li><Link to="/track-order" className="hover:text-white transition-colors">Track Your Order</Link></li>
           </ul>
         </div>
 
         {/* Newsletter */}
         <div>
           <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Stay in the Loop</h4>
-          <p className="text-gray-400 text-sm mb-4">Subscribe for exclusive updates.</p>
+          <p className="text-gray-400 text-sm mb-4">Subscribe for exclusive bridal edits & festive releases.</p>
           <div className="flex border-b border-gray-700 pb-2">
             <input 
               type="email" 
@@ -84,6 +89,11 @@ export default function Footer() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* SEO Keyword Footer Strip */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 pb-8 text-[11px] text-gray-400 leading-relaxed text-center md:text-left">
+        <span className="text-gray-300 font-semibold">Specializing in:</span> Handcrafted Punjabi Juttis • Bridal Juttis in Gurgaon • Sector 15 Gurgaon Studio • Festive & Party Wear Mojaris • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Cash on Delivery (COD) across India • Worldwide Delivery (USA, UK, Canada, Australia, UAE).
       </div>
 
       {/* Copyright Line */}

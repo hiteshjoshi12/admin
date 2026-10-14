@@ -3,7 +3,7 @@ import { Mail, Clock, Instagram, MessageCircle, ArrowRight, MapPin } from 'lucid
 import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from '../util/config'; // Ensure you have this config
 import SEO from '../components/seo/SEO';
-import { getOrganizationSchema, getBreadcrumbSchema } from '../components/seo/schemaUtils';
+import { getOrganizationSchema, getBreadcrumbSchema, getStoreSchema } from '../components/seo/schemaUtils';
 
 export default function Contact() {
   
@@ -62,10 +62,11 @@ export default function Contact() {
     '@graph': [
       {
         '@type': 'ContactPage',
-        name: 'Contact Beads and Bloom',
+        name: 'Contact Beads and Bloom — Handcrafted Juttis Store in Gurgaon',
         url: 'https://beadsandbloom.in/contact',
-        description: 'Contact Beads and Bloom for order inquiries, sizing assistance, and custom requests.',
+        description: 'Contact Beads and Bloom or visit our store in Sector 15, Gurgaon for custom bridal consultations, jutti sizing assistance, and worldwide shipping inquiries.',
       },
+      getStoreSchema(),
       getOrganizationSchema(),
       getBreadcrumbSchema([
         { name: 'Home', url: '/' },
@@ -77,23 +78,23 @@ export default function Contact() {
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-24">
       <SEO
-        title="Contact Customer Support & Inquiries | Beads and Bloom"
-        description="Have questions regarding jutti sizing, custom orders, or your delivery? Reach out to Beads and Bloom support via email or Instagram DM. We reply promptly."
+        title="Visit Store & Contact Support | Beads and Bloom Gurgaon"
+        description="Visit our handcrafted jutti studio in Sector 15, Gurgaon (Gurugram) or reach out for custom bridal orders, sizing assistance, and worldwide delivery support."
         canonical="/contact"
-        keywords="contact beads and bloom, customer support ethnic footwear, jutti inquiry, punjabi jutti sizing help"
+        keywords="jutti store in gurgaon, jutti shop sector 15 gurgaon, bridal juttis gurgaon, punjabi jutti store near me, contact beads and bloom, ethnic footwear gurgaon"
         schema={contactSchema}
       />
       
       {/* --- PAGE HEADER --- */}
       <div className="text-center mb-16 px-6 mt-10">
         <span className="text-[#FF2865] text-xs font-bold uppercase tracking-[0.3em] mb-4 block animate-fade-up">
-          Support
+          Support & Studio
         </span>
         <h1 className="text-4xl md:text-6xl font-serif text-[#1C1917] mb-6 animate-fade-up delay-100">
           Get in <span className="italic font-light text-[#FF2865]">Touch</span>
         </h1>
         <p className="text-gray-500 max-w-lg mx-auto font-light animate-fade-up delay-200">
-          Whether you have a question about sizing, custom orders, or just want to say hello, we are here for you.
+          Visit our Gurgaon studio for bridal trials or reach out for sizing, custom handcrafted orders, and worldwide delivery.
         </p>
       </div>
 
@@ -101,18 +102,26 @@ export default function Contact() {
         <div className="flex flex-col lg:flex-row gap-16">
           
           {/* --- LEFT COLUMN: CONTACT INFO --- */}
-          <div className="w-full lg:w-1/3 space-y-8 animate-fade-up delay-300">
+          <div className="w-full lg:w-1/3 space-y-6 animate-fade-up delay-300">
+            <ContactCard 
+              icon={MapPin}
+              title="Visit Our Studio"
+              desc="Retail & Bridal Consultations"
+              value="Sector 15, Gurugram (Gurgaon), Haryana 122001"
+              link="https://maps.google.com/?q=Sector+15+Gurgaon+Haryana"
+            />
+
             <ContactCard 
               icon={Mail}
               title="Email Us"
-              desc="For orders & collaborations"
-              value="connect@beadsandbloom.in" // Updated to match request
+              desc="Orders, Collaborations & Custom Sizing"
+              value="connect@beadsandbloom.in"
               link="mailto:connect@beadsandbloom.in"
             />
 
             <ContactCard 
               icon={Clock}
-              title="Support Hours"
+              title="Studio & Support Hours"
               desc="Mon - Sat"
               value="10:00 AM - 7:00 PM IST"
             />

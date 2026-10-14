@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Heart, Anchor } from 'lucide-react';
+import { Sparkles, Heart, Anchor, MapPin, Globe, CreditCard } from 'lucide-react';
 import SEO from '../components/seo/SEO';
-import { getOrganizationSchema, getBreadcrumbSchema } from '../components/seo/schemaUtils';
+import { getOrganizationSchema, getBreadcrumbSchema, getStoreSchema } from '../components/seo/schemaUtils';
 
 export default function About() {
   
@@ -15,11 +15,12 @@ export default function About() {
     '@graph': [
       {
         '@type': 'AboutPage',
-        name: 'Our Heritage & Craft — Beads and Bloom',
+        name: 'Our Heritage, Craft & Studio — Beads and Bloom',
         url: 'https://beadsandbloom.in/about',
         description:
-          'Honoring the generational artisans of Punjab, ancient zardosi embroidery, and modern comfort engineered for the discerning woman.',
+          'Handcrafted Punjabi juttis rooted in artisan heritage, based in Sector 15 Gurgaon with worldwide delivery. Complete range from casual to bridal footwear.',
       },
+      getStoreSchema(),
       getOrganizationSchema(),
       getBreadcrumbSchema([
         { name: 'Home', url: '/' },
@@ -31,10 +32,10 @@ export default function About() {
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-20">
       <SEO
-        title="Our Heritage & Craft — Artisanal Jutti Makers | Beads and Bloom"
-        description="Learn the story behind Beads and Bloom. Honoring the generational artisans of Punjab, ancient zardosi embroidery, and modern comfort engineered for the discerning woman."
+        title="Our Story, Studio & Handcrafted Range | Beads and Bloom Gurgaon"
+        description="Discover Beads and Bloom. Handcrafted Punjabi juttis crafted with love, available at our Sector 15 Gurgaon studio and shipped worldwide with COD."
         canonical="/about"
-        keywords="artisanal jutti makers, punjabi jutti heritage, zardosi embroidery shoes, beads and bloom story, traditional ethnic footwear craftsmanship"
+        keywords="beads and bloom gurgaon, jutti store sector 15 gurgaon, handmade juttis india, bridal jutti makers gurgaon, worldwide shipping ethnic shoes, punjabi jutti craft"
         schema={aboutSchema}
       />
       
@@ -144,6 +145,54 @@ export default function About() {
             <p className="max-w-2xl mx-auto">
               I started this journey to build a bridge between the heritage I grew up with and the modern world we live in. It is a quiet confidence. A celebration of where we come from.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* --- GURGAON STUDIO & REACH --- */}
+      <section className="py-20 px-6 bg-white border-b border-gray-100">
+        <div className="max-w-5xl mx-auto text-center">
+          <span className="text-[#C5A059] text-xs font-bold uppercase tracking-[0.3em] mb-3 block">
+            Our Presence
+          </span>
+          <h2 className="font-luxury text-3xl md:text-5xl text-[#1C1917] mb-6">
+            From Sector 15, Gurgaon <span className="italic text-[#FF2865]">to the World</span>
+          </h2>
+          <p className="text-gray-600 font-light max-w-2xl mx-auto mb-12 leading-relaxed">
+            Nestled in <strong>Sector 15, Gurgaon (Gurugram)</strong>, our boutique studio is a sanctuary for authentic Indian footwear craftsmanship. 
+            From bridal wear and sangeet celebrations to effortless everyday casual juttis, each pair is brought to life with passion.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div className="p-6 rounded-2xl bg-[#F9F8F6] border border-gray-200/70">
+              <div className="w-10 h-10 rounded-full bg-[#FFF0F4] text-[#FF2865] flex items-center justify-center mb-4">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif text-lg font-medium text-[#1C1917] mb-2">Gurgaon Studio</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Visit us in Sector 15, Gurgaon for exclusive bridal styling, custom fit appointments, and bridal party orders.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#F9F8F6] border border-gray-200/70">
+              <div className="w-10 h-10 rounded-full bg-[#F0F7FF] text-[#2563EB] flex items-center justify-center mb-4">
+                <Globe className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif text-lg font-medium text-[#1C1917] mb-2">Worldwide Shipping</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                We deliver to homes across the USA, UK, Canada, Australia, UAE, Europe, and India with reliable express shipping.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#F9F8F6] border border-gray-200/70">
+              <div className="w-10 h-10 rounded-full bg-[#F0FDF4] text-[#16A34A] flex items-center justify-center mb-4">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif text-lg font-medium text-[#1C1917] mb-2">COD & Easy Payments</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Enjoy Cash on Delivery (COD) across India alongside secure UPI, Debit/Credit Card, and Net Banking options.
+              </p>
+            </div>
           </div>
         </div>
       </section>
