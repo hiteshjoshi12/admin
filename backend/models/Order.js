@@ -58,7 +58,28 @@ const orderSchema = mongoose.Schema({
   razorpayPaymentId: { type: String },
   razorpaySignature: { type: String },
 
-  // ... (Your existing Fulfillment & Shiprocket fields) ...
+  // 5. Fulfillment & Lifecycle Status
+  orderStatus: {
+    type: String,
+    enum: [
+      'Processing',
+      'Ready to Ship',
+      'Shipped',
+      'Out for Delivery',
+      'Delivered',
+      'Cancelled',
+      'Returned'
+    ],
+    default: 'Processing',
+  },
+  isDelivered: { type: Boolean, required: true, default: false },
+  deliveredAt: { type: Date },
+
+  // 6. Logistics & Shiprocket Tracking
+  shiprocketOrderId: { type: String },
+  shiprocketShipmentId: { type: String },
+  courierCompanyName: { type: String },
+  awbCode: { type: String },
 }, {
   timestamps: true,
 });

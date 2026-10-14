@@ -389,37 +389,40 @@ const updateOrderStatus = async (req, res) => {
   const { status } = req.body;
   try {
     const order = await Order.findById(req.params.id);
-    if (order) {
-      const prevStatus = order.orderStatus;
-      order.orderStatus = status;
-
-      // Restock inventory if cancelled or returned from active status
-      if (["Cancelled", "Returned"].includes(status) && !["Cancelled", "Returned"].includes(prevStatus)) {
-        await restoreOrderStock(order);
-      } else if (!["Cancelled", "Returned"].includes(status) && ["Cancelled", "Returned"].includes(prevStatus)) {
-        await reduceOrderStock(order);
-      }
-
-      // Auto-sync Delivered flag & COD payment
-      if (status === "Delivered") {
-        order.isDelivered = true;
-        order.deliveredAt = Date.now();
-        if (order.paymentMethod === 'cod' && !order.isPaid) {
-          order.isPaid = true;
-          order.paidAt = Date.now();
-        }
-      } else if (status !== "Delivered" && order.isDelivered) {
-        order.isDelivered = false;
-        order.deliveredAt = null;
-      }
-      const updatedOrder = await order.save();
-      res.json(updatedOrder);
-    } else {
-      res.status(404);
-      throw new Error("Order not found");
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
+
+    const prevStatus = order.orderStatus || 'Processing';
+    order.orderStatus = status;
+
+    // Restock inventory if cancelled or returned from active status
+    if (["Cancelled", "Returned"].includes(status) && !["Cancelled", "Returned"].includes(prevStatus)) {
+      await restoreOrderStock(order);
+    } else if (!["Cancelled", "Returned"].includes(status) && ["Cancelled", "Returned"].includes(prevStatus)) {
+      await reduceOrderStock(order);
+    }
+
+    // Auto-sync Delivered flag & COD payment
+    if (status === "Delivered") {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+      if (order.paymentMethod === 'cod' && !order.isPaid) {
+        order.isPaid = true;
+        order.paidAt = Date.now();
+      }
+    } else if (status !== "Delivered" && order.isDelivered) {
+      order.isDelivered = false;
+      order.deliveredAt = null;
+    }
+
+    order.markModified('orderStatus');
+    const updatedOrder = await order.save();
+    console.log(`[Order Status Update] Order ${order._id}: "${prevStatus}" -> "${status}"`);
+    res.json(updatedOrder);
   } catch (error) {
-    res.status(500).json({ message: "Status update failed" });
+    console.error("[Order Status Update Error]:", error);
+    res.status(500).json({ message: error.message || "Status update failed" });
   }
 };
 

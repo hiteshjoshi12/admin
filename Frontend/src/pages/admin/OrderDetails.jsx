@@ -13,7 +13,8 @@ import {
   Phone,
   Mail,
   AlertTriangle,
-  Copy
+  Copy,
+  XCircle
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { API_BASE_URL } from "../../util/config";
@@ -126,7 +127,10 @@ export default function OrderDetails() {
         { headers: { Authorization: `Bearer ${userInfo.token}` } },
       );
       setOrder(data);
-      toast.success("Status Updated!");
+      if (data.orderStatus) {
+        setSelectedStatus(data.orderStatus);
+      }
+      toast.success(`Status updated to "${selectedStatus}"!`);
     } catch (error) {
       toast.error(error.response?.data?.message || "Update Failed");
     } finally {
@@ -212,9 +216,20 @@ export default function OrderDetails() {
                 {order.isPaid ? <CheckCircle size={16} /> : <AlertTriangle size={16} />}
                 {order.isPaid ? 'Payment Verified' : 'Payment Pending'}
              </div>
-             <div className={`px-4 py-2 rounded-lg border text-sm font-bold flex items-center gap-2 ${order.isDelivered ? 'bg-gray-100 text-gray-700 border-gray-200' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>
-                {order.isDelivered ? <CheckCircle size={16} /> : <Clock size={16} />}
-                {order.isDelivered ? 'Delivered' : order.orderStatus}
+             <div className={`px-4 py-2 rounded-lg border text-sm font-bold flex items-center gap-2 ${
+               (order.orderStatus === 'Delivered' || order.isDelivered) ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+               order.orderStatus === 'Shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+               order.orderStatus === 'Ready to Ship' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
+               order.orderStatus === 'Out for Delivery' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+               order.orderStatus === 'Cancelled' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+               order.orderStatus === 'Returned' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+               'bg-amber-50 text-amber-700 border-amber-200'
+             }`}>
+                {(order.orderStatus === 'Delivered' || order.isDelivered) ? <CheckCircle size={16} /> :
+                 order.orderStatus === 'Cancelled' ? <XCircle size={16} /> :
+                 (order.orderStatus === 'Shipped' || order.orderStatus === 'Out for Delivery') ? <Truck size={16} /> :
+                 <Clock size={16} />}
+                {order.orderStatus || (order.isDelivered ? 'Delivered' : 'Processing')}
              </div>
           </div>
         </div>
