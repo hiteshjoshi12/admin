@@ -28,6 +28,12 @@ const productSchema = mongoose.Schema({
   timestamps: true,
 });
 
+// Performance indexes for storefront catalog & homepage queries
+productSchema.index({ isBestSeller: 1 });
+productSchema.index({ isNewArrival: 1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ price: 1 });
+
 productSchema.pre('save', async function () {
   if (this.isModified('name')) {
     const baseSlug = this.name

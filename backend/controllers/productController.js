@@ -40,7 +40,8 @@ const getProducts = async (req, res) => {
     const query = {};
 
     if (req.query.keyword) {
-      query.name = { $regex: req.query.keyword, $options: "i" };
+      const sanitizedKeyword = String(req.query.keyword).trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+      query.name = { $regex: sanitizedKeyword, $options: "i" };
     }
     
     if (req.query.category && req.query.category !== "all") {

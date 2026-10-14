@@ -84,4 +84,11 @@ const orderSchema = mongoose.Schema({
   timestamps: true,
 });
 
+// Performance Indexes for High Traffic Queries
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ razorpayOrderId: 1 }, { sparse: true });
+orderSchema.index({ shiprocketOrderId: 1 }, { sparse: true });
+orderSchema.index({ orderStatus: 1 });
+orderSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('Order', orderSchema);

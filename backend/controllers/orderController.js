@@ -93,6 +93,12 @@ const addOrderItems = async (req, res) => {
 
       if (!dbProduct) throw new Error(`Product not found: ${item.name}`);
 
+      const qty = parseInt(item.quantity, 10);
+      if (isNaN(qty) || qty <= 0 || qty > 20) {
+        throw new Error(`Invalid item quantity for: ${item.name}`);
+      }
+      item.quantity = qty;
+
       // Size check
       const sizeVariant = dbProduct.stock.find((s) => String(s.size) === String(item.size));
       
