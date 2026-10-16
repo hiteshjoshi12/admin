@@ -57,6 +57,7 @@ export default function Footer() {
           <ul className="space-y-4 text-sm text-gray-400">
             <li><Link to="/shop" className="hover:text-white transition-colors">Complete Jutti Range</Link></li>
             <li><Link to="/collection/bridal" className="hover:text-white transition-colors">Bridal & Wedding Juttis</Link></li>
+            <li><Link to="/collection/festive" className="hover:text-white transition-colors">Festive & Sangeet Juttis</Link></li>
             <li><Link to="/collection/casual" className="hover:text-white transition-colors">Casual Everyday Chic</Link></li>
             <li><Link to="/sale" className="hover:text-white transition-colors">Archive Festive Sale</Link></li>
           </ul>

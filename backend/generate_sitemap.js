@@ -16,6 +16,7 @@ async function buildStaticSitemap() {
     { url: 'shop', changefreq: 'daily', priority: '0.9' },
     { url: 'sale', changefreq: 'daily', priority: '0.8' },
     { url: 'collection/bridal', changefreq: 'weekly', priority: '0.8' },
+    { url: 'collection/festive', changefreq: 'weekly', priority: '0.8' },
     { url: 'collection/casual', changefreq: 'weekly', priority: '0.8' },
     { url: 'about', changefreq: 'monthly', priority: '0.7' },
     { url: 'size-chart', changefreq: 'monthly', priority: '0.6' },

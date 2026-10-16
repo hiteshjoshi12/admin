@@ -22,6 +22,14 @@ const collectionConfig = {
     text: "text-[#8B5E3C]", // Bronze/Gold Text
     accent: "text-[#D4AF37]", // Gold Accent
   },
+  festive: {
+    title: "The Festive Edit",
+    subtitle: "Celebration & Occasion Mojris",
+    description: "Handcrafted sparkle and timeless embroidery designed for weddings, sangeet nights, and festive celebrations.",
+    theme: "bg-[#FFFDF9]", // Soft Warm Ivory
+    text: "text-[#1C1917]", // Sharp Charcoal
+    accent: "text-[#C5A059]", // Festive Gold
+  },
   casual: {
     title: "Everyday Chic",
     subtitle: "Effortless Style for Daily Wear",
@@ -75,19 +83,30 @@ export default function Collection() {
   });
 
   const isBridal = category?.toLowerCase() === 'bridal';
+  const isFestive = category?.toLowerCase() === 'festive';
   const isCasual = category?.toLowerCase() === 'casual';
 
   const seoTitle = isBridal
     ? "The Bridal Edit — Luxury Wedding Juttis & Mojris | Beads and Bloom"
+    : isFestive
+    ? "The Festive Edit — Festive & Occasion Juttis | Beads and Bloom"
     : isCasual
     ? "Everyday Chic — Casual & Office Wear Juttis | Beads and Bloom"
     : `${config.title} — Handcrafted Juttis | Beads and Bloom`;
 
   const seoDescription = isBridal
     ? "Walk down the aisle in sublime comfort. Shop exquisite handcrafted bridal juttis featuring heavy zardosi, pearls, and double-padded soles for wedding ceremonies."
+    : isFestive
+    ? "Celebrate every special occasion in artisanal luxury. Shop handcrafted festive juttis featuring dabka, zari, and pearl embroidery with double-cushioned comfort."
     : isCasual
     ? "Step into effortless elegance with our casual handcrafted juttis. Designed for daily wear and office rotations with lightweight, bite-free cushioned soles."
     : config.description;
+
+  const seoKeywords = isBridal
+    ? "bridal juttis, wedding juttis online, bridal mojaris, punjabi bridal jutti, dulhan footwear, embroidered wedding juttis, bridal shoes india"
+    : isFestive
+    ? "festive juttis, sangeet footwear, party wear mojaris, embroidered ethnic flats, zari work juttis, celebration shoes women"
+    : "casual juttis, everyday juttis, daily wear footwear women, ethnic flat juttis, soft leather punjabi juttis, comfortable work flats";
 
   const collectionSchema = {
     '@context': 'https://schema.org',
@@ -108,9 +127,7 @@ export default function Collection() {
         title={seoTitle}
         description={seoDescription}
         canonical={`/collection/${category}`}
-        keywords={isBridal 
-          ? "bridal juttis, wedding juttis online, bridal mojaris, punjabi bridal jutti, dulhan footwear, embroidered wedding juttis, bridal shoes india" 
-          : "casual juttis, everyday juttis, daily wear footwear women, ethnic flat juttis, soft leather punjabi juttis, comfortable work flats"}
+        keywords={seoKeywords}
         schema={collectionSchema}
       />
 
@@ -197,6 +214,74 @@ export default function Collection() {
               <div className={`h-[1px] w-16 ${config.text === 'text-white' ? 'bg-white' : 'bg-current'}`}></div>
            </div>
         )}
+
+        {/* --- EXPLORE OTHER COLLECTIONS (Contextual Internal Linking) --- */}
+        <div className="mt-24 pt-16 border-t border-gray-200/50">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C5A059] block mb-2">
+              Curated Edits
+            </span>
+            <h2 className="text-2xl md:text-3xl font-serif text-[#1C1917]">
+              Explore Other Collections
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {category?.toLowerCase() !== 'bridal' && (
+              <Link
+                to="/collection/bridal"
+                className="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group"
+              >
+                <h3 className="font-serif text-lg text-[#1C1917] group-hover:text-[#C5A059] transition-colors mb-1">
+                  The Bridal Edit
+                </h3>
+                <p className="text-xs text-gray-500">Royal Zardosi & Wedding Mojris</p>
+                <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-widest text-[#8B5E3C]">
+                  View 14 Designs →
+                </span>
+              </Link>
+            )}
+            {category?.toLowerCase() !== 'festive' && (
+              <Link
+                to="/collection/festive"
+                className="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group"
+              >
+                <h3 className="font-serif text-lg text-[#1C1917] group-hover:text-[#C5A059] transition-colors mb-1">
+                  The Festive Edit
+                </h3>
+                <p className="text-xs text-gray-500">Celebration & Sangeet Footwear</p>
+                <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-widest text-[#8B5E3C]">
+                  View 22 Designs →
+                </span>
+              </Link>
+            )}
+            {category?.toLowerCase() !== 'casual' && (
+              <Link
+                to="/collection/casual"
+                className="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-center group"
+              >
+                <h3 className="font-serif text-lg text-[#1C1917] group-hover:text-[#C5A059] transition-colors mb-1">
+                  Everyday Chic
+                </h3>
+                <p className="text-xs text-gray-500">Casual & Office Wear Juttis</p>
+                <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-widest text-[#8B5E3C]">
+                  View 8 Designs →
+                </span>
+              </Link>
+            )}
+            <Link
+              to="/shop"
+              className="p-6 rounded-2xl bg-[#1C1917] text-white shadow-sm hover:bg-black transition-all text-center group flex flex-col justify-center"
+            >
+              <h3 className="font-serif text-lg text-white mb-1">
+                Complete Catalog
+              </h3>
+              <p className="text-xs text-gray-300">Browse All 34 Handcrafted Pairs</p>
+              <span className="inline-block mt-3 text-[10px] font-bold uppercase tracking-widest text-[#C5A059]">
+                Shop Entire Collection →
+              </span>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

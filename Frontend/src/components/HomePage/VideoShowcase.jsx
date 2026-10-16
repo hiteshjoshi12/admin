@@ -21,21 +21,21 @@ const fallbackVideos = [
     videoUrl: "https://ik.imagekit.io/beandandbloom/Media/j5_ketdz3.mp4",
     title: "Handcrafted Bridal Juttis",
     ctaText: "Shop Bridal Edit",
-    link: "/shop?category=Bridal",
+    link: "/collection/bridal",
   },
   {
     _id: 2,
     videoUrl: "https://ik.imagekit.io/beandandbloom/Media/j8_fjkfoe.mp4",
     title: "Daily Wear Punjabi Juttis",
     ctaText: "View Collection",
-    link: "/shop?category=Everyday",
+    link: "/collection/casual",
   },
   {
     _id: 3,
     videoUrl: "https://ik.imagekit.io/beandandbloom/Media/j2_hkesie.mp4",
     title: "Festive Embroidered Juttis",
     ctaText: "Shop Festive",
-    link: "/shop?category=Festive",
+    link: "/collection/festive",
   },
 ];
 

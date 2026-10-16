@@ -49,8 +49,9 @@ export default function Navbar() {
   const wishlistCount = wishlistItems.length;
 
   const navLinks = [
-    { name: 'The Collection', path: '/shop?sort=newest', badge: 'NEW' },
+    { name: 'The Collection', path: '/shop' },
     { name: 'Bridal', path: '/collection/bridal' }, 
+    { name: 'Festive', path: '/collection/festive' },
     { name: 'Casual', path: '/collection/casual' },
     { name: 'Our Story', path: '/about' },
     { name: 'Sale', path: '/sale', isSpecial: true },

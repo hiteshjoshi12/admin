@@ -215,6 +215,22 @@ export default function ProductDetail() {
   const mainImage = optimizedImages[0] || (currentProduct.image ? getOptimizedImage(currentProduct.image, 1000) : `${SITE_URL}/logo.png`);
   const primaryCategory = Array.isArray(currentProduct.category) && currentProduct.category.length > 0 ? currentProduct.category[0] : null;
 
+  const knownCollections = {
+    bridal: { name: 'The Bridal Edit', route: '/collection/bridal' },
+    festive: { name: 'The Festive Edit', route: '/collection/festive' },
+    casual: { name: 'Everyday Chic', route: '/collection/casual' },
+    party: { name: 'The Festive Edit', route: '/collection/festive' },
+    everyday: { name: 'Everyday Chic', route: '/collection/casual' },
+  };
+
+  const matchedCat = primaryCategory ? primaryCategory.toLowerCase() : null;
+  const collectionInfo = matchedCat && knownCollections[matchedCat] 
+    ? knownCollections[matchedCat] 
+    : { name: primaryCategory || 'Collection', route: `/shop` };
+
+  const collectionRoute = collectionInfo.route;
+  const collectionName = collectionInfo.name;
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -222,7 +238,7 @@ export default function ProductDetail() {
       getBreadcrumbSchema([
         { name: 'Home', url: '/' },
         { name: 'Shop', url: '/shop' },
-        ...(primaryCategory ? [{ name: primaryCategory, url: `/shop?category=${encodeURIComponent(primaryCategory)}` }] : []),
+        ...(primaryCategory ? [{ name: collectionName, url: collectionRoute }] : []),
         { name: currentProduct.name, url: `/product/${currentProduct.slug}` }
       ])
     ]
@@ -246,7 +262,24 @@ export default function ProductDetail() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-[1440px] mx-auto px-0 md:px-6 lg:px-12 py-8 flex flex-col lg:flex-row gap-12">
+      {/* UNIVERSAL BREADCRUMBS - VISIBLE ON BOTH MOBILE & DESKTOP */}
+      <div className="max-w-[1440px] mx-auto px-6 md:px-6 lg:px-12 pt-6">
+        <nav aria-label="Breadcrumb" className="flex items-center flex-wrap gap-2 text-[10px] uppercase tracking-[0.2em] text-gray-400">
+          <Link to="/" className="hover:text-[#FF2865] transition-colors">Home</Link>
+          <ChevronRight className="w-3 h-3 text-gray-300" />
+          <Link to="/shop" className="hover:text-[#FF2865] transition-colors">Shop</Link>
+          {primaryCategory && (
+            <>
+              <ChevronRight className="w-3 h-3 text-gray-300" />
+              <Link to={collectionRoute} className="hover:text-[#FF2865] transition-colors">{collectionName}</Link>
+            </>
+          )}
+          <ChevronRight className="w-3 h-3 text-gray-300" />
+          <span className="text-gray-900 font-bold truncate max-w-[220px] sm:max-w-none">{currentProduct.name}</span>
+        </nav>
+      </div>
+
+      <div className="max-w-[1440px] mx-auto px-0 md:px-6 lg:px-12 py-6 flex flex-col lg:flex-row gap-12">
         {/* LEFT: GALLERY */}
         <div className="w-full lg:w-3/5 relative">
           {/* MOBILE WISHLIST HEART */}
@@ -265,22 +298,8 @@ export default function ProductDetail() {
 
           {/* DESKTOP GRID */}
           <div className="hidden lg:grid grid-cols-2 gap-4 relative">
-            <nav aria-label="Breadcrumb" className="col-span-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-2">
-              <Link to="/" className="hover:text-[#FF2865]">Home</Link>
-              <ChevronRight className="w-3 h-3" />
-              <Link to="/shop" className="hover:text-[#FF2865]">Shop</Link>
-              {primaryCategory && (
-                <>
-                  <ChevronRight className="w-3 h-3" />
-                  <Link to={`/shop?category=${encodeURIComponent(primaryCategory)}`} className="hover:text-[#FF2865]">{primaryCategory}</Link>
-                </>
-              )}
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-gray-900 font-bold">{currentProduct.name}</span>
-            </nav>
-
             {/* DESKTOP WISHLIST HEART */}
-            <button onClick={handleWishlistToggle} className="absolute top-16 right-4 z-20 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform group">
+            <button onClick={handleWishlistToggle} className="absolute top-4 right-4 z-20 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform group">
               <Heart className={`w-6 h-6 ${isWishlisted ? "fill-[#FF2865] text-[#FF2865]" : "text-gray-400 group-hover:text-[#FF2865]"}`} />
             </button>
 
@@ -297,6 +316,12 @@ export default function ProductDetail() {
         <div className="w-full lg:w-2/5 px-6 lg:px-0">
           <div className="sticky top-28 space-y-6">
             <div>
+              <Link
+                to={collectionRoute}
+                className="inline-block text-[10px] font-bold uppercase tracking-[0.25em] text-[#8B5E3C] hover:text-[#1C1917] transition-colors mb-2"
+              >
+                {collectionName}
+              </Link>
               <h1 className="text-3xl md:text-4xl font-serif text-[#1C1917] leading-tight">{currentProduct.name}</h1>
               {currentProduct.numReviews > 0 ? (
                 <div onClick={() => document.getElementById("reviews-section").scrollIntoView({ behavior: "smooth" })} className="flex items-center gap-2 mt-2 cursor-pointer w-fit">
@@ -435,7 +460,7 @@ export default function ProductDetail() {
       <div id="reviews-section"><ReviewSection productId={currentProduct._id} /></div>
       
       {/* RELATED PRODUCTS RESTORED */}
-      <RelatedProducts currentId={currentProduct._id} />
+      <RelatedProducts currentId={currentProduct._id} currentProduct={currentProduct} />
 
       {/* RECENTLY VIEWED HISTORY */}
       {recentlyViewed.length > 0 && (
