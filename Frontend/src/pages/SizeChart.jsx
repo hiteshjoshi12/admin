@@ -152,6 +152,35 @@ export default function SizeChart() {
           </div>
         </section>
 
+        {/* --- CONTEXTUAL BUYING & CARE GUIDES --- */}
+        <section className="mt-16 bg-white p-8 md:p-10 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <span className="text-[#C5A059] text-xs font-bold uppercase tracking-widest block mb-1">
+              Handcrafted Footwear Advice
+            </span>
+            <h3 className="text-xl font-serif text-[#1C1917] mb-2">
+              Preparing for Weddings or Daily Wear?
+            </h3>
+            <p className="text-xs md:text-sm text-gray-600 font-light max-w-xl">
+              Learn how to break in new juttis bite-free, protect delicate zardozi embroidery from moisture, or style your pair with bridal lehengas and festive suits.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 shrink-0">
+            <Link
+              to="/care-guide"
+              className="inline-flex items-center gap-1.5 border border-gray-300 hover:border-gray-900 text-gray-800 text-xs font-semibold px-4 py-2.5 rounded-full transition-colors"
+            >
+              <span>Jutti Care Guide</span>
+            </Link>
+            <Link
+              to="/bridal-guide"
+              className="inline-flex items-center gap-1.5 bg-[#FF2865] hover:bg-[#e02055] text-white text-xs font-semibold px-4 py-2.5 rounded-full transition-colors"
+            >
+              <span>Bridal Buying Guide</span>
+            </Link>
+          </div>
+        </section>
+
       </div>
 
     </div>

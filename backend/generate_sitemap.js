@@ -18,6 +18,8 @@ async function buildStaticSitemap() {
     { url: 'collection/bridal', changefreq: 'weekly', priority: '0.8' },
     { url: 'collection/festive', changefreq: 'weekly', priority: '0.8' },
     { url: 'collection/casual', changefreq: 'weekly', priority: '0.8' },
+    { url: 'bridal-guide', changefreq: 'weekly', priority: '0.8' },
+    { url: 'care-guide', changefreq: 'weekly', priority: '0.8' },
     { url: 'about', changefreq: 'monthly', priority: '0.7' },
     { url: 'size-chart', changefreq: 'monthly', priority: '0.6' },
     { url: 'contact', changefreq: 'monthly', priority: '0.5' },

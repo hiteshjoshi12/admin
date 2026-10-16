@@ -70,8 +70,8 @@ export default function ProductDetail() {
   const [showMaxReached, setShowMaxReached] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   
-  // NEW STATE FOR DESCRIPTION ACCORDION
-  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  // NEW STATE FOR DESCRIPTION ACCORDION (Default Open for immediate SEO discovery & CRO)
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(true);
 
   // --- RECENTLY VIEWED LOGIC (SAFE) ---
   useEffect(() => {
@@ -439,6 +439,26 @@ export default function ProductDetail() {
                       <div className="pb-4 text-sm text-gray-600 leading-7 whitespace-pre-line">
                         {currentProduct.description}
                       </div>
+
+                      {/* Structured Artisanal Specifications */}
+                      <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+                        <div className="bg-[#FAF8F5] p-3 rounded-xl border border-gray-100">
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider mb-0.5">Construction</span>
+                          <span className="font-medium text-[#1C1917]">Handcrafted Punjabi Jutti</span>
+                        </div>
+                        <div className="bg-[#FAF8F5] p-3 rounded-xl border border-gray-100">
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider mb-0.5">Footbed & Sole</span>
+                          <span className="font-medium text-[#1C1917]">100% Genuine Leather</span>
+                        </div>
+                        <div className="bg-[#FAF8F5] p-3 rounded-xl border border-gray-100">
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider mb-0.5">Comfort Tech</span>
+                          <span className="font-medium text-[#1C1917]">Double-Padded Memory Foam</span>
+                        </div>
+                        <div className="bg-[#FAF8F5] p-3 rounded-xl border border-gray-100">
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider mb-0.5">Occasion</span>
+                          <span className="font-medium text-[#1C1917]">{collectionName || 'Festive & Ethnic'}</span>
+                        </div>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -455,14 +475,20 @@ export default function ProductDetail() {
             </div>
 
             {/* CARE */}
-            <div className="bg-[#F9F8F6] p-6 rounded-xl mt-6">
-              <div className="flex items-center gap-3 mb-3">
-                <HeartHandshake className="w-5 h-5 text-[#FF2865]" />
-                <h3 className="font-serif text-lg">Material & Care</h3>
+            <div className="bg-[#F9F8F6] p-6 rounded-xl mt-6 border border-[#E7E5E4]">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <HeartHandshake className="w-5 h-5 text-[#FF2865]" />
+                  <h3 className="font-serif text-lg text-[#1C1917]">Material & Care</h3>
+                </div>
+                <Link to="/care-guide" className="text-[11px] font-bold uppercase tracking-wider text-[#8B5E3C] hover:text-[#1C1917] underline">
+                  Full Care Guide →
+                </Link>
               </div>
-              <ul className="text-sm text-gray-600 space-y-2 list-disc pl-4">
-                <li>Avoid exposure to water or moisture.</li>
-                <li>Clean gently with a soft brush or damp cloth.</li>
+              <ul className="text-sm text-gray-600 space-y-2 list-disc pl-4 leading-relaxed">
+                <li><strong>Sole & Lining:</strong> 100% Genuine Leather with double-cushioned memory foam for bite-free comfort.</li>
+                <li><strong>Protection:</strong> Keep away from water and dampness; leather soles absorb moisture.</li>
+                <li><strong>Storage:</strong> Wrap in breathable muslin cloth with silica gel in dry spaces.</li>
               </ul>
             </div>
           </div>

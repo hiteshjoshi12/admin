@@ -49,6 +49,8 @@ async function runAudit() {
     { path: '/collection/festive', type: 'Collection Hub' },
     { path: '/collection/casual', type: 'Collection Hub' },
     { path: '/sale', type: 'Archive Sale' },
+    { path: '/bridal-guide', type: 'Bridal Guide (Editorial)' },
+    { path: '/care-guide', type: 'Care Guide (Editorial)' },
     { path: '/about', type: 'E-E-A-T Brand Story' },
     { path: '/size-chart', type: 'Sizing Guide (AEO)' },
     { path: '/contact', type: 'Gurgaon Studio & Contact' },

@@ -68,7 +68,9 @@ export default function Footer() {
           <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">About & Support</h4>
           <ul className="space-y-4 text-sm text-gray-400">
             <li><Link to="/about" className="hover:text-white transition-colors">Our Story & Heritage</Link></li>
-            <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide</Link></li>
+            <li><Link to="/bridal-guide" className="hover:text-white transition-colors">Bridal Footwear Guide</Link></li>
+            <li><Link to="/care-guide" className="hover:text-white transition-colors">Jutti Care & Cleaning</Link></li>
+            <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide & Fit</Link></li>
             <li><Link to="/terms" className="hover:text-white transition-colors">Worldwide Shipping & COD</Link></li>
             <li><Link to="/contact" className="hover:text-white transition-colors">Gurgaon Studio & Contact</Link></li>
             <li><Link to="/track-order" className="hover:text-white transition-colors">Track Your Order</Link></li>

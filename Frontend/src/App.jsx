@@ -44,6 +44,8 @@ const Reviews = lazy(() => import('./pages/admin/Reviews'));
 const Offers = lazy(() => import('./pages/admin/Offers'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const Collection = lazy(() => import('./pages/Collection'));
+const CareGuide = lazy(() => import('./pages/CareGuide'));
+const BridalGuide = lazy(() => import('./pages/BridalGuide'));
 
 const PageLoader = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
@@ -126,6 +128,8 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/product/:slug" element={<ProductDetail />} />
             <Route path="/collection/:category" element={<Collection />} />
+            <Route path="/care-guide" element={<CareGuide />} />
+            <Route path="/bridal-guide" element={<BridalGuide />} />
             <Route path="/order/:id" element={<OrderDetails />} />
             
             <Route element={<PrivateRoute />}>
