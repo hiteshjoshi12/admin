@@ -291,7 +291,14 @@ export default function ProductDetail() {
           <div className="lg:hidden flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
             {optimizedImages.map((img, idx) => (
               <div key={idx} className="w-full flex-shrink-0 snap-center relative">
-                <img src={img} alt={`${currentProduct.name} - View ${idx + 1}`} className="w-full aspect-[3/4] object-cover" onClick={() => { setActiveImage(idx); setIsLightboxOpen(true); }} />
+                <img 
+                  src={img} 
+                  alt={`${currentProduct.name} - Handcrafted Punjabi Jutti View ${idx + 1}`} 
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  fetchPriority={idx === 0 ? "high" : "auto"}
+                  className="w-full aspect-[3/4] object-cover" 
+                  onClick={() => { setActiveImage(idx); setIsLightboxOpen(true); }} 
+                />
               </div>
             ))}
           </div>
@@ -305,7 +312,13 @@ export default function ProductDetail() {
 
             {optimizedImages.map((img, idx) => (
               <div key={idx} onClick={() => { setActiveImage(idx); setIsLightboxOpen(true); }} className={`relative overflow-hidden cursor-zoom-in group ${idx === 0 ? "col-span-2 aspect-[4/3]" : "col-span-1 aspect-[3/4]"}`}>
-                <img src={img} alt={currentProduct.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img 
+                  src={img} 
+                  alt={`${currentProduct.name} - Handcrafted Indian Jutti Detail ${idx + 1}`} 
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  fetchPriority={idx === 0 ? "high" : "auto"}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                />
                 <div className="absolute top-4 left-4 bg-white/80 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><ZoomIn className="w-4 h-4 text-[#1C1917]" /></div>
               </div>
             ))}

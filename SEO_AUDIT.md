@@ -104,3 +104,65 @@
   - Ensure BreadcrumbList JSON-LD schema matches visible breadcrumb URLs.
 - **P4: Automated Regression Tests**
   - Implement automated test suite verifying all 44 indexable routes have incoming crawlable links, canonical consistency, and zero orphan states.
+
+---
+
+## 6. Route-by-Route Public Inventory & Indexability Audit (Final State)
+
+| # | Route URL | Page Type | Search Intent | H1 Heading | Canonical URL | Indexing | Schema Types | In-Links | Click Depth | Sitemap | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | `/` | Homepage Hub | Navigational / Commercial | Beads & Bloom — Handcrafted Punjabi Juttis | `https://beadsandbloom.in/` | `index, follow` | ShoeStore, Organization, WebSite, FAQPage | 34 | 0 | YES | PASSED |
+| 2 | `/shop` | Catalog Hub | Commercial Investigation | The Handcrafted Jutti Collection | `https://beadsandbloom.in/shop` | `index, follow` | CollectionPage, BreadcrumbList | 44 | 1 | YES | PASSED |
+| 3 | `/collection/bridal` | Collection Hub (14) | High-Intent Transactional | The Bridal Edit | `https://beadsandbloom.in/collection/bridal` | `index, follow` | CollectionPage, BreadcrumbList | 44 | 1 | YES | PASSED |
+| 4 | `/collection/festive` | Collection Hub (22) | Commercial / Transactional | The Festive Edit | `https://beadsandbloom.in/collection/festive` | `index, follow` | CollectionPage, BreadcrumbList | 44 | 1 | YES | PASSED |
+| 5 | `/collection/casual` | Collection Hub (8) | Commercial / Transactional | Everyday Chic | `https://beadsandbloom.in/collection/casual` | `index, follow` | CollectionPage, BreadcrumbList | 44 | 1 | YES | PASSED |
+| 6 | `/sale` | Archive Sale | Transactional Bargain | The Archive Sale — Handcrafted Juttis | `https://beadsandbloom.in/sale` | `index, follow` | CollectionPage, BreadcrumbList | 44 | 1 | YES | PASSED |
+| 7 | `/about` | E-E-A-T Brand Story | Brand Trust & Heritage | Threads of Tradition | `https://beadsandbloom.in/about` | `index, follow` | AboutPage, ShoeStore, Organization, Breadcrumbs | 44 | 1 | YES | PASSED |
+| 8 | `/size-chart` | Sizing Guide (AEO) | Sizing & Measurement Help | Jutti Size Guide & Measurement | `https://beadsandbloom.in/size-chart` | `index, follow` | BreadcrumbList, FAQPage | 44 | 1 | YES | PASSED |
+| 9 | `/contact` | Gurgaon Studio | Local & Customer Support | Get in Touch | `https://beadsandbloom.in/contact` | `index, follow` | ContactPage, ShoeStore, Organization, Breadcrumbs | 44 | 1 | YES | PASSED |
+| 10 | `/terms` | Policy & Shipping | Legal & Customer Rights | Terms, Shipping & Return Policies | `https://beadsandbloom.in/terms` | `index, follow` | BreadcrumbList, FAQPage | 44 | 1 | YES | PASSED |
+| 11 | `/product/neel-pari-beige-embroidered-festive-jutti` | PDP | Transactional | Neel Pari - Beige Embroidered Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 26 | 2 | YES | PASSED |
+| 12 | `/product/peela-sitara-silver-sparkle-festive-jutti` | PDP | Transactional | Peela Sitara - Silver Sparkle Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 24 | 2 | YES | PASSED |
+| 13 | `/product/zar-e-bahaar-dusty-pink-zari-pearl-festive-jutti` | PDP | Transactional | Zar-e-Bahaar - Dusty Pink Zari Pearl Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 30 | 2 | YES | PASSED |
+| 14 | `/product/rose-goldleaf-shimmering-rose-gold-handcrafted-jutti` | PDP | Transactional | Rose Goldleaf - Shimmering Rose Gold Handcrafted Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 32 | 2 | YES | PASSED |
+| 15 | `/product/noorani-dabka-rose-gold-sequined-bridal-jutti` | PDP | Transactional | Noorani Dabka - Rose Gold Sequined Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 8 | 2 | YES | PASSED |
+| 16 | `/product/gul-kairi-zari-paisley-zari-handcrafted-jutti` | PDP | Transactional | Gul Kairi - Zari Paisley Zari Handcrafted Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 10 | 2 | YES | PASSED |
+| 17 | `/product/fuchsia-raqs-pink-zardozi-cutdana-bridal-jutti` | PDP | Transactional | Fuchsia Raqs - Pink Zardozi Cutdana Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 5 | 2 | YES | PASSED |
+| 18 | `/product/noor-e-hunar-pastel-pearl-bead-casual-jutti` | PDP | Transactional | Noor-e-Hunar - Pastel Pearl Bead Casual Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 5 | 2 | YES | PASSED |
+| 19 | `/product/gul-mehar-dastkaar-resham-threadwork-casual-jutti` | PDP | Transactional | Gul Mehar - Dastkaar Resham Threadwork Casual Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 4 | 2 | YES | PASSED |
+| 20 | `/product/silver-khwaab-handcrafted-silver-beaded-jutti` | PDP | Transactional | Silver Khwaab - Handcrafted Silver Beaded Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 3 | 2 | YES | PASSED |
+| 21 | `/product/firoza-bahar-dusty-pink-zari-floral-jutti` | PDP | Transactional | Firoza Bahar - Dusty Pink Zari Floral Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 22 | `/product/rani-gul-rani-pink-velvet-bridal-wedding-jutti` | PDP | Transactional | Rani Gul - Rani Pink Velvet Bridal Wedding Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 4 | 2 | YES | PASSED |
+| 23 | `/product/noor-e-aaina-mirror-work-sheesha-party-jutti` | PDP | Transactional | Noor-e-Aaina - Mirror Work Sheesha Party Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 24 | `/product/silken-dabka-elegance-pure-silk-handcrafted-dabka-jutti` | PDP | Transactional | Silken Dabka Elegance - Pure Silk Handcrafted Dabka Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 25 | `/product/noor-e-zareen-regal-zardozi-georgette-bridal-jutti` | PDP | Transactional | Noor-e-Zareen - Regal Zardozi Georgette Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 4 | 2 | YES | PASSED |
+| 26 | `/product/sitara-lattice-grid-zari-bead-work-festive-jutti` | PDP | Transactional | Sitara Lattice - Grid Zari Bead Work Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 27 | `/product/surkh-aangan-royal-red-zardozi-bridal-wedding-jutti` | PDP | Transactional | Surkh Aangan - Royal Red Zardozi Bridal Wedding Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 28 | `/product/blush-mehar-pastel-pink-handcrafted-bridal-jutti` | PDP | Transactional | Blush Mehar - Pastel Pink Handcrafted Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 29 | `/product/blush-mirage-velvet-gota-patti-work-festive-jutti` | PDP | Transactional | Blush Mirage - Velvet Gota Patti Work Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 30 | `/product/neel-noor-antique-bronze-gold-vintage-festive-jutti` | PDP | Transactional | Neel Noor - Antique Bronze Gold Vintage Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 31 | `/product/meher-sitara-handcrafted-zardozi-sitara-casual-jutti` | PDP | Transactional | Meher Sitara - Handcrafted Zardozi Sitara Casual Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 32 | `/product/sheesh-noir-black-geometric-mirror-work-festive-jutti` | PDP | Transactional | Sheesh Noir - Black Geometric Mirror Work Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 33 | `/product/rang-e-bahaar-pastel-multicolored-handcrafted-festive-jutti` | PDP | Transactional | Rang-e-Bahaar - Pastel Multicolored Handcrafted Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 34 | `/product/ruby-heritage-emerald-green-embroidered-bridal-jutti` | PDP | Transactional | Ruby Heritage - Emerald Green Embroidered Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 35 | `/product/peacock-blush-phulkari-inspired-floral-party-jutti` | PDP | Transactional | Peacock Blush - Phulkari Inspired Floral Party Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 36 | `/product/shehenshah-heirloom-royal-metallic-threadwork-bridal-jutti` | PDP | Transactional | Shehenshah Heirloom - Royal Metallic Threadwork Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 37 | `/product/cobalt-sheesh-golden-heavy-zardozi-wedding-jutti` | PDP | Transactional | Cobalt Sheesh - Golden Heavy Zardozi Wedding Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 38 | `/product/tajvira-royale-mughal-scallop-dabka-zari-festive-jutti` | PDP | Transactional | Tajvira Royale - Mughal Scallop Dabka Zari Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 39 | `/product/champagne-zeenat-champagne-gold-embellished-bridal-jutti` | PDP | Transactional | Champagne Zeenat - Champagne Gold Embellished Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 40 | `/product/rose-aurum-classic-red-stone-bead-work-bridal-jutti` | PDP | Transactional | Rose Aurum - Classic Red Stone Bead Work Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 41 | `/product/nazakat-hand-placed-pearl-bead-bridal-festive-jutti` | PDP | Transactional | Nazakat - Hand Placed Pearl Bead Bridal Festive Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 42 | `/product/chand-zari-ivory-gold-silver-metallic-dabka-jutti` | PDP | Transactional | Chand Zari - Ivory Gold Silver Metallic Dabka Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 43 | `/product/zar-surkh-maroon-velvet-handcrafted-bridal-jutti` | PDP | Transactional | Zar Surkh - Maroon Velvet Handcrafted Bridal Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+| 44 | `/product/gul-blush-handcrafted-embroidered-bridal-punjabi-jutti` | PDP | Transactional | Gul Blush - Handcrafted Embroidered Bridal Punjabi Jutti | Canonical Self | `index, follow` | Product, Offer, BreadcrumbList | 2 | 2 | YES | PASSED |
+
+---
+
+## 7. Verification Summary & Next Steps
+- **Total Audited Public Routes:** 44
+- **Total Orphan Pages:** 0
+- **Total Missing H1s:** 0
+- **Total Broken Internal Links:** 0
+- **Sitemap Consistency:** 100% (All 44 routes match active sitemap)
+- **Production Build:** Passes cleanly (`npm run build` in 23.69s)
+

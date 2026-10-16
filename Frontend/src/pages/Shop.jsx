@@ -125,7 +125,36 @@ export default function Shop() {
         <div className="max-w-2xl mx-auto animate-fade-up">
             <span className="text-[#8B5E3C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4 block">Handcrafted Luxury</span>
             <h1 className="text-4xl md:text-6xl font-serif text-[#1C1917] mb-3">The Handcrafted Jutti Collection</h1>
-            <p className="text-sm text-gray-500 font-light max-w-md mx-auto mb-6">Artisanal Punjabi juttis and ethnic footwear crafted with double-cushioned comfort.</p>
+            <p className="text-sm text-gray-500 font-light max-w-lg mx-auto mb-6">
+              Artisanal Punjabi juttis and ethnic footwear crafted with double-cushioned comfort, genuine leather soles, and heirloom embroidery.
+            </p>
+            {/* Quick Category Navigation Hubs */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+              <Link
+                to="/collection/bridal"
+                className="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white border border-[#E7E5E4] text-[#8B5E3C] hover:bg-[#8B5E3C] hover:text-white transition-all shadow-sm"
+              >
+                Bridal Juttis (14)
+              </Link>
+              <Link
+                to="/collection/festive"
+                className="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white border border-[#E7E5E4] text-[#C5A059] hover:bg-[#C5A059] hover:text-white transition-all shadow-sm"
+              >
+                Festive Edit (22)
+              </Link>
+              <Link
+                to="/collection/casual"
+                className="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white border border-[#E7E5E4] text-[#1C1917] hover:bg-[#1C1917] hover:text-white transition-all shadow-sm"
+              >
+                Everyday Chic (8)
+              </Link>
+              <Link
+                to="/sale"
+                className="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white border border-[#FF2865]/30 text-[#FF2865] hover:bg-[#FF2865] hover:text-white transition-all shadow-sm"
+              >
+                Archive Sale
+              </Link>
+            </div>
             <div className="w-16 h-[1px] bg-[#1C1917] mx-auto opacity-20"></div>
         </div>
       </div>

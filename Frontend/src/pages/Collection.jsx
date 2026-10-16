@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ChevronDown, Loader2, Heart } from "lucide-react";
+import { useParams, Link, Navigate } from "react-router-dom";
+import { ChevronDown, Loader2, Heart, Sparkles, HeartHandshake, Ruler } from "lucide-react";
 import { getOptimizedImage } from "../util/imageUtils";
 import { toast } from "react-hot-toast";
 
@@ -12,7 +12,6 @@ import SEO from "../components/seo/SEO";
 import { getCollectionSchema, getBreadcrumbSchema } from "../components/seo/schemaUtils";
 
 // --- 🎨 COLLECTION CONFIGURATION ---
-// NOTE: Removed 'image' property as it is no longer needed.
 const collectionConfig = {
   bridal: {
     title: "The Bridal Edit",
@@ -48,8 +47,86 @@ const collectionConfig = {
   }
 };
 
+const collectionGuides = {
+  bridal: {
+    heading: "Bridal Footwear Craft & Styling Guide",
+    subheading: "Designed for royal wedding ceremonies, pheras, and all-day celebrations.",
+    cards: [
+      {
+        icon: Sparkles,
+        title: "Heirloom Embroidery",
+        desc: "Each bridal pair features intricate zardozi, dabka, cut-dana, and pearl beadwork hand-stitched by master artisans onto rich velvet and pure silk bases.",
+      },
+      {
+        icon: HeartHandshake,
+        title: "10+ Hour Bite-Free Comfort",
+        desc: "Engineered with our signature double-cushioned memory foam footbed and soft genuine leather lining, eliminating shoe bites for all-day ceremony wear.",
+      },
+      {
+        icon: Ruler,
+        title: "Bridal Sizing & Custom Trials",
+        desc: "Handcrafted juttis mold gently to your feet. For broad feet, size up by 1 EU size. Visit our Sector 15 Gurgaon studio for personalized bridal trials.",
+        link: "/size-chart",
+        linkText: "View Size Guide →",
+      },
+    ],
+  },
+  festive: {
+    heading: "Festive & Sangeet Footwear Guide",
+    subheading: "Vibrant craftsmanship engineered for celebrations, sangeet nights, and festivals.",
+    cards: [
+      {
+        icon: Sparkles,
+        title: "Celebration Artistry",
+        desc: "Showcases dazzling mirror work (sheesha), gota patti, metallic zari, and resham threadwork designed to sparkle under celebration chandeliers.",
+      },
+      {
+        icon: HeartHandshake,
+        title: "Dance-Ready Cushioning",
+        desc: "Lightweight and flexible with plush dual-density padding, ensuring you can dance all night through sangeet and mehendi without foot fatigue.",
+      },
+      {
+        icon: Ruler,
+        title: "Versatile Festive Styling",
+        desc: "Pairs effortlessly with festive lehengas, anarkalis, and sharara suits. Check our sizing guide or consult our studio for styling assistance.",
+        link: "/size-chart",
+        linkText: "Check Footwear Sizing →",
+      },
+    ],
+  },
+  casual: {
+    heading: "Everyday Chic & Office Wear Guide",
+    subheading: "Effortless handcrafted comfort for daily rotations and modern ethnic styling.",
+    cards: [
+      {
+        icon: Sparkles,
+        title: "Subtle Handcrafted Accents",
+        desc: "Features delicate threadwork, subtle bead details, and versatile neutral tones that blend seamlessly with both ethnic wear and western casuals.",
+      },
+      {
+        icon: HeartHandshake,
+        title: "Breathable Genuine Leather",
+        desc: "Pure leather footbeds and soft textile linings that breathe naturally, keeping your feet comfortable and cool throughout long workdays.",
+      },
+      {
+        icon: Ruler,
+        title: "Day-to-Night Fit",
+        desc: "True to size fit that contours to your foot shape after the first wear. Step out in style with kurtis, straight trousers, or relaxed denim.",
+        link: "/size-chart",
+        linkText: "Find Your Everyday Fit →",
+      },
+    ],
+  },
+};
+
 export default function Collection() {
   const { category } = useParams();
+
+  // Redirect /collection/sale to canonical /sale
+  if (category?.toLowerCase() === 'sale') {
+    return <Navigate to="/sale" replace />;
+  }
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortOption, setSortOption] = useState("newest");
@@ -213,6 +290,47 @@ export default function Collection() {
               <span className={`text-[9px] uppercase tracking-[0.3em] font-serif ${config.text}`}>End</span>
               <div className={`h-[1px] w-16 ${config.text === 'text-white' ? 'bg-white' : 'bg-current'}`}></div>
            </div>
+        )}
+
+        {/* --- CRAFTSMANSHIP & OCCASION GUIDE (Helpful Content) --- */}
+        {collectionGuides[category?.toLowerCase()] && (
+          <section className="mt-20 pt-16 border-t border-gray-200/60" aria-label="Craftsmanship & Occasion Guide">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C5A059] block mb-2">
+                Buying & Styling Considerations
+              </span>
+              <h2 className="text-2xl md:text-3xl font-serif text-[#1C1917] mb-3">
+                {collectionGuides[category?.toLowerCase()].heading}
+              </h2>
+              <p className="text-sm text-gray-500 font-light">
+                {collectionGuides[category?.toLowerCase()].subheading}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {collectionGuides[category?.toLowerCase()].cards.map((card, idx) => {
+                const Icon = card.icon;
+                return (
+                  <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <div className="w-10 h-10 rounded-full bg-[#FAF8F5] text-[#C5A059] flex items-center justify-center mb-4 border border-gray-100">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <h3 className="font-serif text-lg text-[#1C1917] mb-2">{card.title}</h3>
+                      <p className="text-xs text-gray-500 leading-relaxed">{card.desc}</p>
+                    </div>
+                    {card.link && (
+                      <div className="mt-4 pt-3 border-t border-gray-50">
+                        <Link to={card.link} className="text-[11px] font-bold uppercase tracking-wider text-[#8B5E3C] hover:text-[#1C1917] transition-colors">
+                          {card.linkText}
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
         )}
 
         {/* --- EXPLORE OTHER COLLECTIONS (Contextual Internal Linking) --- */}

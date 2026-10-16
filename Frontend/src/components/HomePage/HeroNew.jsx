@@ -224,6 +224,7 @@ export default function HeroNew() {
               >
                 {currentSlide.titleLine2 || 'Juttis'}
               </span>
+              <span className="sr-only"> — Handcrafted Punjabi Juttis & Ethnic Footwear</span>
             </h1>
 
             {/* Redesigned Refined CTA Button */}
