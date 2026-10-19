@@ -21,6 +21,10 @@ export default function TrackOrder() {
 
   const fetchTrackOrder = useCallback(async (idToTrack, emailToTrack) => {
     if (!idToTrack || !idToTrack.trim()) return;
+    const rawId = idToTrack.trim();
+    const match24 = rawId.match(/[a-f0-9]{24}/i);
+    const cleanId = match24 ? match24[0] : rawId;
+
     setLoading(true);
     setError('');
     setOrder(null);
@@ -30,7 +34,7 @@ export default function TrackOrder() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          orderId: idToTrack.trim(), 
+          orderId: cleanId, 
           email: emailToTrack ? emailToTrack.trim() : '' 
         }),
       });
@@ -55,21 +59,33 @@ export default function TrackOrder() {
     const qEmail = searchParams.get('email');
 
     if (qId) {
+      const match24 = qId.match(/[a-f0-9]{24}/i);
+      const cleanQId = match24 ? match24[0] : qId;
       setFormData({
-        orderId: qId,
+        orderId: cleanQId,
         email: qEmail || ''
       });
-      fetchTrackOrder(qId, qEmail || '');
+      fetchTrackOrder(cleanQId, qEmail || '');
     }
   }, [searchParams, fetchTrackOrder]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    let { name, value } = e.target;
+    if (name === 'orderId') {
+      const match24 = value.match(/[a-f0-9]{24}/i);
+      if (match24 && (value.includes('/') || value.includes('http') || value.includes('#'))) {
+        value = match24[0];
+      }
+    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchTrackOrder(formData.orderId, formData.email);
+    const rawId = formData.orderId.trim();
+    const match24 = rawId.match(/[a-f0-9]{24}/i);
+    const idToTrack = match24 ? match24[0] : rawId;
+    fetchTrackOrder(idToTrack, formData.email);
   };
 
   const handleCopyLink = () => {
@@ -132,12 +148,12 @@ export default function TrackOrder() {
             <div className="md:col-span-6 space-y-1">
               <label className="text-xs font-bold uppercase tracking-widest text-gray-600 flex items-center justify-between">
                 <span>Order ID *</span>
-                <span className="text-[10px] text-gray-400 font-normal">From email/receipt</span>
+                <span className="text-[10px] text-gray-400 font-normal">From email, link, or receipt</span>
               </label>
               <input 
                 type="text" 
                 name="orderId"
-                placeholder="e.g. 67123abc... or ORD-12345"
+                placeholder="e.g. 6ad665... or paste tracking URL"
                 value={formData.orderId}
                 onChange={handleChange}
                 required

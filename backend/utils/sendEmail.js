@@ -20,13 +20,16 @@ const createTransporter = () => {
 
 // --- HELPER: GET RECIPIENT DETAILS ---
 const getRecipientDetails = (order) => {
-    // 1. Try Logged In User
+    // 1. Prioritize checkout form contact info (saved from customer checkout input)
+    if (order.guestInfo && order.guestInfo.email) {
+        return { 
+          email: order.guestInfo.email, 
+          name: (order.guestInfo.name || (order.user && order.user.name) || "Customer").split(' ')[0] 
+        };
+    }
+    // 2. Try Logged In User
     if (order.user && order.user.email) {
         return { email: order.user.email, name: order.user.name.split(' ')[0] };
-    }
-    // 2. Try Guest Info (Hybrid System Support)
-    if (order.guestInfo && order.guestInfo.email) {
-        return { email: order.guestInfo.email, name: order.guestInfo.name || "Customer" };
     }
     // 3. Fallback to Payment Result
     if (order.paymentResult && order.paymentResult.email_address) {

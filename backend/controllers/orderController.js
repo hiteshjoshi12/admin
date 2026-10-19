@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Coupon = require("../models/Coupon");
@@ -239,12 +240,16 @@ const addOrderItems = async (req, res) => {
     // Attach User ID if logged in
     if (req.user && req.user._id) {
       orderData.user = req.user._id;
-    } else {
-      orderData.guestInfo = {
-        name: req.body.name || shippingAddress.name || "Guest",
-        email: req.body.email || guestEmail || "guest@example.com",
-      };
     }
+
+    // Always store the contact email and name explicitly provided at checkout
+    const checkoutEmail = (guestEmail || (shippingAddress && shippingAddress.email) || (req.user && req.user.email) || "customer@example.com").trim();
+    const checkoutName = (req.body.name || (shippingAddress && shippingAddress.name) || (req.user && req.user.name) || "Customer").trim();
+
+    orderData.guestInfo = {
+      name: checkoutName,
+      email: checkoutEmail,
+    };
 
     const order = new Order(orderData);
     const createdOrder = await order.save();
@@ -268,7 +273,11 @@ const addOrderItems = async (req, res) => {
 // @access  Public
 const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
+    const rawParam = String(req.params.id || "").trim();
+    const match24 = rawParam.match(/[a-f0-9]{24}/i);
+    const orderId = match24 ? match24[0] : rawParam;
+
+    const order = await Order.findById(orderId).populate(
       "user",
       "name email",
     );
@@ -472,22 +481,40 @@ const trackOrderPublic = async (req, res) => {
       return res.status(400).json({ message: "Order ID is required to track order." });
     }
 
-    const cleanId = String(orderId).trim().replace(/^#/, '');
-    if (!mongoose.Types.ObjectId.isValid(cleanId)) {
-      return res.status(400).json({ message: "Invalid Order ID format. Please check your order confirmation." });
-    }
+    const rawInput = String(orderId).trim();
+    const match24 = rawInput.match(/[a-f0-9]{24}/i);
+    let order = null;
 
-    const order = await Order.findById(cleanId).populate("user", "name email");
+    if (match24) {
+      order = await Order.findById(match24[0]).populate("user", "name email");
+    } else {
+      // Allow short reference codes (e.g. #157700, 157700, ORD-157700)
+      const cleanShort = rawInput.replace(/^#*(ORD-*)?/i, '').trim().toLowerCase();
+      if (cleanShort.length >= 4 && /^[a-f0-9]+$/i.test(cleanShort)) {
+        const recentOrders = await Order.find()
+          .sort({ createdAt: -1 })
+          .limit(200)
+          .populate("user", "name email");
+        order = recentOrders.find((o) => o._id.toString().toLowerCase().endsWith(cleanShort));
+      }
+    }
 
     if (!order) {
-      return res.status(404).json({ message: "No order found matching this Order ID." });
+      return res.status(404).json({ message: "No order found matching this Order ID. Please check your order confirmation." });
     }
 
-    const userEmail = order.user?.email || order.guestInfo?.email || order.shippingAddress?.email;
-
-    // If customer provided an email, verify it matches
+    // Check billing email if customer provided one
     if (email && String(email).trim()) {
-      if (!userEmail || userEmail.toLowerCase().trim() !== String(email).toLowerCase().trim()) {
+      const inputEmail = String(email).toLowerCase().trim();
+      const orderEmails = [
+        order.guestInfo?.email,
+        order.user?.email,
+        order.shippingAddress?.email,
+      ]
+        .filter(Boolean)
+        .map((e) => e.toLowerCase().trim());
+
+      if (orderEmails.length > 0 && !orderEmails.includes(inputEmail)) {
         return res.status(404).json({ message: "Order found, but the billing email does not match." });
       }
     }
