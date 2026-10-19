@@ -23,16 +23,19 @@ const createCoupon = async (req, res) => {
     }
 
     const coupon = await Coupon.create({
-      code,
+      code: String(code || '').trim().toUpperCase(),
       discountType,
-      discountAmount,
-      description,
+      discountAmount: Number(discountAmount),
+      description: String(description || '').trim(),
       expirationDate
     });
 
     res.status(201).json(coupon);
   } catch (error) {
-    res.status(400).json({ message: 'Invalid coupon data' });
+    const message = error.errors
+      ? Object.values(error.errors).map(e => e.message).join(', ')
+      : error.message || 'Invalid coupon data';
+    res.status(400).json({ message });
   }
 };
 

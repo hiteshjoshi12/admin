@@ -28,7 +28,7 @@ const userSchema = mongoose.Schema({
       name: String,
       image: String,
       price: Number,
-      size: Number,
+      size: String,
       quantity: Number
     }
   ],

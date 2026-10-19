@@ -91,69 +91,144 @@ const getProducts = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const stockItems = req.body.stock || [];
-    const totalStock = stockItems.reduce((acc, item) => acc + Number(item.quantity || 0), 0);
-    
-    let category = req.body.category;
+    // 1. Sanitize Category (accept category or categories, string or array)
+    let category = req.body.category || req.body.categories;
     if (typeof category === 'string') {
-        category = category.split(',').map(c => c.trim());
+      category = category.split(',').map(c => c.trim()).filter(Boolean);
+    } else if (Array.isArray(category)) {
+      category = category.map(c => String(c).trim()).filter(Boolean);
+    } else {
+      category = [];
     }
 
+    if (!category || category.length === 0) {
+      return res.status(400).json({ message: "At least one category is required" });
+    }
+
+    // 2. Sanitize Main Image
+    const image = req.body.image ? String(req.body.image).trim() : '';
+    if (!image) {
+      return res.status(400).json({ message: "Main product display image is required" });
+    }
+
+    // 3. Sanitize Stock
+    let stock = req.body.stock;
+    if (Array.isArray(stock)) {
+      stock = stock
+        .map(item => ({
+          size: String(item?.size || '').trim(),
+          quantity: Number(item?.quantity) >= 0 ? Number(item.quantity) : 0
+        }))
+        .filter(item => item.size.length > 0);
+    }
+
+    if (!stock || stock.length === 0) {
+      stock = [{ size: 'Standard', quantity: Math.max(0, Number(req.body.countInStock || req.body.totalStock || 0)) }];
+    }
+
+    const totalStock = stock.reduce((acc, item) => acc + Number(item.quantity || 0), 0);
+
+    // 4. Sanitize Gallery Images (exclude empty strings)
+    const images = Array.isArray(req.body.images)
+      ? req.body.images.map(img => String(img || '').trim()).filter(Boolean)
+      : [];
+
+    // 5. Sanitize Numeric Fields
+    const price = Number(req.body.price);
+    if (isNaN(price) || price <= 0) {
+      return res.status(400).json({ message: "A valid positive product price is required" });
+    }
+
+    const originalPrice = !isNaN(Number(req.body.originalPrice)) && Number(req.body.originalPrice) > 0
+      ? Number(req.body.originalPrice)
+      : 0;
+
     const product = new Product({
-      ...req.body,
-      category: category || [],
-      user: req.user._id,
-      totalStock
+      name: String(req.body.name || '').trim(),
+      description: String(req.body.description || '').trim(),
+      price,
+      originalPrice,
+      image,
+      images,
+      category,
+      stock,
+      totalStock,
+      isNewArrival: Boolean(req.body.isNewArrival),
+      isBestSeller: Boolean(req.body.isBestSeller),
+      rating: req.body.rating ? Number(req.body.rating) : 0,
+      numReviews: req.body.numReviews ? Number(req.body.numReviews) : 0,
     });
 
     const createdProduct = await product.save();
     cache.flushAll(); 
     res.status(201).json(createdProduct);
   } catch (error) {
-    console.error("Create Error:", error);
-    res.status(400).json({ message: "Invalid product data" });
+    console.error("Create Product Error:", error);
+    const message = error.errors
+      ? Object.values(error.errors).map(e => e.message).join(", ")
+      : error.message || "Invalid product data";
+    res.status(400).json({ message });
   }
 };
 
-// FIXED: Added missing fields to update payload
 const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (product) {
-      if (req.body.stock) {
-        product.stock = req.body.stock;
-        product.totalStock = req.body.stock.reduce((acc, item) => acc + Number(item.quantity), 0);
-      }
-
-      if (req.body.category) {
-         if (typeof req.body.category === 'string') {
-             product.category = req.body.category.split(',').map(c => c.trim());
-         } else {
-             product.category = req.body.category;
-         }
-      }
-
-      // Map ALL fields properly
-      product.name = req.body.name || product.name;
-      product.price = req.body.price || product.price;
-      product.originalPrice = req.body.originalPrice !== undefined ? req.body.originalPrice : product.originalPrice;
-      product.image = req.body.image || product.image;
-      product.images = req.body.images || product.images; 
-      product.description = req.body.description || product.description;
-      
-      if (req.body.isNewArrival !== undefined) product.isNewArrival = req.body.isNewArrival;
-      if (req.body.isBestSeller !== undefined) product.isBestSeller = req.body.isBestSeller;
-      if (req.body.slug) product.slug = req.body.slug;
-
-      const updatedProduct = await product.save();
-      cache.flushAll(); 
-      res.json(updatedProduct);
-    } else {
-      res.status(404).json({ message: "Product not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
+
+    if (req.body.stock) {
+      let stock = req.body.stock;
+      if (Array.isArray(stock)) {
+        stock = stock
+          .map(item => ({
+            size: String(item?.size || '').trim(),
+            quantity: Number(item?.quantity) >= 0 ? Number(item.quantity) : 0
+          }))
+          .filter(item => item.size.length > 0);
+      }
+      if (stock.length > 0) {
+        product.stock = stock;
+        product.totalStock = stock.reduce((acc, item) => acc + Number(item.quantity || 0), 0);
+      }
+    }
+
+    if (req.body.category || req.body.categories) {
+      let category = req.body.category || req.body.categories;
+      if (typeof category === 'string') {
+        product.category = category.split(',').map(c => c.trim()).filter(Boolean);
+      } else if (Array.isArray(category)) {
+        product.category = category.map(c => String(c).trim()).filter(Boolean);
+      }
+    }
+
+    if (req.body.name) product.name = String(req.body.name).trim();
+    if (req.body.price !== undefined && !isNaN(Number(req.body.price))) product.price = Number(req.body.price);
+    if (req.body.originalPrice !== undefined) {
+      product.originalPrice = !isNaN(Number(req.body.originalPrice)) ? Number(req.body.originalPrice) : 0;
+    }
+    if (req.body.image) product.image = String(req.body.image).trim();
+    if (req.body.images) {
+      product.images = Array.isArray(req.body.images)
+        ? req.body.images.map(img => String(img || '').trim()).filter(Boolean)
+        : [];
+    }
+    if (req.body.description) product.description = String(req.body.description).trim();
+    
+    if (req.body.isNewArrival !== undefined) product.isNewArrival = Boolean(req.body.isNewArrival);
+    if (req.body.isBestSeller !== undefined) product.isBestSeller = Boolean(req.body.isBestSeller);
+    if (req.body.slug) product.slug = req.body.slug;
+
+    const updatedProduct = await product.save();
+    cache.flushAll(); 
+    res.json(updatedProduct);
   } catch (error) {
-    console.error("Update Error:", error);
-    res.status(500).json({ message: "Update Error" });
+    console.error("Update Product Error:", error);
+    const message = error.errors
+      ? Object.values(error.errors).map(e => e.message).join(", ")
+      : error.message || "Update Error";
+    res.status(500).json({ message });
   }
 };
 

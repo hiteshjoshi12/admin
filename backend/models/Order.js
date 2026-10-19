@@ -42,6 +42,7 @@ const orderSchema = mongoose.Schema({
   paymentMethod: { type: String, required: true },
   
   itemPrice: { type: Number, required: true, default: 0.0 },
+  itemsPrice: { type: Number, default: 0.0 },
   shippingPrice: { type: Number, required: true, default: 0.0 },
   
   // 🚨 NEW FIELDS REQUIRED FOR ACCURATE MATH

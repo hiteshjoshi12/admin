@@ -1,20 +1,51 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { 
   Package, MapPin, CreditCard, Calendar, 
-  ArrowLeft, CheckCircle, Clock, Truck, User 
+  ArrowLeft, CheckCircle, Clock, Truck, User,
+  Copy, Sparkles, Check, ShoppingBag, Share2
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 import { API_BASE_URL } from '../util/config';
 import SEO from '../components/seo/SEO';
 
 export default function OrderDetails() {
   const { id } = useParams();
+  const location = useLocation();
   const { userInfo } = useSelector((state) => state.auth);
   
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const isNewOrder = Boolean(location.state?.orderPlaced);
+
+  useEffect(() => {
+    if (isNewOrder) {
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#10B981', '#1C1917', '#F59E0B', '#FF2865']
+        });
+      } catch (e) {}
+    }
+  }, [isNewOrder]);
+
+  const copyLiveTrackingUrl = () => {
+    try {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      toast.success("Live tracking URL copied to clipboard!");
+      setTimeout(() => setCopied(false), 2500);
+    } catch (e) {
+      toast.error("Could not copy link");
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -73,30 +104,86 @@ export default function OrderDetails() {
     <div className="min-h-screen flex flex-col items-center justify-center pt-20 bg-[#F9F8F6]">
       <h2 className="text-2xl font-serif text-red-500 mb-4">Error Loading Order</h2>
       <p className="text-gray-500 mb-6">{error || "Order data is missing"}</p>
-      <Link to="/myorders" className="underline hover:text-[#FF2865]">Back to My Orders</Link>
+      {userInfo ? (
+        <Link to="/myorders" className="underline hover:text-[#FF2865]">Back to My Orders</Link>
+      ) : (
+        <Link to="/track-order" className="underline hover:text-[#FF2865]">Look Up Order by ID</Link>
+      )}
     </div>
   );
 
   const handleSupport = () => {
     window.location.href = `mailto: connect@beadsandbloom.in?subject=Support%20Request%20for%20Order%20${order._id.slice(-6).toUpperCase()}&body=Hello%20Support%20Team,%0D%0A%0D%0AI%20need%20assistance%20with%20my%20order%20${order._id.slice(-6).toUpperCase()}.%0D%0A%0D%0AOrder%20Details:%0D%0A- %20Order ID:%20${order._id}%0D%0A- %20Placed On:%20${new Date(order.createdAt).toLocaleString()}%0D%0A- %20Items:%20${order.orderItems.map(item => `${item.name} (Qty: ${item.quantity})`).join(', ')}.%0D%0A- %20Total:%20₹${safePrice(order.totalPrice)}.%0D%0A%0D%0APlease%20assist%20me%20with...`;
-
-
-  }
+  };
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-12">
-      <SEO title="Order Details | Beads and Bloom" robots="noindex, nofollow" />
+      <SEO 
+        title={`Order #${order._id.slice(-6).toUpperCase()} Tracking | Beads and Bloom`} 
+        description="Live tracking status and invoice breakdown for your Beads and Bloom handcrafted order."
+        robots="noindex, nofollow" 
+      />
       <div className="max-w-5xl mx-auto px-4 md:px-6">
         
+        {/* 🎉 NEW ORDER CELEBRATION BANNER */}
+        {isNewOrder && (
+          <div className="mb-8 p-6 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm animate-fade-in">
+            <div className="flex items-center gap-4 text-left">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center shrink-0 border border-emerald-200">
+                <Sparkles className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-serif font-bold text-emerald-950">
+                  Order Confirmed & Placed Successfully!
+                </h2>
+                <p className="text-xs text-emerald-800 mt-0.5">
+                  A receipt has been sent to your email. Bookmark or copy this live tracking URL to check your order anytime.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 w-full md:w-auto">
+              <button
+                onClick={copyLiveTrackingUrl}
+                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all shadow-sm cursor-pointer"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? "Link Copied!" : "Copy Tracking Link"}
+              </button>
+              <Link
+                to="/shop"
+                className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 bg-white hover:bg-emerald-100/50 text-emerald-900 border border-emerald-300 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all"
+              >
+                <ShoppingBag className="w-4 h-4" /> Shop More
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <Link to="/myorders" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#1C1917] mb-2 transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Back to Orders
-            </Link>
-            <h1 className="text-2xl md:text-3xl font-serif text-[#1C1917] flex items-center gap-3">
-              Order <span className="text-gray-400 font-mono text-xl">#{order._id.slice(-6).toUpperCase()}</span>
-            </h1>
+            {userInfo ? (
+              <Link to="/myorders" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#1C1917] mb-2 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Back to Orders
+              </Link>
+            ) : (
+              <Link to="/shop" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#1C1917] mb-2 transition-colors">
+                <ArrowLeft className="w-4 h-4" /> Continue Shopping
+              </Link>
+            )}
+            <div className="flex items-center flex-wrap gap-3">
+              <h1 className="text-2xl md:text-3xl font-serif text-[#1C1917] flex items-center gap-3">
+                Order <span className="text-gray-400 font-mono text-xl">#{order._id.slice(-6).toUpperCase()}</span>
+              </h1>
+              <button
+                onClick={copyLiveTrackingUrl}
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-600 hover:text-[#1C1917] bg-white border border-gray-200 hover:border-gray-300 px-3 py-1 rounded-full transition-colors cursor-pointer shadow-2xs"
+                title="Copy live tracking URL"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Share2 className="w-3.5 h-3.5 text-gray-500" />}
+                <span>{copied ? "Copied" : "Share Tracking URL"}</span>
+              </button>
+            </div>
           </div>
           <div className="text-right">
              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Placed On</p>

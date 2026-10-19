@@ -223,6 +223,7 @@ const addOrderItems = async (req, res) => {
       shippingAddress,
       paymentMethod,
       itemPrice: calculatedItemsPrice,
+      itemsPrice: calculatedItemsPrice,
       shippingPrice,
       
       // 🚨 SAVE THESE TO DATABASE 🚨
@@ -467,32 +468,49 @@ const getOrders = async (req, res) => {
 const trackOrderPublic = async (req, res) => {
   const { orderId, email } = req.body;
   try {
-    const order = await Order.findById(orderId).populate("user", "name email");
-
-    const userEmail = order.user?.email || order.guestInfo?.email;
-
-    if (
-      order &&
-      userEmail &&
-      userEmail.toLowerCase() === email.toLowerCase().trim()
-    ) {
-      res.json({
-        _id: order._id,
-        createdAt: order.createdAt,
-        orderStatus: order.orderStatus,
-        isPaid: order.isPaid,
-        isDelivered: order.isDelivered,
-        deliveredAt: order.deliveredAt,
-        awbCode: order.awbCode,
-        courierName: order.courierCompanyName || "Shiprocket",
-        orderItems: order.orderItems,
-        totalPrice: order.totalPrice,
-      });
-    } else {
-      res.status(404).json({ message: "Order details not found." });
+    if (!orderId || !String(orderId).trim()) {
+      return res.status(400).json({ message: "Order ID is required to track order." });
     }
+
+    const cleanId = String(orderId).trim().replace(/^#/, '');
+    if (!mongoose.Types.ObjectId.isValid(cleanId)) {
+      return res.status(400).json({ message: "Invalid Order ID format. Please check your order confirmation." });
+    }
+
+    const order = await Order.findById(cleanId).populate("user", "name email");
+
+    if (!order) {
+      return res.status(404).json({ message: "No order found matching this Order ID." });
+    }
+
+    const userEmail = order.user?.email || order.guestInfo?.email || order.shippingAddress?.email;
+
+    // If customer provided an email, verify it matches
+    if (email && String(email).trim()) {
+      if (!userEmail || userEmail.toLowerCase().trim() !== String(email).toLowerCase().trim()) {
+        return res.status(404).json({ message: "Order found, but the billing email does not match." });
+      }
+    }
+
+    res.json({
+      _id: order._id,
+      createdAt: order.createdAt,
+      orderStatus: order.orderStatus,
+      isPaid: order.isPaid,
+      isDelivered: order.isDelivered,
+      deliveredAt: order.deliveredAt,
+      awbCode: order.awbCode,
+      courierName: order.courierCompanyName || "Shiprocket",
+      orderItems: order.orderItems,
+      totalPrice: order.totalPrice,
+      paymentMethod: order.paymentMethod,
+      shippingCity: order.shippingAddress?.city,
+      shippingState: order.shippingAddress?.state,
+      shippingPostalCode: order.shippingAddress?.postalCode
+    });
   } catch (error) {
-    res.status(404).json({ message: "Order details not found." });
+    console.error("Track Order Error:", error);
+    res.status(500).json({ message: "Could not retrieve order details. Please try again." });
   }
 };
 

@@ -335,9 +335,7 @@ export default function Checkout() {
 
             if (verifyRes.ok) {
               dispatch(clearCart());
-              setCreatedOrderId(orderId);
-              setStep(3);
-              window.scrollTo(0, 0);
+              navigate(`/order/${orderId}`, { state: { orderPlaced: true } });
             } else {
               toast.error("Verification failed.");
             }
@@ -409,10 +407,8 @@ export default function Checkout() {
       if (paymentMethod === "razorpay") {
          handleRazorpayPayment(res._id);
       } else {
-         setCreatedOrderId(res._id);
          dispatch(clearCart());
-         setStep(3);
-         window.scrollTo(0, 0);
+         navigate(`/order/${res._id}`, { state: { orderPlaced: true } });
       }
     } catch (err) {
       toast.error(err.message || "Failed to place order");

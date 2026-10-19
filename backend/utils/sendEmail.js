@@ -92,6 +92,9 @@ const sendOrderConfirmation = async (order) => {
         return;
     }
 
+    const frontendBase = process.env.FRONTEND_URL_PROD || "https://beadsandbloom.in";
+    const liveTrackingUrl = `${frontendBase}/order/${order._id}`;
+
     const itemsHtml = order.orderItems.map(item => `
       <tr>
         <td style="padding: 12px; border-bottom: 1px solid #ddd;">
@@ -120,6 +123,16 @@ const sendOrderConfirmation = async (order) => {
           <div style="background-color: #f8f8f8; padding: 15px; border-radius: 8px; margin: 25px 0; text-align: center;">
             <p style="margin: 0; font-size: 12px; text-transform: uppercase; color: #888; letter-spacing: 1px;">Order Reference</p>
             <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 20px; color: #1C1917;">${order._id}</p>
+          </div>
+
+          <!-- 🔗 LIVE ORDER TRACKING BUTTON -->
+          <div style="text-align: center; margin: 25px 0 30px 0;">
+            <a href="${liveTrackingUrl}" style="background-color: #1C1917; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; display: inline-block; letter-spacing: 0.5px;">
+              Track Your Order Live
+            </a>
+            <p style="margin-top: 10px; font-size: 12px; color: #666;">
+              Live tracking link: <a href="${liveTrackingUrl}" style="color: #FF2865; text-decoration: underline; word-break: break-all;">${liveTrackingUrl}</a>
+            </p>
           </div>
 
           <h3 style="color: #1C1917; margin-top: 30px;">Order Summary</h3>
@@ -151,6 +164,10 @@ const sendOrderConfirmation = async (order) => {
               <strong>Phone:</strong> ${order.shippingAddress.phoneNumber}
             </p>
           </div>
+
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+            <p style="margin: 0;">You can check your live order and delivery status anytime at <a href="${liveTrackingUrl}" style="color: #1C1917; font-weight: bold; text-decoration: underline;">Your Live Order Page</a> or via <a href="${frontendBase}/track-order" style="color: #1C1917; font-weight: bold;">Track Order</a>.</p>
+          </div>
         </div>
       `,
     };
@@ -168,6 +185,9 @@ const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
     const transporter = createTransporter();
     const { email } = getRecipientDetails(order);
     if (!email) return;
+
+    const frontendBase = process.env.FRONTEND_URL_PROD || "https://beadsandbloom.in";
+    const activeTrackingUrl = trackingUrl || `${frontendBase}/order/${order._id}`;
 
     let subject = `Update on Order #${order._id.toString().slice(-6).toUpperCase()}`;
     let heading = "Order Update";
@@ -187,16 +207,21 @@ const sendOrderStatusEmail = async (order, status, trackingUrl = null) => {
         message = `We have received your order and are currently packing it. You will receive a tracking link soon.`;
     }
 
-    const trackingHtml = trackingUrl ? `
+    const trackingHtml = `
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${trackingUrl}" style="background-color: #1C1917; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block;">
-          Track Your Package
+        <a href="${activeTrackingUrl}" style="background-color: #1C1917; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; display: inline-block;">
+          Track Your Package Live
         </a>
+        ${order.awbCode ? `
         <p style="margin-top: 10px; font-size: 12px; color: #888;">
-           Tracking Number (AWB): <strong>${order.awbCode || 'N/A'}</strong>
+           Tracking Number (AWB): <strong>${order.awbCode}</strong>
+        </p>
+        ` : ''}
+        <p style="margin-top: 8px; font-size: 12px; color: #666;">
+          Live URL: <a href="${activeTrackingUrl}" style="color: #FF2865; text-decoration: underline; word-break: break-all;">${activeTrackingUrl}</a>
         </p>
       </div>
-    ` : '';
+    `;
 
     const mailOptions = {
       from: `"BeadsNBloom Updates" <${process.env.EMAIL_USERNAME}>`,

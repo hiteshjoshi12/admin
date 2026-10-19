@@ -20,7 +20,7 @@ const productSchema = mongoose.Schema({
   isBestSeller: { type: Boolean, default: false },
   stock: [
     {
-      size: { type: String, required: true }, // FIXED: Changed to String to allow "XL", "8.5", etc.
+      size: { type: String, required: true, default: 'Standard' }, // FIXED: Changed to String to allow "XL", "8.5", etc. with default fallback
       quantity: { type: Number, required: true, default: 0 }
     }
   ],
@@ -36,7 +36,7 @@ productSchema.index({ createdAt: -1 });
 productSchema.index({ price: 1 });
 
 productSchema.pre('save', async function () {
-  if (this.isModified('name')) {
+  if (this.isModified('name') || !this.slug) {
     const baseSlug = this.name
       .toLowerCase()
       .trim()

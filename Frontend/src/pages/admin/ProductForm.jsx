@@ -150,21 +150,64 @@ export default function ProductForm() {
     e.preventDefault();
     setLoading(true);
 
-    if (formData.categories.length === 0) {
-        toast.error("Please select at least one category");
-        setLoading(false);
-        return;
+    if (!formData.name?.trim()) {
+      toast.error("Please enter a product name");
+      setLoading(false);
+      return;
     }
 
-    const totalStock = formData.stock.reduce((acc, item) => acc + Number(item.quantity), 0);
-    
+    if (!formData.image) {
+      toast.error("Please upload a Main Display Image");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.categories || formData.categories.length === 0) {
+      toast.error("Please select at least one category");
+      setLoading(false);
+      return;
+    }
+
+    const priceNum = Number(formData.price);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      toast.error("Please enter a valid product price");
+      setLoading(false);
+      return;
+    }
+
+    // Filter valid stock items (exclude rows with empty size)
+    const validStock = formData.stock
+      .filter((item) => item && String(item.size || '').trim() !== '')
+      .map((item) => ({
+        size: String(item.size).trim(),
+        quantity: Math.max(0, Number(item.quantity) || 0)
+      }));
+
+    if (validStock.length === 0) {
+      toast.error("Please enter at least one size in Inventory (e.g. 38, Free Size, Standard)");
+      setLoading(false);
+      return;
+    }
+
+    const totalStock = validStock.reduce((acc, item) => acc + item.quantity, 0);
+
+    const validImages = Array.isArray(formData.images)
+      ? formData.images.filter((img) => img && String(img).trim() !== '')
+      : [];
+
     const productData = {
-      ...formData,
-      price: Number(formData.price),
-      originalPrice: Number(formData.originalPrice),
-      stock: formData.stock.map(s => ({ size: String(s.size), quantity: Number(s.quantity) })),
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      price: priceNum,
+      originalPrice: formData.originalPrice && !isNaN(Number(formData.originalPrice)) ? Number(formData.originalPrice) : 0,
+      image: formData.image,
+      images: validImages,
+      stock: validStock,
       totalStock, 
-      category: formData.categories, 
+      category: formData.categories,
+      categories: formData.categories,
+      isNewArrival: Boolean(formData.isNewArrival),
+      isBestSeller: Boolean(formData.isBestSeller)
     };
 
     try {
@@ -408,12 +451,12 @@ export default function ProductForm() {
              {formData.stock.map((item, index) => (
                <div key={index} className="flex gap-4 items-end">
                   <div className="flex-1">
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Size</label>
-                    <input type="text" value={item.size} onChange={(e) => handleStockChange(index, 'size', e.target.value)} className="w-full p-2 border rounded outline-none" placeholder="e.g. XL, 38, Free Size" />
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Size *</label>
+                    <input type="text" required value={item.size} onChange={(e) => handleStockChange(index, 'size', e.target.value)} className="w-full p-2 border rounded outline-none" placeholder="e.g. 38, 39, XL, Free Size" />
                   </div>
                   <div className="flex-1">
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Qty</label>
-                    <input type="number" value={item.quantity} onChange={(e) => handleStockChange(index, 'quantity', e.target.value)} className="w-full p-2 border rounded outline-none" />
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Qty *</label>
+                    <input type="number" min="0" required value={item.quantity} onChange={(e) => handleStockChange(index, 'quantity', e.target.value)} className="w-full p-2 border rounded outline-none" />
                   </div>
                   <button type="button" onClick={() => removeStockRow(index)} className="p-2.5 bg-gray-50 rounded-lg hover:text-red-500 hover:bg-red-50 transition-colors" disabled={formData.stock.length === 1} title="Remove stock row">
                     <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />

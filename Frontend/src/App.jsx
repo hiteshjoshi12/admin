@@ -131,6 +131,8 @@ function App() {
             <Route path="/care-guide" element={<CareGuide />} />
             <Route path="/bridal-guide" element={<BridalGuide />} />
             <Route path="/order/:id" element={<OrderDetails />} />
+            <Route path="/order-confirmation/:id" element={<OrderDetails />} />
+            <Route path="/order-success/:id" element={<OrderDetails />} />
             
             <Route element={<PrivateRoute />}>
                <Route path="/profile" element={<Profile />} />
