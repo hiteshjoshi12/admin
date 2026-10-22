@@ -16,7 +16,7 @@ export default function ArtisanalTriad({ product }) {
     {
       num: '01',
       icon: Sparkles,
-      image: 'https://ik.imagekit.io/hiteshh12/editorial/anatomy-zardozi.jpg',
+      image: 'https://ik.imagekit.io/hiteshh12/editorial/Embroidered%20Maroon%20Jutti%20in%20Golden%20Light.png?updatedAt=1792678043096',
       imageAlt: 'Handcrafted Zardozi, Beads and Pearl Embroidery',
       title: 'Handcrafted Zardozi & Embellishments',
       subtitle: 'Artisanal Embroidery',
@@ -27,7 +27,7 @@ export default function ArtisanalTriad({ product }) {
     {
       num: '02',
       icon: Feather,
-      image: 'https://ik.imagekit.io/hiteshh12/editorial/anatomy-cushion.jpg',
+      image: 'https://ik.imagekit.io/hiteshh12/editorial/Ornate%20Golden%20Jutti%20Interior.png?updatedAt=1792678043035',
       imageAlt: 'Double-Padded Memory Foam Footbed Cushioning',
       title: 'Double-Padded Cloud Cushioning',
       subtitle: 'All-Day Bite-Free Comfort',
@@ -38,7 +38,7 @@ export default function ArtisanalTriad({ product }) {
     {
       num: '03',
       icon: ShieldCheck,
-      image: 'https://ik.imagekit.io/hiteshh12/editorial/anatomy-sole.jpg',
+      image: 'https://ik.imagekit.io/hiteshh12/editorial/Handcrafted%20Jutti%20Sole%20and%20Stitching.png?updatedAt=1792678043124',
       imageAlt: '100% Genuine Vegetable-Tanned Leather Sole & Lining',
       title: '100% Genuine Leather Lining & Sole',
       subtitle: 'Organic Foot Contouring',
