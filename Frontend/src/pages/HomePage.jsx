@@ -40,10 +40,10 @@ const HomePage = () => {
   return (
     <div className="bg-white">
       <SEO
-        title="Handcrafted Juttis | Bridal, Festive & Casual | Store in Gurgaon - Beads and Bloom"
-        description="Discover luxury handcrafted Punjabi juttis, bridal mojris & festive footwear at Beads and Bloom. Visit our store in Sector 15, Gurgaon. Worldwide shipping & Cash on Delivery (COD) available."
+        title="Handcrafted Punjabi Juttis | Luxury Bridal, Festive & Casual Mojaris - Beads and Bloom"
+        description="Discover luxury handcrafted Punjabi juttis, bridal mojris & festive footwear at Beads and Bloom. Pure leather soles, double-cushioned comfort, worldwide shipping & Cash on Delivery (COD) available."
         canonical="/"
-        keywords="handcrafted juttis, bridal juttis gurgaon, punjabi jutti sector 15 gurgaon, jutti store gurgaon, festive footwear, wedding mojris, casual juttis, beads and bloom, cash on delivery juttis, worldwide shipping juttis, punjabi juttis online"
+        keywords="handcrafted juttis, bridal juttis, punjabi juttis online, festive footwear, wedding mojris, casual juttis, beads and bloom, cash on delivery juttis, worldwide shipping juttis"
         schema={homeSchema}
       />
       {/* Load Instantly */}

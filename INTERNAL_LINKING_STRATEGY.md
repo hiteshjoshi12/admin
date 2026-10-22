@@ -152,7 +152,7 @@ Structured into 4 user-oriented, crawlable columns:
    - `/contact` ("Gurgaon Studio & Contact")
    - `/track-order` ("Track Your Order")
 3. **Studio Contact & Socials:**
-   - Physical address details in Sector 15, Gurgaon.
+   - Physical address details in Online Atelier.
    - Official social media links (`https://www.instagram.com/beadsnbloom.india`).
 4. **Legal & Policies:**
    - `/terms` ("Terms of Service", "Privacy Policy", "Exchange Policy").

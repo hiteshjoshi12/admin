@@ -53,7 +53,7 @@ This implementation transforms Beads & Bloom from an initial brand-only search p
    - Embedded 4 verified FAQs and rich `Article`, `BreadcrumbList`, and `FAQPage` JSON-LD schema.
 3. `Frontend/src/pages/BridalGuide.jsx` (**NEW FILE**):
    - Created the Bridal Jutti Buying & Lehenga Styling Guide.
-   - Solves the bridal dilemma (Juttis vs. High Heels for 10-hour pheras comfort), lehenga hem fitting rules, wedding event trousseau checklist (Haldi to Reception), and Sector 15 Gurugram studio appointments.
+   - Solves the bridal dilemma (Juttis vs. High Heels for 10-hour pheras comfort), lehenga hem fitting rules, wedding event trousseau checklist (Haldi to Reception), and Online Atelier studio appointments.
    - Embedded `Article`, `BreadcrumbList`, and `FAQPage` schema.
 4. `Frontend/src/App.jsx`:
    - Added lazy imports for `CareGuide` and `BridalGuide`.

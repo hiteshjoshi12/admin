@@ -135,7 +135,7 @@ export default function PincodeChecker({ productPrice = 0 }) {
                 Estimated Delivery: <span className="text-emerald-700">{estimateData.dateRangeStr}</span>
               </p>
               <p className="text-[11px] text-gray-500 mt-0.5">
-                Dispatches within 24–48 hours from Gurgaon Studio • Tracking link via SMS & Email.
+                Dispatches within 24–48 hours from our artisan atelier • Tracking link via SMS & Email.
               </p>
             </div>
           </div>

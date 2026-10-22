@@ -7,7 +7,7 @@ export const SITE_URL = 'https://beadsandbloom.in';
 
 export const getStoreSchema = () => ({
   '@context': 'https://schema.org',
-  '@type': 'ShoeStore',
+  '@type': 'OnlineStore',
   '@id': `${SITE_URL}/#store`,
   name: 'Beads and Bloom — Handcrafted Juttis & Ethnic Footwear',
   image: `${SITE_URL}/logo.png`,
@@ -16,30 +16,7 @@ export const getStoreSchema = () => ({
   priceRange: '₹₹',
   paymentAccepted: ['Cash on Delivery', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking'],
   currenciesAccepted: 'INR',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Sector 15',
-    addressLocality: 'Gurugram',
-    addressRegion: 'Haryana',
-    postalCode: '122001',
-    addressCountry: 'IN',
-  },
-  geo: {
-    '@type': 'GeoCoordinates',
-    latitude: 28.4682,
-    longitude: 77.0371,
-  },
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      opens: '10:00',
-      closes: '19:00',
-    },
-  ],
   areaServed: [
-    { '@type': 'City', name: 'Gurgaon' },
-    { '@type': 'AdministrativeArea', name: 'Delhi NCR' },
     { '@type': 'Country', name: 'India' },
     { '@type': 'Country', name: 'United States' },
     { '@type': 'Country', name: 'United Kingdom' },

@@ -15,10 +15,10 @@ export default function About() {
     '@graph': [
       {
         '@type': 'AboutPage',
-        name: 'Our Heritage, Craft & Studio — Beads and Bloom',
+        name: 'Our Heritage & Artisan Story — Beads and Bloom',
         url: 'https://beadsandbloom.in/about',
         description:
-          'Handcrafted Punjabi juttis rooted in artisan heritage, based in Sector 15 Gurgaon with worldwide delivery. Complete range from casual to bridal footwear.',
+          'Handcrafted Punjabi juttis rooted in artisan heritage with worldwide delivery. Complete range from casual to royal bridal footwear.',
       },
       getStoreSchema(),
       getOrganizationSchema(),
@@ -32,10 +32,10 @@ export default function About() {
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-20">
       <SEO
-        title="Our Story, Studio & Handcrafted Range | Beads and Bloom Gurgaon"
-        description="Discover Beads and Bloom. Handcrafted Punjabi juttis crafted with love, available at our Sector 15 Gurgaon studio and shipped worldwide with COD."
+        title="Our Story & Artisan Heritage | Beads and Bloom"
+        description="Discover Beads and Bloom. Handcrafted luxury Punjabi juttis crafted with love, delivered nationwide and shipped worldwide with COD."
         canonical="/about"
-        keywords="beads and bloom gurgaon, jutti store sector 15 gurgaon, handmade juttis india, bridal jutti makers gurgaon, worldwide shipping ethnic shoes, punjabi jutti craft"
+        keywords="beads and bloom, handcrafted juttis india, bridal jutti makers, worldwide shipping ethnic shoes, punjabi jutti craft, designer mojris"
         schema={aboutSchema}
       />
       
@@ -149,28 +149,28 @@ export default function About() {
         </div>
       </section>
 
-      {/* --- GURGAON STUDIO & REACH --- */}
+      {/* --- HERITAGE ROOTS & REACH --- */}
       <section className="py-20 px-6 bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto text-center">
           <span className="text-[#C5A059] text-xs font-bold uppercase tracking-[0.3em] mb-3 block">
             Our Presence
           </span>
           <h2 className="font-luxury text-3xl md:text-5xl text-[#1C1917] mb-6">
-            From Sector 15, Gurgaon <span className="italic text-[#FF2865]">to the World</span>
+            Heritage Craft <span className="italic text-[#FF2865]">to the World</span>
           </h2>
           <p className="text-gray-600 font-light max-w-2xl mx-auto mb-12 leading-relaxed">
-            Nestled in <strong>Sector 15, Gurgaon (Gurugram)</strong>, our boutique studio is a sanctuary for authentic Indian footwear craftsmanship. 
-            From bridal wear and sangeet celebrations to effortless everyday casual juttis, each pair is brought to life with passion.
+            Rooted in authentic Indian footwear craftsmanship, Beads & Bloom celebrates the timeless elegance of the handcrafted Punjabi jutti. 
+            From regal bridal couture and sangeet celebrations to effortless everyday chic, each pair is brought to life with meticulous care.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
             <div className="p-6 rounded-2xl bg-[#F9F8F6] border border-gray-200/70">
               <div className="w-10 h-10 rounded-full bg-[#FFF0F4] text-[#FF2865] flex items-center justify-center mb-4">
-                <MapPin className="w-5 h-5" />
+                <Sparkles className="w-5 h-5" />
               </div>
-              <h3 className="font-serif text-lg font-medium text-[#1C1917] mb-2">Gurgaon Studio</h3>
+              <h3 className="font-serif text-lg font-medium text-[#1C1917] mb-2">Artisan Karigari</h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Visit us in Sector 15, Gurgaon for exclusive bridal styling, custom fit appointments, and bridal party orders.
+                Over 24+ artisan hours spent per pair, featuring royal zardozi, hand-stitched leather soles, and cloud-like cushioning.
               </p>
             </div>
 

@@ -1,7 +1,7 @@
 # BEADS & BLOOM — MASTER SEO CONTENT MAP & ROUTE ARCHITECTURE
 **Domain:** `https://beadsandbloom.in/`  
 **Brand:** Beads & Bloom (Artisanal Luxury Handcrafted Indian Juttis & Mojris)  
-**Studio Location:** Sector 15, Gurugram (Gurgaon), Haryana 122001, India  
+**Studio Location:** Online Atelier (Gurgaon), Haryana 122001, India  
 **Audited Canonical Public Inventory:** 44 Routes (10 Hubs/Collections + 34 Handcrafted Products)  
 **Status:** Implemented & Verified in Codebase  
 
@@ -40,10 +40,10 @@ graph TD
 - **Page Type:** Homepage Hub
 - **Search Intent:** Commercial / Navigational ("handcrafted juttis", "punjabi jutti online", "jutti store gurgaon")
 - **Primary Topic / Keyword:** Handcrafted Punjabi Juttis & Luxury Ethnic Footwear
-- **Secondary Topics:** Bridal juttis Gurgaon, bite-free cushioned juttis, Sector 15 Gurgaon studio, worldwide shipping, cash on delivery (COD).
+- **Secondary Topics:** Bridal juttis Gurgaon, bite-free cushioned juttis, Online Atelier studio, worldwide shipping, cash on delivery (COD).
 - **H1:** `Beads & Bloom — Handcrafted Punjabi Juttis & Ethnic Footwear` (Semantic screen-reader accessible with brand headline)
 - **Title Tag:** `Handcrafted Juttis | Bridal, Festive & Casual | Store in Gurgaon - Beads and Bloom`
-- **Meta Description:** `Discover luxury handcrafted Punjabi juttis, bridal mojris & festive footwear at Beads and Bloom. Visit our store in Sector 15, Gurgaon. Worldwide shipping & Cash on Delivery (COD) available.`
+- **Meta Description:** `Discover luxury handcrafted Punjabi juttis, bridal mojris & festive footwear at Beads and Bloom. Visit our store in Online Atelier. Worldwide shipping & Cash on Delivery (COD) available.`
 - **Canonical:** `https://beadsandbloom.in/` (Self-referencing)
 - **Indexing Decision:** `index, follow`
 - **Structured Data:** `ShoeStore`, `Organization`, `WebSite` (with `SearchAction`), `FAQPage` (StoreTrustFAQ)
@@ -148,16 +148,16 @@ graph TD
 - **Page Type:** E-E-A-T Brand Heritage & Physical Studio Page
 - **Search Intent:** Informational / Brand Trust ("beads and bloom gurgaon", "about beads and bloom", "punjabi jutti makers")
 - **Primary Topic / Keyword:** Artisanal Punjabi Jutti Heritage & Gurgaon Studio
-- **Secondary Topics:** Sector 15 Gurugram studio, artisan techniques, founder philosophy, worldwide shipping, COD.
+- **Secondary Topics:** Online Atelier studio, artisan techniques, founder philosophy, worldwide shipping, COD.
 - **H1:** `Threads of Tradition`
 - **Title Tag:** `Our Story, Studio & Handcrafted Range | Beads and Bloom Gurgaon`
-- **Meta Description:** `Discover Beads and Bloom. Handcrafted Punjabi juttis crafted with love, available at our Sector 15 Gurgaon studio and shipped worldwide with COD.`
+- **Meta Description:** `Discover Beads and Bloom. Handcrafted Punjabi juttis crafted with love, available at our Online Atelier studio and shipped worldwide with COD.`
 - **Canonical:** `https://beadsandbloom.in/about`
 - **Indexing Decision:** `index, follow`
 - **Structured Data:** `AboutPage`, `ShoeStore`, `Organization`, `BreadcrumbList` (Home > About)
 - **Inbound Internal Links:** Header nav ("Our Story"), Footer, Homepage BrandStory ("Read Our Heritage Story").
 - **Outbound Internal Links:** `/shop`, Instagram profile, contact studio.
-- **Content Improvements Implemented:** Verified Gurgaon Sector 15 studio address; Google Maps link; core craftsmanship pillars (Rooted, Resilient, Refined).
+- **Content Improvements Implemented:** Verified Gurgaon Online Atelierstudio address; Google Maps link; core craftsmanship pillars (Rooted, Resilient, Refined).
 
 ---
 
@@ -184,16 +184,16 @@ graph TD
 - **Page Type:** Customer Support & Local Physical Entity
 - **Search Intent:** Local / Navigational ("contact beads and bloom", "jutti store near me gurgaon")
 - **Primary Topic / Keyword:** Gurgaon Studio Visit & Customer Support
-- **Secondary Topics:** Sector 15 Gurugram studio trials, custom bridal inquiries, email `connect@beadsandbloom.in`, hours 10 AM - 7 PM IST.
+- **Secondary Topics:** Online Atelier studio trials, custom bridal inquiries, email `connect@beadsandbloom.in`, hours 10 AM - 7 PM IST.
 - **H1:** `Get in Touch`
 - **Title Tag:** `Visit Store & Contact Support | Beads and Bloom Gurgaon`
-- **Meta Description:** `Visit our handcrafted jutti studio in Sector 15, Gurgaon (Gurugram) or reach out for custom bridal orders, sizing assistance, and worldwide delivery support.`
+- **Meta Description:** `Visit our handcrafted jutti studio in Online Atelier (Gurugram) or reach out for custom bridal orders, sizing assistance, and worldwide delivery support.`
 - **Canonical:** `https://beadsandbloom.in/contact`
 - **Indexing Decision:** `index, follow`
 - **Structured Data:** `ContactPage`, `ShoeStore`, `Organization`, `BreadcrumbList` (Home > Contact)
 - **Inbound Internal Links:** Footer, 404 page ("Contact Support").
 - **Outbound Internal Links:** Google Maps studio location, mailto, Instagram.
-- **Content Improvements Implemented:** Interactive contact form connected to backend API; studio hours; verified Sector 15 Gurugram postal code.
+- **Content Improvements Implemented:** Interactive contact form connected to backend API; studio hours; verified Online Atelier postal code.
 
 ---
 

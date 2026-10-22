@@ -64,8 +64,8 @@ const collectionGuides = {
       },
       {
         icon: Ruler,
-        title: "Bridal Sizing & Custom Trials",
-        desc: "Handcrafted juttis mold gently to your feet. For broad feet, size up by 1 EU size. Visit our Sector 15 Gurgaon studio for personalized bridal trials.",
+        title: "Bridal Sizing & Concierge Advice",
+        desc: "Handcrafted juttis mold gently to your feet. For broad feet or half-sizes, size up by 1 EU size. Explore our detailed size guide or connect with our bridal concierge.",
         link: "/size-chart",
         linkText: "View Size Guide →",
       },
@@ -88,7 +88,7 @@ const collectionGuides = {
       {
         icon: Ruler,
         title: "Versatile Festive Styling",
-        desc: "Pairs effortlessly with festive lehengas, anarkalis, and sharara suits. Check our sizing guide or consult our studio for styling assistance.",
+        desc: "Pairs effortlessly with festive lehengas, anarkalis, and sharara suits. Check our sizing guide or contact our team for styling assistance.",
         link: "/size-chart",
         linkText: "Check Footwear Sizing →",
       },

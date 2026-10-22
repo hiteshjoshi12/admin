@@ -62,9 +62,9 @@ export default function Contact() {
     '@graph': [
       {
         '@type': 'ContactPage',
-        name: 'Contact Beads and Bloom — Handcrafted Juttis Store in Gurgaon',
+        name: 'Contact Beads and Bloom — Customer Support & Bridal Concierge',
         url: 'https://beadsandbloom.in/contact',
-        description: 'Contact Beads and Bloom or visit our store in Sector 15, Gurgaon for custom bridal consultations, jutti sizing assistance, and worldwide shipping inquiries.',
+        description: 'Contact Beads and Bloom for custom bridal consultations, jutti sizing assistance, and worldwide shipping inquiries.',
       },
       getStoreSchema(),
       getOrganizationSchema(),
@@ -78,23 +78,23 @@ export default function Contact() {
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-24">
       <SEO
-        title="Visit Store & Contact Support | Beads and Bloom Gurgaon"
-        description="Visit our handcrafted jutti studio in Sector 15, Gurgaon (Gurugram) or reach out for custom bridal orders, sizing assistance, and worldwide delivery support."
+        title="Contact Customer Support & Bridal Assistance | Beads and Bloom"
+        description="Reach out to Beads and Bloom for custom bridal orders, sizing assistance, and nationwide & worldwide delivery support."
         canonical="/contact"
-        keywords="jutti store in gurgaon, jutti shop sector 15 gurgaon, bridal juttis gurgaon, punjabi jutti store near me, contact beads and bloom, ethnic footwear gurgaon"
+        keywords="contact beads and bloom, bridal juttis online, punjabi juttis support, handcrafted juttis customer care, custom jutti order"
         schema={contactSchema}
       />
       
       {/* --- PAGE HEADER --- */}
       <div className="text-center mb-16 px-6 mt-10">
         <span className="text-[#FF2865] text-xs font-bold uppercase tracking-[0.3em] mb-4 block animate-fade-up">
-          Support & Studio
+          Customer Care & Concierge
         </span>
         <h1 className="text-4xl md:text-6xl font-serif text-[#1C1917] mb-6 animate-fade-up delay-100">
           Get in <span className="italic font-light text-[#FF2865]">Touch</span>
         </h1>
         <p className="text-gray-500 max-w-lg mx-auto font-light animate-fade-up delay-200">
-          Visit our Gurgaon studio for bridal trials or reach out for sizing, custom handcrafted orders, and worldwide delivery.
+          Reach out to our artisan concierge team for sizing guidance, custom bridal inquiries, order support, and worldwide delivery.
         </p>
       </div>
 
@@ -104,24 +104,24 @@ export default function Contact() {
           {/* --- LEFT COLUMN: CONTACT INFO --- */}
           <div className="w-full lg:w-1/3 space-y-6 animate-fade-up delay-300">
             <ContactCard 
-              icon={MapPin}
-              title="Visit Our Studio"
-              desc="Retail & Bridal Consultations"
-              value="Sector 15, Gurugram (Gurgaon), Haryana 122001"
-              link="https://maps.google.com/?q=Sector+15+Gurgaon+Haryana"
+              icon={Sparkles}
+              title="Artisan Concierge"
+              desc="Bridal Styling & Sizing Guidance"
+              value="connect@beadsandbloom.in"
+              link="mailto:connect@beadsandbloom.in"
             />
 
             <ContactCard 
               icon={Mail}
               title="Email Us"
-              desc="Orders, Collaborations & Custom Sizing"
+              desc="Orders, Collaborations & Inquiries"
               value="connect@beadsandbloom.in"
               link="mailto:connect@beadsandbloom.in"
             />
 
             <ContactCard 
               icon={Clock}
-              title="Studio & Support Hours"
+              title="Support Hours"
               desc="Mon - Sat"
               value="10:00 AM - 7:00 PM IST"
             />

@@ -34,8 +34,8 @@ export default function BridalGuide() {
       answer: "Look at your outfit's primary metallic embellishments. If your lehenga features warm antique zardozi, choose juttis with dabka and antique gold cord work. If your lehenga highlights pearls, mirrors, or silver tilla work, opt for ivory or pearl-embellished pairs. For pastel outfits, matching or complementary tone-on-tone thread embroidery creates a cohesive royal look."
     },
     {
-      question: "Can I book a bridal trial at your Gurgaon studio?",
-      answer: "Yes. Brides and bridal parties in Delhi NCR can visit our physical studio in Sector 15, Gurugram (122001) for personalized sizing trials and bridal styling consultations. Please reach out via our Contact page or WhatsApp support to confirm appointment availability."
+      question: "Can I get personalized bridal sizing and styling consultations?",
+      answer: "Yes! Our bridal concierge provides one-on-one virtual styling and sizing guidance via WhatsApp and email. Share your lehenga swatch or wedding outfit details, and our bridal specialists will guide you on the ideal palette, embroidery match, and comfortable fit."
     }
   ];
 
@@ -132,7 +132,7 @@ export default function BridalGuide() {
     <div className="bg-[#FAF8F5] min-h-screen pt-24 pb-24">
       <SEO
         title="Bridal Jutti Guide: Footwear for Lehengas & Weddings | Beads and Bloom"
-        description="Expert bridal jutti styling and buying guide for Indian weddings. How to match handcrafted juttis with lehengas, 10-hour pheras comfort, and studio fittings."
+        description="Expert bridal jutti styling and buying guide for Indian weddings. How to match handcrafted juttis with lehengas, 10-hour pheras comfort, and personalized bridal consultations."
         canonical="/bridal-guide"
         keywords="bridal jutti guide, wedding footwear for lehenga, bridal mojris comfort, pheras footwear india, punjabi juttis for brides, lehenga matching juttis"
         schema={bridalSchema}
@@ -295,18 +295,18 @@ export default function BridalGuide() {
                 Personalized Fitting Experience
               </span>
               <h2 className="text-2xl md:text-3xl font-serif text-[#1C1917] mb-4">
-                Delhi NCR Bridal Studio Appointments
+                Virtual Bridal Styling & Sizing Concierge
               </h2>
               <p className="text-xs md:text-sm text-gray-600 font-light leading-relaxed mb-4">
-                We understand that every detail must be flawless for your big day. Brides visiting Delhi NCR can book an appointment at our physical studio in <strong>Sector 15, Gurugram (122001)</strong> to experience our full trousseau collection, test cushioned fits with wedding attire, and receive personalized styling guidance.
+                We understand that every detail must be flawless for your big day. Our bridal styling concierge assists you in selecting the perfect pair for every ceremony—from Haldi and Sangeet to your wedding pheras. Get expert sizing recommendations, trousseau planning, and custom embroidery advice directly from our specialists.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   to="/contact"
                   className="inline-flex items-center justify-center gap-2 bg-[#1C1917] hover:bg-black text-white text-xs font-medium px-6 py-3 rounded-md transition-colors"
                 >
-                  <MapPin className="w-3.5 h-3.5 text-[#C5A059]" />
-                  <span>Book Studio Fitting</span>
+                  <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />
+                  <span>Contact Bridal Concierge</span>
                 </Link>
                 <Link
                   to="/size-chart"

@@ -10,10 +10,10 @@
 
 | Item | Current Implementation in Code | Question / Clarification Required from Business | Impact on SEO & Customer Experience |
 | :--- | :--- | :--- | :--- |
-| **Studio Address** | Sector 15, Gurugram, Haryana 122001, India | What is the exact house, plot, or commercial building number in Sector 15? (Google Business Profile requires a complete street address for local pack verification). | Crucial for Google Local Knowledge Graph and avoiding client navigation confusion in Sector 15. |
+| **Studio Address** | Online Atelier, Haryana 122001, India | What is the exact house, plot, or commercial building number in Online Atelier? (Google Business Profile requires a complete street address for local pack verification). | Crucial for Google Local Knowledge Graph and avoiding client navigation confusion in Online Atelier. |
 | **Operating Hours & Days** | General working hours | What are the exact visiting hours and days (e.g., Monday–Saturday 11:00 AM – 7:00 PM, Sunday closed)? | Necessary for `OpeningHoursSpecification` schema and Contact page copy. |
 | **Bridal Trial Appointment Policy** | "Contact via WhatsApp or Contact Form to schedule" | Are in-person studio visits by prior appointment only, or are walk-ins permitted? Is there an appointment consultation fee, or is it complimentary? | Protects studio staff time and sets accurate customer expectations for Delhi NCR brides. |
-| **Studio Inventory Scope** | Entire trousseau collection showcased | Are all 34 website styles physically present at the Gurgaon studio for sizing trials, or is studio stock limited to bestsellers? | Prevents customer disappointment if a bride travels to Sector 15 for a specific design. |
+| **Studio Inventory Scope** | Entire trousseau collection showcased | Are all 34 website styles physically present at the Gurgaon studio for sizing trials, or is studio stock limited to bestsellers? | Prevents customer disappointment if a bride travels to Online Atelierfor a specific design. |
 
 ---
 

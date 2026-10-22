@@ -16,7 +16,7 @@ export default function Footer() {
             Handcrafted luxury footwear blending Punjabi heritage with double-cushioned modern elegance.
           </p>
           <div className="text-xs text-gray-400 space-y-1 mb-6 border-l-2 border-[#C5A059] pl-3">
-            <p><span className="text-white font-medium">Studio:</span> Sector 15, Gurgaon, HR 122001</p>
+            <p><span className="text-white font-medium">Artisan Atelier:</span> Handcrafted in India</p>
             <p><span className="text-white font-medium">Delivery:</span> Worldwide Express Shipping</p>
             <p><span className="text-white font-medium">Payments:</span> COD & 100% Secure Online</p>
           </div>
@@ -72,7 +72,7 @@ export default function Footer() {
             <li><Link to="/care-guide" className="hover:text-white transition-colors">Jutti Care & Cleaning</Link></li>
             <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide & Fit</Link></li>
             <li><Link to="/terms" className="hover:text-white transition-colors">Worldwide Shipping & COD</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition-colors">Gurgaon Studio & Contact</Link></li>
+            <li><Link to="/contact" className="hover:text-white transition-colors">Customer Care & Contact</Link></li>
             <li><Link to="/track-order" className="hover:text-white transition-colors">Track Your Order</Link></li>
           </ul>
         </div>
@@ -96,7 +96,7 @@ export default function Footer() {
 
       {/* SEO Keyword Footer Strip */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 pb-8 text-[11px] text-gray-400 leading-relaxed text-center md:text-left">
-        <span className="text-gray-300 font-semibold">Specializing in:</span> Handcrafted Punjabi Juttis • Bridal Juttis in Gurgaon • Sector 15 Gurgaon Studio • Festive & Party Wear Mojaris • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Cash on Delivery (COD) across India • Worldwide Delivery (USA, UK, Canada, Australia, UAE).
+        <span className="text-gray-300 font-semibold">Specializing in:</span> Handcrafted Punjabi Juttis • Designer Bridal Mojaris • Festive & Party Wear Juttis • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Genuine Leather Footwear • Cash on Delivery (COD) across India • Worldwide Delivery (USA, UK, Canada, Australia, UAE).
       </div>
 
       {/* Copyright Line */}

@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const FAQ_DATA = [
   {
-    question: "Where is the Beads & Bloom store located in Gurgaon?",
-    answer: "Our retail studio is based in Sector 15, Gurgaon (Gurugram), Haryana 122001. We welcome brides, festive shoppers, and footwear connoisseurs for bridal trials, sizing consultations, and in-person retail shopping.",
+    question: "How do I purchase Beads & Bloom juttis?",
+    answer: "You can shop our complete artisanal footwear catalog online at beadsandbloom.in! We deliver across India with Cash on Delivery (COD) and ship worldwide to the USA, UK, Canada, Australia, and UAE with door-to-door express tracking.",
   },
   {
     question: "What range of handcrafted juttis do you offer?",
@@ -40,10 +40,10 @@ export default function StoreTrustFAQ() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
             <div className="w-12 h-12 rounded-full bg-[#FFF0F4] text-[#FF2865] flex items-center justify-center mb-3">
-              <MapPin className="w-5 h-5" />
+              <Sparkles className="w-5 h-5" />
             </div>
-            <h3 className="font-serif text-sm md:text-base font-semibold text-[#1C1917] mb-1">Gurgaon Studio</h3>
-            <p className="text-xs text-gray-500">Sector 15, Gurugram Store & Bridal Trials</p>
+            <h3 className="font-serif text-sm md:text-base font-semibold text-[#1C1917] mb-1">Artisan Heritage</h3>
+            <p className="text-xs text-gray-500">100% Handcrafted by Master Karigars</p>
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
@@ -80,7 +80,7 @@ export default function StoreTrustFAQ() {
             Frequently Asked Questions
           </h2>
           <p className="text-sm text-gray-500 font-light">
-            Everything you need to know about our handcrafted Punjabi juttis, our Gurgaon studio, worldwide orders, and sizing.
+            Everything you need to know about our handcrafted Punjabi juttis, online orders, shipping, and sizing.
           </p>
         </div>
 
