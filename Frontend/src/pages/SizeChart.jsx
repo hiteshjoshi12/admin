@@ -39,8 +39,7 @@ export default function SizeChart() {
     ]
   };
 
-  // Replace this with your actual image URL from the chat
-  const sizeChartImage = "size chart.jpeg";
+  const sizeChartImage = "https://ik.imagekit.io/hiteshh12/editorial/size_chart_aWjlVTwLC.jpeg";
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen pt-24 pb-24">

@@ -143,6 +143,23 @@ const createProduct = async (req, res) => {
       ? Number(req.body.originalPrice)
       : 0;
 
+    // 6. Sanitize Care Instructions & Occasions
+    const careInstructions = Array.isArray(req.body.careInstructions)
+      ? req.body.careInstructions.map(c => String(c).trim()).filter(Boolean)
+      : (typeof req.body.careInstructions === 'string' && req.body.careInstructions.trim())
+        ? req.body.careInstructions.split('\n').map(c => c.trim()).filter(Boolean)
+        : [];
+
+    const occasions = Array.isArray(req.body.occasions)
+      ? req.body.occasions.map(o => String(o).trim()).filter(Boolean)
+      : (typeof req.body.occasions === 'string' && req.body.occasions.trim())
+        ? req.body.occasions.split(',').map(o => o.trim()).filter(Boolean)
+        : [];
+
+    const imageDetails = Array.isArray(req.body.imageDetails)
+      ? req.body.imageDetails.filter(img => img && img.url)
+      : [];
+
     const product = new Product({
       name: String(req.body.name || '').trim(),
       description: String(req.body.description || '').trim(),
@@ -157,6 +174,19 @@ const createProduct = async (req, res) => {
       isBestSeller: Boolean(req.body.isBestSeller),
       rating: req.body.rating ? Number(req.body.rating) : 0,
       numReviews: req.body.numReviews ? Number(req.body.numReviews) : 0,
+      
+      // Artisanal Specifications
+      sku: String(req.body.sku || '').trim(),
+      material: String(req.body.material || '').trim(),
+      color: String(req.body.color || '').trim(),
+      embellishment: String(req.body.embellishment || '').trim(),
+      lining: String(req.body.lining || '').trim(),
+      sole: String(req.body.sole || '').trim(),
+      comfortNotes: String(req.body.comfortNotes || '').trim(),
+      careInstructions,
+      occasions,
+      fitTip: String(req.body.fitTip || '').trim(),
+      imageDetails
     });
 
     const createdProduct = await product.save();
@@ -219,6 +249,38 @@ const updateProduct = async (req, res) => {
     if (req.body.isNewArrival !== undefined) product.isNewArrival = Boolean(req.body.isNewArrival);
     if (req.body.isBestSeller !== undefined) product.isBestSeller = Boolean(req.body.isBestSeller);
     if (req.body.slug) product.slug = req.body.slug;
+
+    // Artisanal Specifications
+    if (req.body.sku !== undefined) product.sku = String(req.body.sku).trim();
+    if (req.body.material !== undefined) product.material = String(req.body.material).trim();
+    if (req.body.color !== undefined) product.color = String(req.body.color).trim();
+    if (req.body.embellishment !== undefined) product.embellishment = String(req.body.embellishment).trim();
+    if (req.body.lining !== undefined) product.lining = String(req.body.lining).trim();
+    if (req.body.sole !== undefined) product.sole = String(req.body.sole).trim();
+    if (req.body.comfortNotes !== undefined) product.comfortNotes = String(req.body.comfortNotes).trim();
+    if (req.body.fitTip !== undefined) product.fitTip = String(req.body.fitTip).trim();
+
+    if (req.body.careInstructions !== undefined) {
+      product.careInstructions = Array.isArray(req.body.careInstructions)
+        ? req.body.careInstructions.map(c => String(c).trim()).filter(Boolean)
+        : (typeof req.body.careInstructions === 'string' && req.body.careInstructions.trim())
+          ? req.body.careInstructions.split('\n').map(c => c.trim()).filter(Boolean)
+          : [];
+    }
+
+    if (req.body.occasions !== undefined) {
+      product.occasions = Array.isArray(req.body.occasions)
+        ? req.body.occasions.map(o => String(o).trim()).filter(Boolean)
+        : (typeof req.body.occasions === 'string' && req.body.occasions.trim())
+          ? req.body.occasions.split(',').map(o => o.trim()).filter(Boolean)
+          : [];
+    }
+
+    if (req.body.imageDetails !== undefined) {
+      product.imageDetails = Array.isArray(req.body.imageDetails)
+        ? req.body.imageDetails.filter(img => img && img.url)
+        : [];
+    }
 
     const updatedProduct = await product.save();
     cache.flushAll(); 

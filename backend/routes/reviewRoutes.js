@@ -6,7 +6,8 @@ const {
     createReview, 
     approveReview,
     deleteReview,
-    updateReview // <--- 1. Import the new controller
+    updateReview, // <--- 1. Import the new controller
+    voteHelpful
 } = require('../controllers/reviewController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -18,6 +19,9 @@ router.route('/:productId')
   .get(getProductReviews)
   .post(protect, createReview);
 
+// Helpful vote (Public)
+router.post('/:reviewId/helpful', voteHelpful);
+
 // Admin Action Routes (Specific Review Context)
 router.route('/:reviewId/approve').put(protect, admin, approveReview);
 
@@ -28,4 +32,4 @@ router.route('/:reviewId')
   .delete(protect, admin, deleteReview)
   .put(protect, updateReview); // <--- 2. Add the PUT route here
 
-module.exports = router;
+module.exports = router;

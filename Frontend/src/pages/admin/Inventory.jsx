@@ -70,10 +70,18 @@ export default function Inventory() {
   };
 
   // --- FILTERING ---
-  const filteredProducts = products.filter(product => 
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(product => {
+    const categoryStr = Array.isArray(product.category) 
+      ? product.category.join(' ') 
+      : (product.category || '');
+    const skuStr = product.sku || '';
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (product.name && product.name.toLowerCase().includes(searchLower)) ||
+      categoryStr.toLowerCase().includes(searchLower) ||
+      skuStr.toLowerCase().includes(searchLower)
+    );
+  });
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -139,14 +147,25 @@ export default function Inventory() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900 text-sm line-clamp-1">{product.name}</p>
-                        <p className="text-xs text-gray-400">ID: ...{product._id.slice(-6)}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {product.sku && (
+                            <span className="text-[11px] font-mono font-bold text-gray-700 bg-gray-100 px-1.5 py-0.2 rounded border border-gray-200">
+                              {product.sku}
+                            </span>
+                          )}
+                          <p className="text-xs text-gray-400">ID: ...{product._id.slice(-6)}</p>
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                      {product.category}
-                    </span>
+                    <div className="flex flex-wrap gap-1 max-w-[220px]">
+                      {(Array.isArray(product.category) ? product.category : [product.category]).map(c => (
+                        <span key={c} className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-800 border border-rose-200">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     ₹{product.price.toLocaleString()}
@@ -199,11 +218,22 @@ export default function Inventory() {
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start">
                   <h3 className="font-bold text-gray-900 text-sm truncate pr-2">{product.name}</h3>
-                  <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-100">
-                    {product.category}
-                  </span>
+                  <div className="flex flex-wrap gap-1 justify-end">
+                    {(Array.isArray(product.category) ? product.category : [product.category]).map(c => (
+                      <span key={c} className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-50 text-rose-800 border border-rose-100">
+                        {c}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-1 font-mono">ID: ...{product._id.slice(-6)}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  {product.sku && (
+                    <span className="text-[10px] font-mono font-bold text-gray-700 bg-gray-100 px-1 py-0.2 rounded border border-gray-200">
+                      {product.sku}
+                    </span>
+                  )}
+                  <p className="text-xs text-gray-400 font-mono">ID: ...{product._id.slice(-6)}</p>
+                </div>
                 <p className="text-sm font-bold text-gray-900 mt-1">₹{product.price.toLocaleString()}</p>
               </div>
             </div>

@@ -12,7 +12,7 @@ const fallbackSlides = [
     id: 'fallback-1',
     mediaType: 'video',
     video: 'https://ik.imagekit.io/hiteshh12/ecommerce_uploads/products/uncategorized/banner3_beah8o_LnFLRXA-U.webp',
-    image: 'banner1.png',
+    image: 'https://ik.imagekit.io/hiteshh12/editorial/banner1_7npLvX_g6.png',
     subtitle: 'Artisanal Punjabi Juttis',
     titleLine1: 'Beads &',
     titleLine2: 'Bloom',
@@ -22,7 +22,7 @@ const fallbackSlides = [
   {
     id: 'fallback-2',
     mediaType: 'image',
-    image: 'banner1.png',
+    image: 'https://ik.imagekit.io/hiteshh12/editorial/banner1_7npLvX_g6.png',
     subtitle: 'Handcrafted Heritage',
     titleLine1: 'Couture',
     titleLine2: 'Craftsmanship',
@@ -81,7 +81,7 @@ function SlideMedia({ slide, isActive, isMuted }) {
     <div className={`w-full h-full transition-transform duration-[7000ms] ease-out ${isActive ? 'scale-105' : 'scale-100'
       }`}>
       <ImageWithShimmer
-        src={getOptimizedImage(slide.image || 'banner1.png', 1920)}
+        src={getOptimizedImage(slide.image || 'https://ik.imagekit.io/hiteshh12/editorial/banner1_7npLvX_g6.png', 1920)}
         alt={`${slide.titleLine1 || 'Beads and Bloom'} ${slide.titleLine2 || 'Handcrafted Juttis'}`}
         className="w-full h-full object-cover object-center"
         priority={isActive}
@@ -117,7 +117,7 @@ export default function HeroNew() {
               id: slide._id || `slide-${idx}`,
               mediaType: isVid ? 'video' : 'image',
               video: slide.video || (isVideoUrl(slide.image) ? slide.image : ''),
-              image: isVideoUrl(slide.image) ? (slide.video ? slide.image : '') : (slide.image || 'banner1.png'),
+              image: isVideoUrl(slide.image) ? (slide.video ? slide.image : '') : (slide.image || 'https://ik.imagekit.io/hiteshh12/editorial/banner1_7npLvX_g6.png'),
               titleLine1: line1,
               titleLine2: line2,
               subtitle: slide.subtitle || 'Artisanal Footwear',

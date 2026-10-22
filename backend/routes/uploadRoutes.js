@@ -30,7 +30,9 @@ const upload = multer({
 });
 
 router.post("/", protect, admin, upload.single("file"), uploadFile);
+// Authenticated customers can upload photos for reviews
+router.post("/customer", protect, upload.single("file"), uploadFile);
 // ADD THE DELETE ROUTE:
 router.delete("/", protect, admin, deleteFile); 
 
-module.exports = router;
+module.exports = router;

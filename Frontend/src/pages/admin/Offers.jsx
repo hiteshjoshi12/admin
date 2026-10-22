@@ -16,7 +16,12 @@ export default function Offers() {
     discountType: 'percentage',
     discountAmount: '',
     description: '',
-    expirationDate: ''
+    expirationDate: '',
+    minOrderAmount: '',
+    excludeNewArrivals: false,
+    bannerText: '',
+    terms: '',
+    showOnProductPage: true
   });
 
   const { userInfo } = useSelector((state) => state.auth);
@@ -95,7 +100,12 @@ export default function Offers() {
       discountType: coupon.discountType,
       discountAmount: coupon.discountAmount,
       description: coupon.description,
-      expirationDate: new Date(coupon.expirationDate).toISOString().split('T')[0]
+      expirationDate: new Date(coupon.expirationDate).toISOString().split('T')[0],
+      minOrderAmount: coupon.minOrderAmount || '',
+      excludeNewArrivals: Boolean(coupon.excludeNewArrivals),
+      bannerText: coupon.bannerText || '',
+      terms: coupon.terms || '',
+      showOnProductPage: coupon.showOnProductPage !== undefined ? coupon.showOnProductPage : true
     });
     setShowModal(true);
   };
@@ -119,13 +129,27 @@ export default function Offers() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${userInfo.token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          minOrderAmount: Number(formData.minOrderAmount) || 0
+        })
       });
       
       if (res.ok) {
         setShowModal(false);
         setEditId(null);
-        setFormData({ code: '', discountType: 'percentage', discountAmount: '', description: '', expirationDate: '' });
+        setFormData({ 
+          code: '', 
+          discountType: 'percentage', 
+          discountAmount: '', 
+          description: '', 
+          expirationDate: '',
+          minOrderAmount: '',
+          excludeNewArrivals: false,
+          bannerText: '',
+          terms: '',
+          showOnProductPage: true
+        });
         fetchCoupons();
         toast.success(editId ? "Coupon Updated!" : "Coupon Created!", { id: toastId });
       } else {
@@ -141,7 +165,18 @@ export default function Offers() {
   const handleClose = () => {
     setShowModal(false);
     setEditId(null);
-    setFormData({ code: '', discountType: 'percentage', discountAmount: '', description: '', expirationDate: '' });
+    setFormData({ 
+      code: '', 
+      discountType: 'percentage', 
+      discountAmount: '', 
+      description: '', 
+      expirationDate: '',
+      minOrderAmount: '',
+      excludeNewArrivals: false,
+      bannerText: '',
+      terms: '',
+      showOnProductPage: true
+    });
   };
 
   if (loading) return (
@@ -193,9 +228,33 @@ export default function Offers() {
                    </label>
                 </div>
 
-                <div className="mb-6">
+                <div className="mb-4">
                    <h3 className="text-xl font-bold text-gray-900 tracking-tight">{coupon.code}</h3>
                    <p className="text-sm text-gray-500 font-medium">{coupon.description}</p>
+                   {coupon.bannerText && (
+                     <p className="text-xs text-[#FF2865] font-semibold mt-1 bg-pink-50 p-1.5 rounded border border-pink-100">
+                       📢 {coupon.bannerText}
+                     </p>
+                   )}
+                </div>
+
+                {/* Coupon Badges */}
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                   {coupon.minOrderAmount > 0 && (
+                     <span className="text-[10px] font-semibold bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
+                       Min Cart: ₹{coupon.minOrderAmount.toLocaleString()}
+                     </span>
+                   )}
+                   {coupon.excludeNewArrivals && (
+                     <span className="text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded">
+                       Excludes New Arrivals
+                     </span>
+                   )}
+                   {coupon.showOnProductPage && (
+                     <span className="text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded">
+                       Product Page Visible
+                     </span>
+                   )}
                 </div>
 
                 <div className="flex justify-between items-end border-t border-gray-100 pt-4">
@@ -209,12 +268,14 @@ export default function Offers() {
                       <button 
                         onClick={() => handleEdit(coupon)}
                         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit Coupon"
                       >
                          <Edit className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleDelete(coupon._id)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete Coupon"
                       >
                          <Trash2 className="w-4 h-4" />
                       </button>
@@ -234,8 +295,8 @@ export default function Offers() {
 
       {/* CREATE/EDIT MODAL */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in overflow-y-auto">
+           <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-8">
               <div className="flex justify-between items-center p-6 border-b border-gray-100">
                  <h3 className="text-lg font-bold text-gray-800">
                    {editId ? 'Edit Coupon' : 'Create New Coupon'}
@@ -245,21 +306,20 @@ export default function Offers() {
                  </button>
               </div>
               
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coupon Code</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coupon Code *</label>
                     <input 
                       required 
                       className="w-full p-3 border border-gray-200 rounded-lg uppercase font-mono text-sm focus:ring-2 focus:ring-black/5 outline-none"
                       placeholder="e.g. SUMMER25"
                       value={formData.code}
                       onChange={e => setFormData({...formData, code: e.target.value.toUpperCase()})}
-                    
                     />
                  </div>
 
                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description / Title *</label>
                     <input 
                       required 
                       className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-black/5 outline-none"
@@ -271,7 +331,7 @@ export default function Offers() {
 
                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Type</label>
+                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Type *</label>
                        <select 
                          className="w-full p-3 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-black/5 outline-none"
                          value={formData.discountType}
@@ -282,10 +342,11 @@ export default function Offers() {
                        </select>
                     </div>
                     <div>
-                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Value</label>
+                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Value *</label>
                        <input 
                          required 
                          type="number"
+                         min="1"
                          className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-black/5 outline-none"
                          placeholder="e.g. 20"
                          value={formData.discountAmount}
@@ -294,18 +355,77 @@ export default function Offers() {
                     </div>
                  </div>
 
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Min Cart Value (₹)</label>
+                       <input 
+                         type="number"
+                         min="0"
+                         className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-black/5 outline-none"
+                         placeholder="e.g. 2999 (0 for no min)"
+                         value={formData.minOrderAmount}
+                         onChange={e => setFormData({...formData, minOrderAmount: e.target.value})}
+                       />
+                    </div>
+                    <div>
+                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Expiration Date *</label>
+                       <input 
+                         required 
+                         type="date"
+                         className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-black/5 outline-none"
+                         value={formData.expirationDate}
+                         onChange={e => setFormData({...formData, expirationDate: e.target.value})}
+                       />
+                    </div>
+                 </div>
+
                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Expiration Date</label>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                      Product Page Banner / Teaser Copy
+                    </label>
                     <input 
-                      required 
-                      type="date"
                       className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-black/5 outline-none"
-                      value={formData.expirationDate}
-                      onChange={e => setFormData({...formData, expirationDate: e.target.value})}
+                      placeholder="e.g. Save ₹500 on bridal orders above ₹3,999"
+                      value={formData.bannerText}
+                      onChange={e => setFormData({...formData, bannerText: e.target.value})}
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1">Short headline shown in the offer card next to price on product pages.</p>
+                 </div>
+
+                 <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Terms & Exclusions Summary</label>
+                    <input 
+                      className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-black/5 outline-none"
+                      placeholder="e.g. Valid on cart over ₹2,999. Excludes New Arrivals. 1 use per customer."
+                      value={formData.terms}
+                      onChange={e => setFormData({...formData, terms: e.target.value})}
                     />
                  </div>
 
-                 <button type="submit" className="w-full bg-[#111827] text-white py-3.5 rounded-xl font-bold hover:bg-black transition-colors mt-2">
+                 {/* Exclusion Checkboxes */}
+                 <div className="space-y-2 pt-2 border-t border-gray-100">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.excludeNewArrivals}
+                        onChange={e => setFormData({...formData, excludeNewArrivals: e.target.checked})}
+                        className="w-4 h-4 rounded text-black accent-black"
+                      />
+                      <span><strong>Exclude New Arrivals</strong> — Do not show or apply on new arrival products</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.showOnProductPage}
+                        onChange={e => setFormData({...formData, showOnProductPage: e.target.checked})}
+                        className="w-4 h-4 rounded text-black accent-black"
+                      />
+                      <span><strong>Show on Product Page</strong> — Feature this offer card near price & Add to Bag</span>
+                    </label>
+                 </div>
+
+                 <button type="submit" className="w-full bg-[#111827] text-white py-3.5 rounded-xl font-bold hover:bg-black transition-colors mt-4">
                     {editId ? 'Update Coupon' : 'Create Coupon'}
                  </button>
               </form>

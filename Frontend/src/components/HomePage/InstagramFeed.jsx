@@ -131,7 +131,7 @@ export default function InstagramFeed() {
               {/* 4. OPTIMIZE VIDEO (Width 500 for quality vertical video) */}
               <VideoWithShimmer
                 ref={videoRef}
-                src="instareel.webm"
+                src="https://ik.imagekit.io/hiteshh12/editorial/instareel_SKbvMlxutt.webm"
                 className="w-full h-full"
                 autoPlay
                 muted

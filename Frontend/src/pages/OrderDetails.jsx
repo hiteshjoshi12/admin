@@ -261,19 +261,34 @@ export default function OrderDetails() {
               </div>
               <div className="divide-y divide-gray-50">
                 {order.orderItems?.map((item, index) => (
-                  <div key={index} className="p-6 flex gap-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  <div key={index} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex gap-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-grow">
+                        <Link to={`/product/${item.product}`} className="font-bold text-[#1C1917] hover:text-[#FF2865] transition-colors line-clamp-1">
+                          {item.name}
+                        </Link>
+                        <p className="text-sm text-gray-500 mt-1">Size: {item.size} | Qty: {item.quantity}</p>
+                        <p className="font-bold text-[#1C1917] mt-1 sm:hidden">₹{safePrice(item.price * item.quantity)}</p>
+                      </div>
                     </div>
-                    <div className="flex-grow">
-                      <Link to={`/product/${item.product}`} className="font-bold text-[#1C1917] hover:text-[#FF2865] transition-colors line-clamp-1">
-                        {item.name}
-                      </Link>
-                      <p className="text-sm text-gray-500 mt-1">Size: {item.size} | Qty: {item.quantity}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-[#1C1917]">₹{safePrice(item.price * item.quantity)}</p>
-                      <p className="text-xs text-gray-400">₹{item.price} each</p>
+                    
+                    <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-2 sm:pt-0 border-t border-gray-50 sm:border-0">
+                      {(order.isDelivered || activeStep >= 4) && (
+                        <Link
+                          to={`/product/${item.product}?writeReview=true&size=${item.size}#reviews-section`}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 rounded-full text-xs font-bold transition-colors"
+                        >
+                          <Sparkles className="w-3 h-3 text-emerald-600" />
+                          Review & Share Fit
+                        </Link>
+                      )}
+                      <div className="hidden sm:block text-right">
+                        <p className="font-bold text-[#1C1917]">₹{safePrice(item.price * item.quantity)}</p>
+                        <p className="text-xs text-gray-400">₹{item.price} each</p>
+                      </div>
                     </div>
                   </div>
                 ))}

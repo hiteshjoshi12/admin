@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Plus, Trash2, Check, AlertCircle } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2, Check, AlertCircle, ArrowUp, ArrowDown, Sparkles, HelpCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
 import { toast } from 'react-hot-toast';
@@ -9,6 +9,7 @@ import FileUpload from '../admin/FileUpload';
 import { getOptimizedImage } from '../../util/imageUtils';
 
 const CATEGORIES = ["Bridal", "Casual", "Party", "Festive", "Office","Everyday", "Limited Edition"];
+const OCCASIONS = ["Bridal", "Festive", "Sangeet & Mehendi", "Wedding Guest", "Everyday Chic", "Party", "Work/Office"];
 
 export default function ProductForm() {
   const { id } = useParams(); 
@@ -28,7 +29,18 @@ export default function ProductForm() {
     images: [], 
     isNewArrival: false,
     isBestSeller: false,
-    stock: [{ size: '', quantity: 0 }] 
+    stock: [{ size: '', quantity: 0 }],
+    // Artisanal Specifications
+    sku: '',
+    material: '',
+    color: '',
+    embellishment: '',
+    lining: '',
+    sole: '',
+    comfortNotes: '',
+    fitTip: '',
+    careInstructions: '',
+    occasions: []
   });
 
   useEffect(() => {
@@ -52,16 +64,26 @@ export default function ProductForm() {
           }
 
           setFormData({
-            name: data.name,
-            description: data.description,
-            price: data.price,
+            name: data.name || '',
+            description: data.description || '',
+            price: data.price || '',
             originalPrice: data.originalPrice || '',
             categories: categoryArray, 
-            image: data.image,
+            image: data.image || '',
             images: data.images || [],
             isNewArrival: data.isNewArrival || false,
             isBestSeller: data.isBestSeller || false,
-            stock: data.stock && data.stock.length > 0 ? data.stock : [{ size: '', quantity: 0 }]
+            stock: data.stock && data.stock.length > 0 ? data.stock : [{ size: '', quantity: 0 }],
+            sku: data.sku || '',
+            material: data.material || '',
+            color: data.color || '',
+            embellishment: data.embellishment || '',
+            lining: data.lining || data.sole || '',
+            sole: data.sole || data.lining || '',
+            comfortNotes: data.comfortNotes || '',
+            fitTip: data.fitTip || '',
+            careInstructions: Array.isArray(data.careInstructions) ? data.careInstructions.join('\n') : (data.careInstructions || ''),
+            occasions: Array.isArray(data.occasions) ? data.occasions : []
           });
         } catch (error) {
           console.error("Fetch Error:", error);
@@ -105,6 +127,14 @@ export default function ProductForm() {
     });
   };
 
+  const toggleOccasion = (occ) => {
+    setFormData(prev => {
+      const exists = prev.occasions.includes(occ);
+      const newOccasions = exists ? prev.occasions.filter(o => o !== occ) : [...prev.occasions, occ];
+      return { ...prev, occasions: newOccasions };
+    });
+  };
+
   const handleStockChange = (index, field, value) => {
     const newStock = [...formData.stock];
     newStock[index][field] = value;
@@ -125,6 +155,16 @@ export default function ProductForm() {
 
   const handleAddImage = () => {
     setFormData({ ...formData, images: [...formData.images, ''] });
+  };
+
+  const moveImage = (index, direction) => {
+    const newImages = [...formData.images];
+    const targetIdx = index + direction;
+    if (targetIdx < 0 || targetIdx >= newImages.length) return;
+    const temp = newImages[index];
+    newImages[index] = newImages[targetIdx];
+    newImages[targetIdx] = temp;
+    setFormData({ ...formData, images: newImages });
   };
 
   // --- 🔴 UPDATED: Trigger Cloud Delete on Removal ---
@@ -207,7 +247,20 @@ export default function ProductForm() {
       category: formData.categories,
       categories: formData.categories,
       isNewArrival: Boolean(formData.isNewArrival),
-      isBestSeller: Boolean(formData.isBestSeller)
+      isBestSeller: Boolean(formData.isBestSeller),
+      // Craft Specifications
+      sku: String(formData.sku || '').trim(),
+      material: String(formData.material || '').trim(),
+      color: String(formData.color || '').trim(),
+      embellishment: String(formData.embellishment || '').trim(),
+      sole: String(formData.sole || formData.lining || '').trim(),
+      lining: String(formData.lining || formData.sole || '').trim(),
+      comfortNotes: String(formData.comfortNotes || '').trim(),
+      fitTip: String(formData.fitTip || '').trim(),
+      careInstructions: formData.careInstructions 
+        ? formData.careInstructions.split('\n').map(s => s.trim()).filter(Boolean)
+        : [],
+      occasions: formData.occasions || []
     };
 
     try {
@@ -339,6 +392,18 @@ export default function ProductForm() {
               />
             </div>
 
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">SKU / Product Code</label>
+              <input 
+                type="text" 
+                name="sku" 
+                value={formData.sku}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none" 
+                placeholder="e.g. BB-ZIV-01"
+              />
+            </div>
+
             {/* --- MULTI-SELECT CATEGORIES --- */}
             <div className="md:col-span-2">
               <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Categories</label>
@@ -391,10 +456,6 @@ export default function ProductForm() {
                     value={formData.image}
                     folderName={formData.name || "draft-product"}
                     onUpload={(url) => {
-                        // 🔴 OPTIONAL: Delete the old main image if they replace it
-                        // if (formData.image && formData.image !== url) {
-                        //     deleteImageFromCloud(formData.image);
-                        // }
                         setFormData({ ...formData, image: url })
                     }}
                   />
@@ -411,7 +472,7 @@ export default function ProductForm() {
 
            <div>
              <div className="flex justify-between items-center mb-3">
-                <label className="block text-xs font-bold text-gray-500 uppercase">Gallery Images</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase">Gallery Images (Aim for 5–8 consistent images)</label>
                 <button type="button" onClick={handleAddImage} className="text-xs font-bold text-[#FF2865] flex items-center gap-1">
                   <Plus className="w-4 h-4" /> Add Slot
                 </button>
@@ -427,7 +488,25 @@ export default function ProductForm() {
                        onUpload={(newUrl) => handleImageChange(index, newUrl)}
                      />
                    </div>
-                   <div className="flex gap-3 items-center mt-6">
+                   <div className="flex gap-2 items-center mt-6">
+                     <button 
+                       type="button" 
+                       onClick={() => moveImage(index, -1)} 
+                       disabled={index === 0}
+                       className="p-2 border rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-20 transition-opacity" 
+                       title="Move Up"
+                     >
+                       <ArrowUp className="w-4 h-4" />
+                     </button>
+                     <button 
+                       type="button" 
+                       onClick={() => moveImage(index, 1)} 
+                       disabled={index === formData.images.length - 1}
+                       className="p-2 border rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-20 transition-opacity" 
+                       title="Move Down"
+                     >
+                       <ArrowDown className="w-4 h-4" />
+                     </button>
                      {url && <img src={getOptimizedImage(url, 100)} className="w-12 h-12 rounded object-cover" />}
                      <button type="button" onClick={() => handleRemoveImage(index)} className="p-2 text-gray-400 hover:text-red-500" title="Remove image">
                        <Trash2 className="w-5 h-5" />
@@ -437,6 +516,149 @@ export default function ProductForm() {
                ))}
              </div>
            </div>
+        </div>
+
+        {/* SECTION 3: ARTISANAL SPECIFICATIONS & CRAFT DETAILS */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-6">
+          <div className="border-b pb-2">
+            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#FF2865]" /> Artisanal Specifications & Craft Details
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Add precise craft details as required by the product page guidelines to build customer trust.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Primary Material</label>
+              <input 
+                type="text" 
+                name="material" 
+                value={formData.material}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="e.g. Pure Raw Silk / Velvet / Vegan Leather"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Color / Tone</label>
+              <input 
+                type="text" 
+                name="color" 
+                value={formData.color}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="e.g. Champagne Gold / Ruby Red"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Embellishment / Work</label>
+              <input 
+                type="text" 
+                name="embellishment" 
+                value={formData.embellishment}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="e.g. Handcrafted Zardozi, Pearls, Moti work"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Footbed & Outsole (Sole)</label>
+              <input 
+                type="text" 
+                name="sole" 
+                value={formData.sole}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="e.g. 100% Genuine Vegetable-Tanned Leather Sole"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Inner Lining</label>
+              <input 
+                type="text" 
+                name="lining" 
+                value={formData.lining}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="e.g. Soft Genuine Leather Lining with Double Cushioning"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-gray-500 uppercase">
+                  Comfort & Cushioning Notes
+                </label>
+                <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold border border-amber-200">
+                  ⚠️ Mention comfort/cushioning only when confirmed on sample
+                </span>
+              </div>
+              <input 
+                type="text" 
+                name="comfortNotes" 
+                value={formData.comfortNotes}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="e.g. Double-cushioned memory foam footbed for bite-free all-day comfort"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Fit & Sizing Advice</label>
+              <input 
+                type="text" 
+                name="fitTip" 
+                value={formData.fitTip}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="e.g. Fits true to size. If you have broad feet or fall between sizes, order one size up."
+              />
+            </div>
+
+            {/* Occasions Multi-Select */}
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Suitable Occasions</label>
+              <div className="flex flex-wrap gap-2">
+                {OCCASIONS.map((occ) => {
+                  const isSelected = formData.occasions?.includes(occ);
+                  return (
+                    <button
+                      key={occ}
+                      type="button"
+                      onClick={() => toggleOccasion(occ)}
+                      className={`px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5
+                        ${isSelected 
+                          ? "bg-[#1C1917] text-white border-[#1C1917]" 
+                          : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                        }`}
+                    >
+                      {isSelected && <Check size={14} />}
+                      {occ}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Care Instructions */}
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Care Instructions (One per line)</label>
+              <textarea 
+                name="careInstructions" 
+                rows="3"
+                value={formData.careInstructions}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:border-[#1C1917] outline-none text-sm" 
+                placeholder="Keep away from moisture & water&#10;Store in breathable muslin dust bag&#10;Clean with soft, dry cloth"
+              />
+            </div>
+          </div>
         </div>
 
         {/* SECTION 3: STOCK */}

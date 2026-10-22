@@ -1,6 +1,7 @@
 import { ShoppingBag, Menu, X, User, LogOut, Package, ChevronDown, Heart, Search, ArrowRight, Loader2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 // REDUX
 import { useSelector, useDispatch } from "react-redux";
@@ -39,6 +40,7 @@ export default function Navbar() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -56,6 +58,14 @@ export default function Navbar() {
     { name: 'Our Story', path: '/about' },
     { name: 'Sale', path: '/sale', isSpecial: true },
   ];
+
+  const isLinkActive = (path) => {
+    if (path === '/') return location.pathname === '/';
+    if (path === '/shop') {
+      return location.pathname === '/shop' || location.pathname.startsWith('/product/');
+    }
+    return location.pathname === path || location.pathname.startsWith(path);
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -139,20 +149,37 @@ export default function Navbar() {
           </Link>
 
           {/* 2. NAV LINKS - HIDDEN WHEN SEARCH OPEN */}
-          <div className={`hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`text-xs font-bold uppercase tracking-widest relative group flex items-center gap-1 ${link.isSpecial ? 'text-[#C5A059]' : 'text-gray-600 hover:text-black'}`}
-              >
-                {link.name}
-                {link.badge && (
-                  <span className="bg-[#1C1917] text-white text-[8px] px-1.5 py-0.5 rounded ml-1 -translate-y-2">{link.badge}</span>
-                )}
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black group-hover:w-full transition-all duration-300"></span>
-              </Link>
-            ))}
+          <div className={`hidden lg:flex items-center gap-7 absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+            {navLinks.map((link) => {
+              const active = isLinkActive(link.path);
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`text-xs uppercase tracking-widest relative py-1 px-1 flex items-center gap-1 transition-colors ${
+                    active
+                      ? 'text-[#1C1917] font-extrabold'
+                      : link.isSpecial
+                        ? 'text-[#C5A059] font-bold hover:text-[#1C1917]'
+                        : 'text-gray-500 font-bold hover:text-[#1C1917]'
+                  }`}
+                >
+                  <span>{link.name}</span>
+                  {link.badge && (
+                    <span className="bg-[#1C1917] text-white text-[8px] px-1.5 py-0.5 rounded ml-1 -translate-y-2">{link.badge}</span>
+                  )}
+                  {active ? (
+                    <motion.span
+                      layoutId="activeNavIndicator"
+                      className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[#1C1917] rounded-full"
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  ) : (
+                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black/40 group-hover:w-full transition-all duration-300" />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
           {/* 3. SEARCH BAR - CENTERED, DROPS FROM TOP */}
@@ -305,16 +332,25 @@ export default function Navbar() {
         </form>
 
         <div className="flex flex-col gap-4">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-3xl font-serif text-brand-black flex items-center justify-between w-full hover:text-[#C5A059] transition-colors"
-            >
-              {link.name} <ArrowRight size={20} className="text-gray-300" />
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isLinkActive(link.path);
+            return (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`text-3xl font-serif flex items-center justify-between w-full transition-colors ${
+                  active ? 'text-[#1C1917] font-bold' : 'text-gray-700 hover:text-[#C5A059]'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  {link.name}
+                  {active && <span className="w-2 h-2 rounded-full bg-[#1C1917]" />}
+                </span>
+                <ArrowRight size={20} className={active ? "text-[#1C1917]" : "text-gray-300"} />
+              </Link>
+            );
+          })}
           
           <div className="w-full h-[1px] bg-gray-100 my-4"></div>
 

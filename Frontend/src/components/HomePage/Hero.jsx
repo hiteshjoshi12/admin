@@ -8,7 +8,7 @@ import { ImageWithShimmer } from '../../util/ShimmerMedia';
 // 1. UPDATED FALLBACK - Provides valid image & semantic text defaults
 const fallbackSlide = {
   id: 'fallback-1',
-  image: "banner1.png",
+  image: "https://ik.imagekit.io/hiteshh12/editorial/banner1_7npLvX_g6.png",
   subtitle: "Handcrafted Luxury",
   titleLine1: "Beads &",
   titleLine2: "Bloom",

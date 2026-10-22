@@ -24,7 +24,26 @@ const productSchema = mongoose.Schema({
       quantity: { type: Number, required: true, default: 0 }
     }
   ],
-  totalStock: { type: Number, required: true, default: 0 } 
+  totalStock: { type: Number, required: true, default: 0 },
+  
+  // Artisanal Specifications & Craft Details
+  sku: { type: String, default: '' },
+  material: { type: String, default: '' },
+  color: { type: String, default: '' },
+  embellishment: { type: String, default: '' },
+  lining: { type: String, default: '' },
+  sole: { type: String, default: '' },
+  comfortNotes: { type: String, default: '' },
+  careInstructions: [{ type: String }],
+  occasions: [{ type: String }],
+  fitTip: { type: String, default: '' },
+  imageDetails: [
+    {
+      url: { type: String },
+      perspective: { type: String, default: 'Angle' },
+      isPrimary: { type: Boolean, default: false }
+    }
+  ]
 }, {
   timestamps: true,
 });
