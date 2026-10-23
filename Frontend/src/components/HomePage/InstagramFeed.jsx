@@ -1,12 +1,10 @@
-import { Instagram, Play, Heart } from "lucide-react";
+import { Instagram, Play, ArrowRight } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { InstagramSkeleton } from "../loaders/SectionLoader";
 import { API_BASE_URL } from "../../util/config";
-// 1. IMPORT OPTIMIZERS
 import { getOptimizedImage } from "../../util/imageUtils";
 import { ImageWithShimmer, VideoWithShimmer } from "../../util/ShimmerMedia";
 
-// DEFAULT FALLBACK CONTENT
 const defaultContent = {
   photo1: "https://ik.imagekit.io/beandandbloom/Media/img1_cwdqem.jpg",
   photo2: "https://ik.imagekit.io/beandandbloom/Media/img2_rssgsc.jpg",
@@ -15,16 +13,12 @@ const defaultContent = {
   link: "https://www.instagram.com/beadsnbloom.india",
 };
 
-const instaGradientClass =
-  "bg-gradient-to-tr from-[#833ab4] via-[#fd1d1d] to-[#fcb045]";
-
 export default function InstagramFeed() {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [feedData, setFeedData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // --- 1. FETCH DATA FROM CMS ---
   useEffect(() => {
     const fetchInstagramData = async () => {
       try {
@@ -46,7 +40,7 @@ export default function InstagramFeed() {
         console.error("Failed to load Instagram feed:", error);
         setFeedData(defaultContent);
       } finally {
-        setTimeout(() => setLoading(false), 500);
+        setTimeout(() => setLoading(false), 400);
       }
     };
 
@@ -64,133 +58,105 @@ export default function InstagramFeed() {
   if (loading) return <InstagramSkeleton />;
 
   return (
-    <section className="py-24 px-4 bg-[#F9F8F6] relative overflow-hidden border-t border-gray-200">
-      <div className="max-w-[1200px] mx-auto">
+    <section className="py-24 md:py-32 bg-white border-t border-[#ECE7E1]" aria-label="Social Atelier Journal">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+        
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center gap-2 mb-4 bg-white px-4 py-2 rounded-full shadow-sm">
-            <span
-              className={`${instaGradientClass} bg-clip-text text-transparent`}
-            >
-              <Instagram className="w-4 h-4 text-[#833ab4]" />
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div>
+            <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-[#C5A059] block mb-2.5">
+              The Living Atelier
             </span>
-            <a href={feedData.link} target="_blank" rel="noopener noreferrer">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-black">
-                {feedData.handle}
-              </span>
-            </a>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#1C1917]">
+              Follow @beadsnbloom.india
+            </h2>
           </div>
-          <h2 className="text-4xl md:text-5xl font-serif text-brand-black">
-            The Gram
-          </h2>
+
+          <a 
+            href={feedData.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 text-xs font-bold uppercase tracking-widest bg-[#1C1917] text-white px-7 py-3.5 rounded-full hover:bg-[#8B5E3C] transition-colors shadow-xs"
+          >
+            <Instagram className="w-4 h-4" />
+            <span>Join Our Community</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </div>
 
-        {/* THE MOODBOARD LAYOUT */}
-        <div className="relative grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-          {/* LEFT COLUMN: The Stacked Photos */}
-          <div className="md:col-span-5 flex flex-col gap-8 relative z-10 px-4 md:px-0">
-            {/* PHOTO 1: Tilted Left */}
-            <div className="relative group w-full max-w-[320px] aspect-square bg-white p-3 shadow-xl transform rotate-[-3deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-start">
-              <div className="relative w-full h-full overflow-hidden bg-gray-100">
-                {/* 2. OPTIMIZE IMAGE (Width 500 for high density screens) */}
-                <ImageWithShimmer
-                  src={getOptimizedImage(feedData.photo1, 500)}
-                  alt="Insta Photo 1"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Heart className="text-white w-8 h-8 fill-white" />
-                </div>
+        {/* Editorial Media Trio Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          
+          {/* Photos Column */}
+          <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="group relative aspect-[4/5] rounded-3xl overflow-hidden bg-[#ECE7E1] shadow-xs">
+              <ImageWithShimmer
+                src={getOptimizedImage(feedData.photo1, 700)}
+                alt="Beads and Bloom handcrafted juttis lifestyle photography"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                <span className="text-xs text-white font-serif tracking-wider">Bridal Heirloom Detail</span>
               </div>
             </div>
 
-            {/* PHOTO 2: Tilted Right (Offset) */}
-            <div className="relative group w-full max-w-[320px] aspect-[4/5] bg-white p-3 shadow-xl transform rotate-[4deg] hover:rotate-0 transition-all duration-500 ease-out hover:z-20 self-end md:-mt-12">
-              <div className="relative w-full h-full overflow-hidden bg-gray-100">
-                {/* 3. OPTIMIZE IMAGE */}
-                <ImageWithShimmer
-                  src={getOptimizedImage(feedData.photo2, 500)}
-                  alt="Insta Photo 2"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Heart className="text-white w-8 h-8 fill-white" />
-                </div>
+            <div className="group relative aspect-[4/5] rounded-3xl overflow-hidden bg-[#ECE7E1] shadow-xs sm:translate-y-8">
+              <ImageWithShimmer
+                src={getOptimizedImage(feedData.photo2, 700)}
+                alt="Festive jutti styling and embroidered footwear"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                <span className="text-xs text-white font-serif tracking-wider">Pure Leather Craftsmanship</span>
               </div>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: The Reel (Cinematic) */}
-          <div className="md:col-span-7 relative z-0 md:pl-12">
+          {/* Reel Feature Column */}
+          <div className="md:col-span-5 md:pl-6">
             <div
-              className="relative w-full md:max-w-[400px] mx-auto aspect-[9/16] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white transform hover:scale-[1.02] transition-transform duration-500 cursor-pointer"
+              className="relative w-full max-w-[360px] mx-auto aspect-[9/16] rounded-3xl overflow-hidden shadow-xl border border-gray-100 cursor-pointer group bg-black"
               onClick={togglePlay}
             >
-              {/* 4. OPTIMIZE VIDEO (Width 500 for quality vertical video) */}
               <VideoWithShimmer
                 ref={videoRef}
                 src="https://ik.imagekit.io/hiteshh12/editorial/instareel_SKbvMlxutt.webm"
-                className="w-full h-full"
+                className="w-full h-full object-cover"
                 autoPlay
                 muted
                 loop
                 playsInline
+                aria-label="Atelier craftsmanship video reel"
               />
 
-              {/* Reel UI Overlay */}
-              <div className="absolute top-4 right-4 bg-black/20 backdrop-blur-md p-2 rounded-full">
-                <Instagram className="w-5 h-5 text-white" />
+              <div className="absolute top-5 right-5 bg-black/40 backdrop-blur-md p-2 rounded-full text-white">
+                <Instagram className="w-4 h-4" />
               </div>
 
               <div
-                className={`absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 ${isPlaying ? "opacity-0" : "opacity-100"}`}
+                className={`absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity duration-300 ${isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}
               >
-                <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
-                  <Play className="w-8 h-8 text-white fill-white ml-1" />
+                <div className="w-14 h-14 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white">
+                  <Play className="w-6 h-6 fill-white ml-0.5" />
                 </div>
               </div>
 
-              <div className="absolute bottom-6 left-6 flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full border border-white overflow-hidden">
-                  <img
-                    src="/logo.png"
-                    alt="B&B"
-                    className="w-full h-full object-cover bg-white"
-                  />
+              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white pointer-events-none">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-full border border-white/60 overflow-hidden bg-white">
+                    <img src="/logo.png" alt="B&B Logo" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="text-xs font-serif font-light tracking-wide">Behind the Craft</span>
                 </div>
-                <span className="text-white text-xs font-bold tracking-widest drop-shadow-md">
-                  Watch Reel
-                </span>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-white/80">Tap to Play</span>
               </div>
             </div>
           </div>
 
-          {/* THE STICKER */}
-          <a
-            target="_blank"
-            href={feedData.link}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 group"
-            rel="noreferrer"
-          >
-            <div
-              className={`
-                w-36 h-36 md:w-48 md:h-48 rounded-full ${instaGradientClass} text-white 
-                flex flex-col items-center justify-center text-center p-4 
-                shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)]
-                border-[6px] border-[#F9F8F6]
-                transition-transform duration-300 hover:scale-110 hover:rotate-12
-             `}
-            >
-              <Instagram className="w-10 h-10 md:w-12 md:h-12 mb-2" />
-              <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest leading-tight">
-                Follow <br />
-                {feedData.handle.replace("@", "")}
-              </span>
-            </div>
-          </a>
         </div>
+
       </div>
     </section>
   );

@@ -22,10 +22,10 @@ export default function ChatWidget() {
           ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-10 pointer-events-none'}
         `}
       >
-        <div className="bg-[#FF2865] p-6 text-white">
-          <h3 className="text-xl font-serif font-medium mb-1">Hi there! 👋</h3>
-          <p className="text-xs text-white/90 font-sans tracking-wide">
-            We usually reply within a few minutes.
+        <div className="bg-[#1C1917] p-6 text-white">
+          <h3 className="text-xl font-serif font-medium mb-1">Client Concierge</h3>
+          <p className="text-xs text-white/80 font-sans tracking-wide">
+            Connect with our bridal stylists and support team.
           </p>
         </div>
 

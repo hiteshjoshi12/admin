@@ -42,7 +42,7 @@ export default function BestSellers() {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-12 px-2">
            <div className="text-center md:text-left w-full md:w-auto">
-             <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-[#C5A059] mb-3 block">
+             <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-[#8B5E3C] mb-3 block">
                Curated Favorites
              </span>
              <h2 className="text-3xl md:text-5xl font-serif text-[#1C1917]">

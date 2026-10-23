@@ -160,7 +160,7 @@ export default function Navbar() {
                     active
                       ? 'text-[#1C1917] font-extrabold'
                       : link.isSpecial
-                        ? 'text-[#C5A059] font-bold hover:text-[#1C1917]'
+                        ? 'text-[#8B5E3C] font-extrabold hover:text-[#1C1917]'
                         : 'text-gray-500 font-bold hover:text-[#1C1917]'
                   }`}
                 >

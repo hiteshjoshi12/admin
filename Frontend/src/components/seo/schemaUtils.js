@@ -195,10 +195,10 @@ export const getCollectionSchema = (title, description, url) => ({
   },
 });
 
-export const getFAQSchema = (faqs) => ({
+export const getFAQSchema = (faqs = []) => ({
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: faqs.map((faq) => ({
+  mainEntity: (faqs || []).map((faq) => ({
     '@type': 'Question',
     name: faq.question,
     acceptedAnswer: {

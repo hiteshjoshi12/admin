@@ -13,6 +13,7 @@ export const ImageWithShimmer = ({ src, alt, className, loading = 'lazy', priori
       <img
         src={src}
         alt={alt}
+        crossOrigin="anonymous"
         loading={priority ? 'eager' : loading}
         fetchPriority={priority ? 'high' : 'auto'}
         onLoad={() => setIsLoaded(true)}
@@ -36,6 +37,7 @@ export const VideoWithShimmer = forwardRef(({ src, className, ...props }, ref) =
       <video
         ref={ref} // 👈 This allows your togglePlay(videoRef) to work!
         src={src}
+        crossOrigin="anonymous"
         onLoadedData={() => setIsLoaded(true)}
         className={`w-full h-full object-cover transition-opacity duration-500 ease-in-out ${
           isLoaded ? 'opacity-100' : 'opacity-0'

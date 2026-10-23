@@ -1,28 +1,34 @@
 import { useState } from 'react';
-import { ChevronDown, MapPin, Globe, ShieldCheck, Sparkles, Truck, CreditCard } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FAQ_DATA } from '../../data/faqData';
+export { FAQ_DATA };
 
-export const FAQ_DATA = [
+const TRUST_HALLMARKS = [
   {
-    question: "How do I purchase Beads & Bloom juttis?",
-    answer: "You can shop our complete artisanal footwear catalog online at beadsandbloom.in! We deliver across India with Cash on Delivery (COD) and ship worldwide to the USA, UK, Canada, Australia, and UAE with door-to-door express tracking.",
+    number: "01",
+    title: "Handcrafted Heritage",
+    subtitle: "Authentic Karigar Work",
+    detail: "Handmade on traditional Punjabi wooden lasts with genuine leather soles."
   },
   {
-    question: "What range of handcrafted juttis do you offer?",
-    answer: "We offer a complete collection of handcrafted Punjabi juttis and ethnic footwear. Our range spans Royal Bridal Juttis (featuring zardozi, dabka, pearls, and cut-dana work), Festive & Sangeet Party Wear Juttis, and Lightweight Casual Juttis engineered for everyday chic.",
+    number: "02",
+    title: "Bite-Free Comfort",
+    subtitle: "Double Foam Cushioning",
+    detail: "Dual memory padding protects against blisters during long wedding events."
   },
   {
-    question: "Do you ship handcrafted juttis worldwide?",
-    answer: "Yes, we ship globally! We regularly deliver to our valued clients across the United States (USA), United Kingdom (UK), Canada, Australia, the United Arab Emirates (UAE), Europe, and Singapore via reliable international express couriers.",
+    number: "03",
+    title: "Worldwide Express",
+    subtitle: "Doorstep International Delivery",
+    detail: "Fast insured shipping to USA, UK, Canada, Australia, and the UAE."
   },
   {
-    question: "Do you offer Cash on Delivery (COD) and Online Payments?",
-    answer: "Yes, we offer Cash on Delivery (COD) across all serviceable pincodes in India. For online payments, we support 100% secure Razorpay checkout with UPI (Google Pay, PhonePe, Paytm), Credit Cards, Debit Cards, and Net Banking.",
-  },
-  {
-    question: "Are your juttis bite-free and comfortable for long weddings?",
-    answer: "Every single pair from Beads & Bloom features our signature double-cushioned memory foam footbed and buttery-soft genuine leather lining. They are specially engineered to eliminate shoe bites and provide all-day comfort for 10+ hours.",
-  },
+    number: "04",
+    title: "Pan-India COD",
+    subtitle: "Hassle-Free Exchange",
+    detail: "Cash on delivery available nationwide."
+  }
 ];
 
 export default function StoreTrustFAQ() {
@@ -33,88 +39,81 @@ export default function StoreTrustFAQ() {
   };
 
   return (
-    <section className="py-20 bg-[#FAF8F5] border-t border-b border-[#ECE7E1]" aria-label="Store Information and FAQs">
+    <section className="py-24 md:py-32 bg-[#FAF8F5] border-t border-b border-[#ECE7E1]" aria-label="Store Information and FAQs">
       <div className="max-w-[1240px] mx-auto px-6 md:px-12">
-        
-        {/* 4 Trust Highlights (USPs) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-full bg-[#FFF0F4] text-[#FF2865] flex items-center justify-center mb-3">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <h3 className="font-serif text-sm md:text-base font-semibold text-[#1C1917] mb-1">Artisan Heritage</h3>
-            <p className="text-xs text-gray-500">100% Handcrafted by Master Karigars</p>
-          </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-full bg-[#FFF7E8] text-[#C5A059] flex items-center justify-center mb-3">
-              <Sparkles className="w-5 h-5" />
+        {/* 4 Clean Editorial Hallmarks (No colored bubble icons) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+          {TRUST_HALLMARKS.map((item) => (
+            <div
+              key={item.number}
+              className="bg-white p-7 rounded-3xl border border-[#EAE3D2] shadow-xs flex flex-col justify-between transition-all duration-300 hover:shadow-md"
+            >
+              <div>
+                <span className="font-serif text-2xl text-[#C5A059] block mb-2 font-light">
+                  {item.number}
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#8B5E3C] block mb-1">
+                  {item.subtitle}
+                </span>
+                <h3 className="font-serif text-lg font-semibold text-[#1C1917] mb-2">
+                  {item.title}
+                </h3>
+              </div>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">
+                {item.detail}
+              </p>
             </div>
-            <h3 className="font-serif text-sm md:text-base font-semibold text-[#1C1917] mb-1">Complete Jutti Range</h3>
-            <p className="text-xs text-gray-500">Bridal, Festive & Casual Handcrafted Styles</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-full bg-[#F0F7FF] text-[#2563EB] flex items-center justify-center mb-3">
-              <Globe className="w-5 h-5" />
-            </div>
-            <h3 className="font-serif text-sm md:text-base font-semibold text-[#1C1917] mb-1">Worldwide Delivery</h3>
-            <p className="text-xs text-gray-500">Express Shipping to USA, UK, UAE & Beyond</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-full bg-[#F0FDF4] text-[#16A34A] flex items-center justify-center mb-3">
-              <CreditCard className="w-5 h-5" />
-            </div>
-            <h3 className="font-serif text-sm md:text-base font-semibold text-[#1C1917] mb-1">COD & Online Pay</h3>
-            <p className="text-xs text-gray-500">Cash on Delivery across India + Secure UPI</p>
-          </div>
+          ))}
         </div>
 
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-[#C5A059] text-xs font-bold uppercase tracking-[0.25em] block mb-2">
-            The Beads & Bloom Experience
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="text-[#8B5E3C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] block mb-2.5">
+            Client Assistance
           </span>
-          <h2 className="font-serif text-3xl md:text-4xl text-[#1C1917] mb-4">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#1C1917] mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-sm text-gray-500 font-light">
-            Everything you need to know about our handcrafted Punjabi juttis, online orders, shipping, and sizing.
+          <p className="text-sm text-gray-500 font-light leading-relaxed">
+            Essential information regarding sizing, worldwide shipping, bridal customization, and care.
           </p>
         </div>
 
-        {/* Accordion */}
+        {/* Minimalist Accordion */}
         <div className="max-w-3xl mx-auto space-y-4">
           {FAQ_DATA.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <div 
-                key={index} 
-                className="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm transition-all"
+              <div
+                key={index}
+                className="bg-white rounded-2xl border border-[#EAE3D2] overflow-hidden shadow-xs transition-all duration-300 hover:border-[#1C1917]/30"
               >
                 <button
                   type="button"
                   onClick={() => toggleAccordion(index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left gap-4 hover:bg-gray-50/50 transition-colors"
+                  className="w-full px-7 py-5 flex items-center justify-between text-left gap-4 hover:bg-[#FAF8F5]/60 transition-colors"
                   aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${index}`}
                 >
-                  <span className="font-serif text-base md:text-lg text-[#1C1917] font-normal">
+                  <span className="font-serif text-base sm:text-lg font-medium text-[#1C1917]">
                     {faq.question}
                   </span>
-                  <ChevronDown 
-                    className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#C5A059]' : ''}`} 
-                  />
+                  <div className={`p-1.5 rounded-full border border-gray-200 transition-transform duration-300 ${isOpen ? 'rotate-180 bg-[#1C1917] text-white border-[#1C1917]' : 'text-gray-400'}`}>
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
                 </button>
-                <AnimatePresence initial={false}>
+
+                <AnimatePresence>
                   {isOpen && (
                     <motion.div
+                      id={`faq-answer-${index}`}
                       initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
+                      animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <div className="px-6 pb-6 pt-1 text-sm text-gray-600 leading-relaxed border-t border-gray-100">
+                      <div className="px-7 pb-6 pt-1 text-sm text-gray-600 font-light leading-relaxed border-t border-gray-100/60">
                         {faq.answer}
                       </div>
                     </motion.div>

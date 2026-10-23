@@ -43,9 +43,10 @@ export default function CollectionTiles() {
   ];
 
   const QuickAddOverlay = () => (
-    <div className="absolute inset-0 z-20 flex items-end justify-center pb-8 transition-opacity duration-300 bg-black/5 opacity-100 md:opacity-0 md:group-hover:opacity-100">
-      <span className="bg-white text-[#1C1917] px-6 py-3 rounded-full text-xs uppercase tracking-widest font-bold flex items-center gap-2 shadow-xl transition-all duration-500 ease-out group-hover:bg-[#C5A059] group-hover:text-white translate-y-0 md:translate-y-4 md:group-hover:translate-y-0">
-        <ShoppingBag className="w-4 h-4"/> Browse Collection
+    <div className="absolute inset-0 z-20 flex items-end justify-center pb-8 transition-opacity duration-300 bg-black/10 opacity-100 md:opacity-0 md:group-hover:opacity-100">
+      <span className="bg-white text-[#1C1917] px-7 py-3 rounded-full text-xs uppercase tracking-widest font-bold flex items-center gap-2 shadow-xl transition-all duration-500 ease-out group-hover:bg-[#1C1917] group-hover:text-white translate-y-0 md:translate-y-4 md:group-hover:translate-y-0">
+        <span>Browse Collection</span>
+        <ArrowRight className="w-3.5 h-3.5" />
       </span>
     </div>
   );

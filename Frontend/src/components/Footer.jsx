@@ -101,11 +101,11 @@ export default function Footer() {
       </div>
 
       {/* Copyright Line */}
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 uppercase tracking-widest">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-xs text-stone-400 uppercase tracking-widest">
         <p>© 2026 Beads & Bloom. All rights reserved.</p>
         <div className="flex gap-6 mt-4 md:mt-0">
-          <Link to="/terms" className="hover:text-gray-400">Privacy Policy</Link>
-          <Link to="/terms" className="hover:text-gray-400">Terms of Service</Link>
+          <Link to="/terms" className="hover:text-white transition-colors">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
         </div>
       </div>
     </footer>
