@@ -11,8 +11,8 @@ const connectDB = async () => {
       maxPoolSize: 10, 
 
       // 2. Server Selection Timeout:
-      // If the DB is down, fail fast (5s) instead of hanging the request for 30s.
-      serverSelectionTimeoutMS: 5000,
+      // Allow up to 15s for Atlas SSL handshake and replica set election
+      serverSelectionTimeoutMS: 15000,
 
       // 3. Socket Timeout:
       // Close idle connections after 45s to free up memory.
@@ -21,8 +21,9 @@ const connectDB = async () => {
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1);
+    console.error(`MongoDB Connection Error: ${error.message}`);
+    // Retry connection after 5 seconds instead of hard exit
+    setTimeout(connectDB, 5000);
   }
 };
 

@@ -8,6 +8,22 @@ export default class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
+    // If it's a dynamic module script chunk loading failure, auto-recover by reloading once
+    const msg = (error?.message || '').toLowerCase();
+    if (
+      msg.includes('failed to fetch dynamically imported module') ||
+      msg.includes('importing a module script failed') ||
+      msg.includes('error loading dynamically imported module') ||
+      msg.includes('mime type of "text/html"') ||
+      msg.includes('failed to load module script')
+    ) {
+      const reloadKey = 'bb_err_chunk_reload';
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, 'true');
+        window.location.reload();
+        return { hasError: false, error: null };
+      }
+    }
     return { hasError: true, error };
   }
 

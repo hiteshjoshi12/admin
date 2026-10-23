@@ -59,7 +59,17 @@ const fs = require('fs');
 const distPath = path.join(__dirname, 'dist');
 
 // Serve static assets from the 'dist' directory
-app.use(express.static(distPath));
+app.use(express.static(distPath, {
+  maxAge: '1y',
+  immutable: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 // SEO Injection Configuration for /collection/festive
 const FESTIVE_INJECTION = {
@@ -249,15 +259,12 @@ const ABOUT_INJECTION = {
   `
 };
 
-let cachedIndexHtml = null;
 const getIndexHtml = () => {
-  if (!cachedIndexHtml) {
-    const indexPath = path.join(distPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      cachedIndexHtml = fs.readFileSync(indexPath, 'utf8');
-    }
+  const indexPath = path.join(distPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    return fs.readFileSync(indexPath, 'utf8');
   }
-  return cachedIndexHtml;
+  return null;
 };
 
 // Fallback for React Router (handles root '/', client subpaths, and prevents overriding /api)
@@ -265,6 +272,19 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ message: 'API route not found' });
   }
+
+  // Guard against missing assets/scripts returning index.html as text/html
+  if (
+    req.path.startsWith('/assets/') || 
+    /\.(js|mjs|css|png|jpg|jpeg|gif|webp|svg|ico|json|map|woff|woff2|ttf|eot)$/i.test(req.path)
+  ) {
+    return res.status(404).type('text/plain').send('Asset not found');
+  }
+
+  // Prevent intermediate proxies (LiteSpeed, Cloudflare, Caddy) and browsers from caching SPA shell HTML
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
 
   const rawHtml = getIndexHtml();
   if (!rawHtml) {
