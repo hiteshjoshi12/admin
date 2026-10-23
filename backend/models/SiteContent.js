@@ -24,6 +24,12 @@ const siteContentSchema = mongoose.Schema({
     ncrShipping: { type: Number, default: 100 },
     freeShippingThreshold: { type: Number, default: 5000 },
     ncrPincodePrefixes: { type: String, default: "11,12,201" }
+  },
+  festiveContent: {
+    type: mongoose.Schema.Types.Mixed
+  },
+  aboutContent: {
+    type: mongoose.Schema.Types.Mixed
   }
 }, {
   timestamps: true,

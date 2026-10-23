@@ -207,3 +207,25 @@ export const getFAQSchema = (faqs) => ({
     },
   })),
 });
+
+export const getItemListSchema = (items, name = 'Handcrafted Festive Juttis Collection') => ({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name,
+  numberOfItems: items.length,
+  itemListElement: items.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    url: `${SITE_URL}/product/${item.slug}`,
+    name: item.name,
+    ...(item.price ? {
+      offers: {
+        '@type': 'Offer',
+        price: item.price,
+        priceCurrency: 'INR',
+        availability: item.totalStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      }
+    } : {}),
+  })),
+});
+

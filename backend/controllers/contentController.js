@@ -1,4 +1,6 @@
 const SiteContent = require('../models/SiteContent');
+const defaultFestiveContent = require('../data/defaultFestiveContent');
+const defaultAboutContent = require('../data/defaultAboutContent');
 
 // @desc    Get site content
 const getContent = async (req, res) => {
@@ -27,6 +29,17 @@ const getContent = async (req, res) => {
           content.shippingSettings.ncrPincodePrefixes = "11,12,201";
         }
       }
+
+      // Ensure festiveContent has defaults if missing
+      if (!content.festiveContent || !content.festiveContent.occasions || content.festiveContent.occasions.length === 0) {
+        content.festiveContent = defaultFestiveContent;
+      }
+
+      // Ensure aboutContent has defaults if missing
+      if (!content.aboutContent || !content.aboutContent.pillars || content.aboutContent.pillars.length === 0) {
+        content.aboutContent = defaultAboutContent;
+      }
+
       res.json(content);
     } else {
       // Return empty structure if nothing saved yet
@@ -38,7 +51,9 @@ const getContent = async (req, res) => {
           ncrShipping: 100,
           freeShippingThreshold: 5000,
           ncrPincodePrefixes: "11,12,201"
-        }
+        },
+        festiveContent: defaultFestiveContent,
+        aboutContent: defaultAboutContent
       });
     }
   } catch (error) {
@@ -64,6 +79,14 @@ const updateContent = async (req, res) => {
         };
         content.markModified('shippingSettings');
       }
+      if (req.body.festiveContent !== undefined) {
+        content.festiveContent = req.body.festiveContent;
+        content.markModified('festiveContent');
+      }
+      if (req.body.aboutContent !== undefined) {
+        content.aboutContent = req.body.aboutContent;
+        content.markModified('aboutContent');
+      }
       const updatedContent = await content.save();
       res.json(updatedContent);
     } else {
@@ -76,7 +99,9 @@ const updateContent = async (req, res) => {
           ncrShipping: 100,
           freeShippingThreshold: 5000,
           ncrPincodePrefixes: "11,12,201"
-        }
+        },
+        festiveContent: req.body.festiveContent || defaultFestiveContent,
+        aboutContent: req.body.aboutContent || defaultAboutContent
       });
       const savedContent = await newContent.save();
       res.status(201).json(savedContent);

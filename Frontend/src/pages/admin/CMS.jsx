@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { 
   Save, Layout, Instagram, Image as ImageIcon, Plus, 
-  Trash2, Star, Grid, Video, PlayCircle, GripVertical, Truck 
+  Trash2, Star, Grid, Video, PlayCircle, GripVertical, Truck, Sparkles, BookOpen 
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../util/config';
@@ -12,6 +12,8 @@ import toast from 'react-hot-toast';
 import { getOptimizedImage } from '../../util/imageUtils';
 import { getOptimizedVideo } from '../../util/videoUtils';
 import FileUpload from '../admin/FileUpload';
+import FestiveCMS from './FestiveCMS';
+import AboutCMS from './AboutCMS';
 
 export default function CMS() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -28,6 +30,8 @@ export default function CMS() {
 
       <div className="flex gap-4 mb-8 border-b border-gray-200 overflow-x-auto scrollbar-hide pb-1">
         <TabButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={Layout} label="Home & Socials" />
+        <TabButton active={activeTab === 'about'} onClick={() => setActiveTab('about')} icon={BookOpen} label="About Page" />
+        <TabButton active={activeTab === 'festive'} onClick={() => setActiveTab('festive')} icon={Sparkles} label="Festive Collection" />
         <TabButton active={activeTab === 'bestsellers'} onClick={() => setActiveTab('bestsellers')} icon={Star} label="Best Sellers" />
         <TabButton active={activeTab === 'collections'} onClick={() => setActiveTab('collections')} icon={Grid} label="Collections" />
         <TabButton active={activeTab === 'runway'} onClick={() => setActiveTab('runway')} icon={Video} label="Runway" />
@@ -35,6 +39,8 @@ export default function CMS() {
       </div>
 
       {activeTab === 'home' && <HomeCMS userInfo={userInfo} />}
+      {activeTab === 'about' && <AboutCMS userInfo={userInfo} />}
+      {activeTab === 'festive' && <FestiveCMS userInfo={userInfo} />}
       {activeTab === 'bestsellers' && <BestSellersCMS userInfo={userInfo} />}
       {activeTab === 'collections' && <CollectionsCMS userInfo={userInfo} />}
       {activeTab === 'runway' && <RunwayCMS userInfo={userInfo} />}

@@ -10,6 +10,7 @@ import { toggleWishlistAPI, toggleWishlistLocal } from "../redux/wishlistSlice";
 import { API_BASE_URL } from "../util/config";
 import SEO from "../components/seo/SEO";
 import { getCollectionSchema, getBreadcrumbSchema } from "../components/seo/schemaUtils";
+import FestiveCollection from "./FestiveCollection";
 
 // --- 🎨 COLLECTION CONFIGURATION ---
 const collectionConfig = {
@@ -127,6 +128,11 @@ export default function Collection() {
     return <Navigate to="/sale" replace />;
   }
 
+  // Render dedicated redesigned Festive Collection page
+  if (category?.toLowerCase() === 'festive') {
+    return <FestiveCollection />;
+  }
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortOption, setSortOption] = useState("newest");
@@ -140,7 +146,7 @@ export default function Collection() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE_URL}/api/products?category=${category}&sort=${sortOption}`);
+        const res = await fetch(`${API_BASE_URL}/api/products?category=${category}&pageSize=100&sort=${sortOption}`);
         const data = await res.json();
         setProducts(Array.isArray(data) ? data : data.products || []);
       } catch (err) {

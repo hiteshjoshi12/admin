@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Mail, Clock, Instagram, MessageCircle, ArrowRight, MapPin } from 'lucide-react';
+import { Mail, Clock, Instagram, MessageCircle, ArrowRight, MapPin, Sparkles } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from '../util/config'; // Ensure you have this config
 import SEO from '../components/seo/SEO';
