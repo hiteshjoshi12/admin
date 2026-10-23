@@ -26,6 +26,9 @@ Disallow: /track-order
 User-agent: Googlebot
 Allow: /
 
+User-agent: Google-Extended
+Allow: /
+
 User-agent: Bingbot
 Allow: /
 
@@ -40,6 +43,16 @@ Allow: /
 
 User-agent: Applebot
 Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# LLM Agent Manifest
+# https://beadsandbloom.in/llms.txt
+# https://beadsandbloom.in/llms-full.txt
 
 # Master Sitemap
 Sitemap: https://beadsandbloom.in/sitemap.xml

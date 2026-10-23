@@ -38,6 +38,7 @@ export default function ChatWidget() {
             href={contactInfo.instagram}
             target="_blank" 
             rel="noopener noreferrer"
+            aria-label="Direct message us on Instagram"
             className="group flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#FF2865]/30 transition-all duration-200"
           >
             <div className="flex items-center gap-3">
@@ -56,6 +57,7 @@ export default function ChatWidget() {
 
           <a 
             href={contactInfo.email}
+            aria-label="Send customer support an email"
             className="group flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#FF2865]/30 transition-all duration-200"
           >
             <div className="flex items-center gap-3">
@@ -82,6 +84,7 @@ export default function ChatWidget() {
       {/* THE TOGGLE BUTTON */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close customer support chat" : "Open customer support chat"}
         // FIX 3: Added 'pointer-events-auto' here so the button remains clickable
         className={`
           relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 pointer-events-auto

@@ -1,15 +1,15 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Sparkles, Heart, ShieldCheck, Globe, CreditCard, 
-  Truck, Award, ArrowRight, Layers, Check, Feather, Users 
+import {
+  Sparkles, Heart, ShieldCheck, Globe, CreditCard,
+  Truck, Award, ArrowRight, Layers, Check, Feather, Users
 } from 'lucide-react';
 import { API_BASE_URL } from '../util/config';
 import SEO from '../components/seo/SEO';
-import { 
-  getOrganizationSchema, 
-  getBreadcrumbSchema, 
-  getStoreSchema 
+import {
+  getOrganizationSchema,
+  getBreadcrumbSchema,
+  getStoreSchema
 } from '../components/seo/schemaUtils';
 import { defaultAboutContent } from '../data/defaultAboutContent';
 
@@ -40,16 +40,16 @@ export default function About() {
   const hero = cmsContent.hero || defaultAboutContent.hero;
   const mission = cmsContent.mission || defaultAboutContent.mission;
   const stats = (cmsContent.stats && cmsContent.stats.length > 0)
-    ? cmsContent.stats 
+    ? cmsContent.stats
     : defaultAboutContent.stats;
   const pillars = (cmsContent.pillars && cmsContent.pillars.length > 0)
-    ? cmsContent.pillars 
+    ? cmsContent.pillars
     : defaultAboutContent.pillars;
   const values = (cmsContent.values && cmsContent.values.length > 0)
-    ? cmsContent.values 
+    ? cmsContent.values
     : defaultAboutContent.values;
   const gallery = (cmsContent.gallery && cmsContent.gallery.length > 0)
-    ? cmsContent.gallery 
+    ? cmsContent.gallery
     : defaultAboutContent.gallery;
   const founderNote = cmsContent.founderNote || defaultAboutContent.founderNote;
 
@@ -102,7 +102,7 @@ export default function About() {
       {/* --- 1. HERO SECTION (LUXURY EDITORIAL ATELIER) --- */}
       <section className="relative w-full pt-10 pb-16 md:pt-16 md:pb-24 px-6 md:px-12 bg-gradient-to-b from-[#FBF8F2] via-[#FAF6ED] to-[#FAF8F5] border-b border-[#EAE0D0]/80 overflow-hidden">
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          
+
           {/* Breadcrumb Navigation */}
           <nav aria-label="Breadcrumb" className="mb-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#8B5E3C] font-semibold">
             <Link to="/" className="hover:text-[#1C1917] transition-colors">Home</Link>
@@ -166,7 +166,7 @@ export default function About() {
       {/* --- 3. THE BRAND GENESIS & REVOLUTION --- */}
       <section className="py-20 md:py-28 px-6 md:px-12 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           {/* Left Visual Composition */}
           <div className="lg:col-span-5 relative">
             <div className="aspect-[4/5] rounded-3xl overflow-hidden bg-[#FAF0DC] border border-[#EAE0D0] shadow-sm relative group">
@@ -245,7 +245,7 @@ export default function About() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {pillars.map((pillar, idx) => (
-              <div 
+              <div
                 key={idx}
                 className="bg-[#FAF8F5] rounded-2xl overflow-hidden border border-[#EAE0D0] flex flex-col justify-between group hover:shadow-md transition-all duration-300"
               >
@@ -305,7 +305,7 @@ export default function About() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {gallery.map((imgUrl, idx) => (
-            <div 
+            <div
               key={idx}
               className="aspect-[4/5] rounded-2xl overflow-hidden bg-[#EFE8DD] border border-[#EAE0D0] group relative shadow-xs"
             >
@@ -342,7 +342,7 @@ export default function About() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {values.map((val, idx) => (
-              <div 
+              <div
                 key={idx}
                 className="bg-white p-6 rounded-2xl border border-[#EAE0D0] shadow-xs flex flex-col justify-between"
               >
@@ -370,7 +370,7 @@ export default function About() {
       {/* --- 7. FOUNDER'S NOTE & INSPIRATION --- */}
       <section className="py-20 md:py-28 px-6 md:px-12 max-w-4xl mx-auto text-center" aria-label="Founder Note">
         <div className="bg-white p-8 sm:p-12 md:p-14 rounded-3xl border border-[#EAE0D0] shadow-sm relative overflow-hidden">
-          
+
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF0DC] text-[#8A5B28] text-[10px] font-bold uppercase tracking-wider mb-6">
             <Heart className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
             <span>{founderNote.headline || "A Message from Our Atelier"}</span>
@@ -398,7 +398,7 @@ export default function About() {
       {/* --- 8. WORLDWIDE REACH & SHOPPING PEACE OF MIND --- */}
       <section className="bg-white border-t border-[#EAE0D0] py-14 px-6 md:px-12" aria-label="Services & Reach">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          
+
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
             <div className="w-12 h-12 rounded-2xl bg-[#FAF0DC] text-[#C5A059] flex items-center justify-center shrink-0">
               <Globe className="w-6 h-6" />
@@ -418,7 +418,7 @@ export default function About() {
             <div>
               <h4 className="font-serif text-base text-[#1C1917] mb-1">Pan-India COD</h4>
               <p className="text-xs text-gray-500 font-light leading-relaxed">
-                Cash on Delivery available nationwide across India, along with fast 48-hour size exchange support.
+                Cash on Delivery available nationwide across India.
               </p>
             </div>
           </div>

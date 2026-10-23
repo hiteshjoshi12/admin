@@ -85,6 +85,7 @@ export default function Footer() {
             <input 
               type="email" 
               placeholder="Enter your email" 
+              aria-label="Enter your email to subscribe to newsletter"
               className="bg-transparent w-full text-sm outline-none placeholder-gray-600 text-white"
             />
             <button className="text-xs font-bold uppercase tracking-widest hover:text-[#C5A059] text-white">

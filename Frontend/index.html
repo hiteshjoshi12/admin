@@ -8,7 +8,7 @@
     <meta name="title" content="Handcrafted Punjabi Juttis | Luxury Bridal, Festive & Casual Mojaris - Beads and Bloom" />
     <meta name="description" content="Discover luxury handcrafted Punjabi juttis, bridal mojris & festive footwear at Beads and Bloom. Made with pure leather soles & double cushioning. Worldwide shipping & Cash on Delivery (COD) available." />
     <meta name="keywords" content="handcrafted juttis, bridal juttis, punjabi juttis online, festive footwear, wedding mojris, casual juttis, beads and bloom, cash on delivery juttis, worldwide shipping juttis, embroidered juttis" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="author" content="Beads and Bloom" />
 
     <meta property="og:type" content="website" />
@@ -30,6 +30,15 @@
     <!-- Google Fonts Preconnect for Core Web Vitals -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Preload Critical LCP Hero Banner -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/webp"
+      href="https://ik.imagekit.io/hiteshh12/editorial/banner1_7npLvX_g6.png?tr=w-1600,f-webp,q-80"
+      fetchpriority="high"
+    />
 
     <link href="/src/index.css" rel="stylesheet" />
 
@@ -82,18 +91,41 @@
       }
     </script>
 
-    <!-- Meta Pixel Code -->
+    <!-- Meta Pixel Code (Deferred to idle callback to optimize Total Blocking Time) -->
     <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1455326106412816');
-      fbq('track', 'PageView');
+      (function() {
+        var pixelInitialized = false;
+        function initMetaPixel() {
+          if (pixelInitialized) return;
+          pixelInitialized = true;
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', '1455326106412816');
+          fbq('track', 'PageView');
+        }
+
+        if (document.readyState === 'complete') {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(initMetaPixel, { timeout: 2000 });
+          } else {
+            setTimeout(initMetaPixel, 1200);
+          }
+        } else {
+          window.addEventListener('load', function() {
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(initMetaPixel, { timeout: 2000 });
+            } else {
+              setTimeout(initMetaPixel, 1200);
+            }
+          });
+        }
+      })();
     </script>
     <!-- End Meta Pixel Code -->
   </head>

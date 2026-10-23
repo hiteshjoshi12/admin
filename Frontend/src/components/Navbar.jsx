@@ -143,7 +143,7 @@ export default function Navbar() {
             <span className="font-serif text-xl font-bold tracking-wide text-[#1C1917] leading-none group-hover:text-gray-600 transition-colors">
               BEADS & BLOOM
             </span>
-            <span className="text-[0.5rem] md:text-[0.6rem] font-sans text-gray-400 tracking-[0.25em] uppercase mt-1">
+            <span className="text-[0.5rem] md:text-[0.6rem] font-sans text-stone-500 tracking-[0.25em] uppercase mt-1">
               Handcrafted Luxury
             </span>
           </Link>
@@ -197,11 +197,16 @@ export default function Navbar() {
                    placeholder="Search..." 
                    value={searchQuery}
                    onChange={(e) => setSearchQuery(e.target.value)}
-                   className="w-full bg-transparent  pl-12 pr-8 py-2 text-sm text-left focus:outline-none focus:border-[#1C1917] placeholder:text-gray-300 transition-all font-medium "
+                   className="w-full bg-transparent  pl-12 pr-8 py-2 text-sm text-left focus:outline-none focus:border-[#1C1917] placeholder:text-gray-400 transition-all font-medium "
                 />
                 
                 {/* Close Button Right */}
-                <button type="button" onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }} className="absolute right-4 text-gray-400 hover:text-red-500 p-1">
+                <button 
+                   type="button" 
+                   onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }} 
+                   aria-label="Close search bar"
+                   className="absolute right-4 text-gray-400 hover:text-red-500 p-1"
+                >
                    <X size={16} />
                 </button>
 
@@ -246,12 +251,13 @@ export default function Navbar() {
                  setIsSearchOpen(!isSearchOpen);
                  if(!isSearchOpen) setSearchQuery(""); 
               }} 
+              aria-label="Open search bar"
               className={`p-2 rounded-full transition-colors ${isSearchOpen ? 'text-[#1C1917] bg-gray-100' : 'text-gray-700 hover:bg-gray-100'}`}
             >
               <Search className="w-5 h-5" />
             </button>
 
-            <Link to="/wishlist" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors hidden sm:block">
+            <Link to="/wishlist" aria-label="View Wishlist" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors hidden sm:block">
               <Heart className="w-5 h-5 text-gray-700 hover:text-[#FF2865] transition-colors" />
               {wishlistCount > 0 && (
                 <span className="absolute top-0 right-0 h-4 w-4 bg-[#FF2865] text-white text-[9px] flex items-center justify-center rounded-full font-bold border-2 border-white">
@@ -260,7 +266,7 @@ export default function Navbar() {
               )}
             </Link>
 
-            <Link to="/cart" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <Link to="/cart" aria-label="View Shopping Cart" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
               <ShoppingBag className="w-5 h-5 text-gray-700" />
               {cartCount > 0 && (
                 <span className="absolute top-0 right-0 h-4 w-4 bg-[#1C1917] text-white text-[9px] flex items-center justify-center rounded-full font-bold border-2 border-white">
@@ -272,7 +278,7 @@ export default function Navbar() {
             <div className="hidden md:block">
               {userInfo ? (
                 <div className="relative" ref={dropdownRef}>
-                  <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-1 p-1 rounded-full border border-transparent hover:border-gray-200 transition-all">
+                  <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} aria-label="User account menu" className="flex items-center gap-1 p-1 rounded-full border border-transparent hover:border-gray-200 transition-all">
                     <div className="w-8 h-8 bg-[#1C1917] text-white rounded-full flex items-center justify-center font-serif text-sm">
                       {userInfo.name.charAt(0).toUpperCase()}
                     </div>
@@ -310,7 +316,7 @@ export default function Navbar() {
               )}
             </div>
 
-            <button className="md:hidden p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <button className="md:hidden p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle navigation menu">
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -328,7 +334,7 @@ export default function Navbar() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-gray-50 border border-gray-200 rounded-full px-6 py-4 text-lg outline-none focus:border-black"
            />
-           <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"><Search /></button>
+           <button type="submit" aria-label="Search products" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"><Search /></button>
         </form>
 
         <div className="flex flex-col gap-4">

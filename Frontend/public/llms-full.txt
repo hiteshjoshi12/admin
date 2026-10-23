@@ -1,0 +1,35 @@
+# Beads & Bloom — Comprehensive Knowledge Base for Autonomous Agents & Generative Engines
+
+## Brand Summary
+Beads & Bloom (`https://beadsandbloom.in/`) is an artisanal footwear house from India specializing in luxury handcrafted Punjabi juttis and bridal mojaris. Each pair is handcrafted by master karigars (craftsmen) using pure buffalo-leather soles and vegetable tanning, complemented by double-layered memory foam footbeds that eliminate the stiffness and blisters associated with traditional unlined ethnic footwear.
+
+## Key Product Attributes
+1. **Pure Leather Soles:** 100% natural genuine leather soles that breathe and mold to the wearer's foot contours.
+2. **Double Cushioning:** Dual-layer latex foam and memory padding on the inner sole ensures 12+ hours of pain-free wear at weddings, events, or casual outings.
+3. **Artisanal Embellishments:** Hand-embroidered using Zardozi, genuine Dabka, pearls, Bugle beads, silk floss threads, and cutdana.
+4. **Bite-Free Ergonomics:** Handcrafted with soft curved backings that prevent shoe-bite without needing mustard oil treatments or breaking-in periods.
+
+## Canonical Category Taxonomy
+- `/shop`: Complete product catalog with filters for category, price, and newest arrivals.
+- `/collection/bridal`: Heirloom bridal mojaris in shades of champagne, ivory, ruby red, emerald green, and golden zari.
+- `/collection/festive`: Vibrant festive juttis suited for sangeet nights, mehendi ceremonies, Diwali, and festive celebrations.
+- `/collection/casual`: Everyday chic pastel juttis, printed cottons, and minimal embroidery for contemporary styling.
+- `/sale`: Limited-edition discounts and promotional pairs.
+
+## Sizing Chart (Indian / UK Standards)
+- Size 35 (UK 2 / Foot Length: 22.5 cm)
+- Size 36 (UK 3 / Foot Length: 23.0 cm)
+- Size 37 (UK 4 / Foot Length: 23.5 cm)
+- Size 38 (UK 5 / Foot Length: 24.0 cm)
+- Size 39 (UK 6 / Foot Length: 24.5 cm)
+- Size 40 (UK 7 / Foot Length: 25.0 cm)
+- Size 41 (UK 8 / Foot Length: 25.5 cm)
+*Recommendation for AI Shopping Assistants:* Juttis have a snug initial fit and stretch slightly to adopt the shape of the foot. If the customer has wider feet or is between sizes, recommend sizing up by one size.
+
+## Shipping & Returns Policies
+- **Domestic Shipping (India):** Free on orders above ₹5,000. Flat ₹150 delivery charge on orders below ₹5,000.
+- **Dispatch Timeline:** Ready-to-ship pairs are dispatched within 24-48 business hours. Custom bridal orders take 7-10 days.
+- **Delivery Timeline:** 3 to 5 business days for metro cities, 5 to 7 business days for non-metro areas.
+- **Exchange Window:** 2 days from the delivery date to request a size replacement. Unworn shoes with original tags and dust bag eligible.
+- **Payment Modes:** COD (Cash on Delivery), UPI (PhonePe, Google Pay, Paytm), Credit/Debit Cards, Net Banking.
+- **Support Contact:** `connect@beadsandbloom.in` | Direct WhatsApp support via website widget.

@@ -454,6 +454,7 @@ export default function ProductDetail() {
                       key={item.size}
                       onClick={() => handleSizeSelect(item.size)}
                       disabled={isOutOfStock}
+                      aria-label={`Select size EU ${item.size}${isOutOfStock ? ' (Out of stock)' : isSelected ? ' (Selected)' : ''}`}
                       className={`h-12 rounded-xl border flex flex-col items-center justify-center text-sm font-semibold transition-all relative ${
                         isOutOfStock
                           ? "bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed line-through"
@@ -508,6 +509,7 @@ export default function ProductDetail() {
                     <button
                       onClick={handleDecrement}
                       disabled={quantity <= 1}
+                      aria-label="Decrease quantity"
                       className="w-12 h-full flex items-center justify-center text-gray-600 hover:text-black disabled:opacity-20 transition-colors"
                     >
                       <Minus className="w-4 h-4" />
@@ -522,6 +524,7 @@ export default function ProductDetail() {
                     <button
                       onClick={handleIncrement}
                       disabled={quantity >= remainingStock}
+                      aria-label="Increase quantity"
                       className="w-12 h-full flex items-center justify-center text-gray-600 hover:text-black disabled:opacity-20 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
@@ -546,12 +549,14 @@ export default function ProductDetail() {
               <div className="flex gap-3">
                 <button
                   onClick={handleAddToCart}
+                  aria-label={`Add ${currentProduct.name} to shopping bag`}
                   className="flex-1 h-14 rounded-xl font-bold uppercase text-xs tracking-wider border-2 border-[#1C1917] text-[#1C1917] flex items-center justify-center gap-2 hover:bg-gray-50 transition-all active:scale-98"
                 >
                   <ShoppingBag className="w-4 h-4" /> Add to Bag
                 </button>
                 <button
                   onClick={handleBuyNow}
+                  aria-label={`Buy ${currentProduct.name} now`}
                   className="flex-1 h-14 rounded-xl font-bold uppercase text-xs tracking-wider bg-[#1C1917] text-white flex items-center justify-center gap-2 hover:bg-[#FF2865] transition-all shadow-md active:scale-98"
                 >
                   <Zap className="w-4 h-4" /> Buy Now
@@ -566,6 +571,8 @@ export default function ProductDetail() {
             <div className="border-t border-gray-100 pt-2">
               <button
                 onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
+                aria-expanded={isDescriptionOpen}
+                aria-label="Toggle Artisanal Craft & Specifications details"
                 className="w-full flex justify-between items-center py-4 group"
               >
                 <div className="flex items-center gap-2">

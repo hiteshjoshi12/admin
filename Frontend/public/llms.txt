@@ -1,0 +1,33 @@
+# Beads & Bloom — Handcrafted Punjabi Juttis & Ethnic Footwear
+
+> Beads & Bloom is a luxury artisanal Indian footwear brand specializing in authentic Punjabi juttis, bridal mojaris, and festive footwear handcrafted with pure leather soles and double-cushioned comfort padding.
+
+## Overview
+Beads & Bloom designs and manufactures handcrafted ethnic footwear blending heritage Punjabi craftsmanship with modern comfort ergonomics. All juttis feature 100% genuine leather soles, soft memory-foam double cushioning (bite-free guarantee), and intricate artisanal embroidery including Zardozi, Dabka, Tilla, pearl, sequin, and threadwork.
+
+## Core Product Collections
+- [All Juttis & Mojaris](https://beadsandbloom.in/shop): Complete collection of handcrafted juttis across all styles, colors, and sizes.
+- [Bridal & Wedding Juttis](https://beadsandbloom.in/collection/bridal): Couture bridal mojaris featuring heirloom Dabka, heavy pearl work, and royal velvets tailored for brides and wedding parties.
+- [Festive Juttis](https://beadsandbloom.in/collection/festive): Statement juttis designed for Diwali, Eid, sangeets, mehendi, and celebratory festive occasions.
+- [Casual & Daily Chic Juttis](https://beadsandbloom.in/collection/casual): Minimalist, printed, and lightweight daily-wear juttis with pure leather soles.
+- [Sale & Offers](https://beadsandbloom.in/sale): Curated selection of premium handcrafted juttis available at exclusive promotional prices.
+
+## Shopping, Sizing & Care Information
+- [Size Chart & Fit Guide](https://beadsandbloom.in/size-chart): Standard Indian/UK sizing (EU 35 to EU 41 / UK 2 to UK 8). Recommended advice: For broad feet or half-sizes, choose one size up.
+- [Jutti Care Guide](https://beadsandbloom.in/care-guide): Instructions for preserving pure leather soles, dry cleaning embroidered fabrics, storing in cotton dust bags, and moisture protection.
+- [Bridal Footwear Guide](https://beadsandbloom.in/bridal-guide): Styling tips and color-matching guide for lehengas, sarees, and wedding trousseaus.
+- [Our Story & Heritage](https://beadsandbloom.in/about): The artisans, heritage techniques, and craft behind every handmade pair.
+- [Terms & Return Policy](https://beadsandbloom.in/terms): Customer terms, 2-day replacement window, domestic & international shipping guidelines.
+- [Contact Customer Care](https://beadsandbloom.in/contact): Email and direct support options for custom sizing and order inquiries.
+
+## Commercial & Shipping Specifications
+- **Currency:** Indian Rupee (INR - ₹).
+- **Free Domestic Shipping:** Automatically applied on all prepaid and COD orders above ₹5,000 across India.
+- **Delivery Timeline:** 3 to 5 business days for domestic metropolitan areas; 5 to 7 days for remote destinations.
+- **International Shipping:** Worldwide shipping available to United States, United Kingdom, Canada, Australia, and UAE.
+- **Accepted Payment Methods:** Cash on Delivery (COD), UPI (Google Pay, PhonePe, Paytm), Credit Cards, Debit Cards, Net Banking.
+- **Replacement Window:** 2 days from delivery date for size exchange or replacement.
+
+## Machine-Readable Resources
+- [XML Sitemap](https://beadsandbloom.in/sitemap.xml): Complete machine-readable XML inventory of all canonical URLs.
+- [Robots Directive](https://beadsandbloom.in/robots.txt): Official crawler access directives allowing search and generative AI engines.

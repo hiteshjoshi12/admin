@@ -11,7 +11,6 @@ import ChatWidget from './components/ChatWidget';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Inventory from './pages/admin/Inventory';
 
 // ... (Your Lazy Imports) ...
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -36,6 +35,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
 const DashboardHome = lazy(() => import('./pages/admin/DashboardHome'));
 const ProductForm = lazy(() => import('./pages/admin/ProductForm'));
+const Inventory = lazy(() => import('./pages/admin/Inventory'));
 const CMS = lazy(() => import('./pages/admin/CMS'));
 const Orders = lazy(() => import('./pages/admin/Orders'));
 const AdminOrderDetails = lazy(() => import('./pages/admin/OrderDetails'));
