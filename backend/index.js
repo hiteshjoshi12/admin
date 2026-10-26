@@ -40,8 +40,7 @@ app.get('/api/test-ip', (req, res) => {
     reqIp: req.ip,
     reqIps: req.ips,
     rawXForwardedFor: req.headers['x-forwarded-for'],
-    rawXRealIp: req.headers['x-real-ip'],
-    remoteAddress: req.socket?.remoteAddress
+    headers: req.headers
   });
 });
 
