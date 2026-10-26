@@ -61,6 +61,7 @@ connectDB();
 app.use('/api/products', publicReadLimiter);
 app.use('/api/collections', publicReadLimiter);
 app.use('/api/content', publicReadLimiter);
+app.use('/api/bestsellers', publicReadLimiter);
 
 // Global API Rate Limiting for other routes
 app.use('/api', apiLimiter);

@@ -60,7 +60,7 @@ const apiLimiter = rateLimit({
   skip: (req) => {
     // Let public catalog GET requests be governed by publicReadLimiter
     if (req.method === 'GET') {
-      const p = req.baseUrl || req.path || '';
+      const p = req.originalUrl || (req.baseUrl + req.path) || '';
       return p.includes('/products') || p.includes('/collections') || p.includes('/content') || p.includes('/bestsellers');
     }
     return false;
