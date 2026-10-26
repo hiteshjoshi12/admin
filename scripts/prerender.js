@@ -30,7 +30,14 @@ function getChromePath() {
   } else if (process.platform === 'darwin') {
     return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
   } else {
-    const candidates = ['/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium-browser', '/usr/bin/chromium', 'google-chrome'];
+    const candidates = [
+      '/usr/bin/google-chrome',
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium',
+      'google-chrome',
+      'chromium'
+    ];
     for (const bin of candidates) {
       try {
         execSync(`which ${bin}`, { stdio: 'ignore' });
@@ -64,7 +71,7 @@ function cleanRootHtml(rawRoot) {
   return cleaned.trim();
 }
 
-async function startPreviewServer(distDir, port) {
+async function startPreviewServer(port) {
   return new Promise((resolve, reject) => {
     const previewProcess = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
       cwd: path.join(__dirname, '../Frontend'),
@@ -81,10 +88,6 @@ async function startPreviewServer(distDir, port) {
           resolve(previewProcess);
         }
       }
-    });
-
-    previewProcess.stderr.on('data', (data) => {
-      // console.error(`Preview stderr: ${data}`);
     });
 
     setTimeout(() => {
@@ -104,9 +107,9 @@ async function runPrerender() {
 
   const port = 4173;
   console.log(`[prerender] Starting Vite preview server on port ${port}...`);
-  const serverProcess = await startPreviewServer(path.join(__dirname, '../Frontend/dist'), port);
+  const serverProcess = await startPreviewServer(port);
 
-  // Give server 1 second to stabilize
+  // Allow server to stabilize
   await new Promise(r => setTimeout(r, 1000));
 
   const results = {};
@@ -119,7 +122,7 @@ async function runPrerender() {
 
       try {
         const rawOutput = execSync(
-          `"${chromePath}" --headless --disable-gpu --virtual-time-budget=5000 --dump-dom "${url}"`,
+          `"${chromePath}" --headless --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --virtual-time-budget=5000 --dump-dom "${url}"`,
           {
             encoding: 'utf8',
             maxBuffer: 20 * 1024 * 1024,
@@ -162,12 +165,12 @@ async function runPrerender() {
       }
     }
   } finally {
-    // Kill preview server
+    // Kill preview server process tree
     try {
       if (process.platform === 'win32') {
         execSync(`taskkill /pid ${serverProcess.pid} /T /F`, { stdio: 'ignore' });
       } else {
-        serverProcess.kill('SIGTERM');
+        execSync(`kill -9 ${serverProcess.pid} 2>/dev/null || true`, { stdio: 'ignore' });
       }
     } catch (e) {}
   }
@@ -191,6 +194,7 @@ async function runPrerender() {
   }
 
   console.log(`\n[prerender] All ${routes.length} static routes successfully captured and validated!\n`);
+  process.exit(0);
 }
 
 runPrerender().catch(err => {
