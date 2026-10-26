@@ -15,6 +15,7 @@ import Footer from './components/Footer';
 // ... (Your Lazy Imports) ...
 const HomePage = lazy(() => import('./pages/HomePage'));
 const About = lazy(() => import('./pages/About'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const SizeChart = lazy(() => import('./pages/SizeChart'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -119,6 +120,7 @@ function App() {
             <Route path="/resetpassword/:token" element={<ResetPassword />} />
             <Route path="/track-order" element={<TrackOrder />} />
             <Route path="/about" element={<About />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/size-chart" element={<SizeChart />} />
             <Route path="/contact" element={<Contact />} />

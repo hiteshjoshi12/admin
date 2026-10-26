@@ -11,7 +11,7 @@ const SITE_URL = routesManifest.siteUrl || 'https://beadsandbloom.in';
 const STATIC_PAGE_CONFIGS = routesManifest.staticRoutes;
 const PRIVATE_ROUTES = routesManifest.privateRoutes;
 
-// Helper to escape HTML attributes to prevent XSS and broken tags
+// Helper to escape HTML attributes to prevent XSS and broken tags (used ONLY in HTML tags)
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -46,11 +46,12 @@ function getBreadcrumbsSchema(crumbs) {
   };
 }
 
-// Product Schema Generator (Strictly omitting MerchantReturnPolicy due to no-refund policy)
+// Product Schema Generator (Real SKU, all gallery images, real stock availability, NO shipping/return claims)
 function getProductSchema(product) {
-  const inStock = Array.isArray(product.stock)
-    ? product.stock.reduce((acc, item) => acc + (item.quantity || 0), 0) > 0
-    : true;
+  const totalStock = product.totalStock !== undefined 
+    ? product.totalStock 
+    : (Array.isArray(product.stock) ? product.stock.reduce((acc, item) => acc + (item.quantity || 0), 0) : 0);
+  const inStock = totalStock > 0;
 
   const imageList = [];
   if (product.image) imageList.push(product.image);
@@ -60,22 +61,25 @@ function getProductSchema(product) {
     });
   }
   const images = imageList.length > 0 ? imageList : [`${SITE_URL}/logo.png`];
+  const productUrl = `${SITE_URL}/product/${product.slug}`;
+  const realSku = product.sku && String(product.sku).trim() ? String(product.sku).trim() : String(product.slug);
 
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     image: images,
-    description: product.description || `Handcrafted ${product.name} ethnic jutti with pure leather soles by Beads and Bloom.`,
-    sku: String(product._id || product.slug),
+    description: product.description || `Handcrafted ${product.name} with pure leather soles by Beads and Bloom.`,
+    sku: realSku,
+    url: productUrl,
     brand: {
       '@type': 'Brand',
       name: 'Beads and Bloom'
     },
-    category: 'Clothing > Shoes > Traditional Footwear > Juttis & Mojaris',
+    category: 'Traditional Footwear > Juttis & Mojaris',
     offers: {
       '@type': 'Offer',
-      url: `${SITE_URL}/product/${product.slug}`,
+      url: productUrl,
       priceCurrency: 'INR',
       price: product.price,
       priceValidUntil: '2027-12-31',
@@ -84,33 +88,6 @@ function getProductSchema(product) {
       seller: {
         '@type': 'Organization',
         name: 'Beads and Bloom'
-      },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        shippingRate: {
-          '@type': 'MonetaryAmount',
-          value: product.price >= 4999 ? '0' : '100',
-          currency: 'INR'
-        },
-        shippingDestination: {
-          '@type': 'DefinedRegion',
-          addressCountry: 'IN'
-        },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 1,
-            maxValue: 2,
-            unitCode: 'DAY'
-          },
-          transitTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 3,
-            maxValue: 7,
-            unitCode: 'DAY'
-          }
-        }
       }
     }
   };
@@ -127,8 +104,8 @@ function getProductSchema(product) {
 
   const breadcrumbs = getBreadcrumbsSchema([
     { name: 'Home', url: '/' },
-    { name: 'Shop', url: '/shop' },
-    { name: product.name, url: `/product/${product.slug}` }
+    { name: 'The Collection', url: '/shop' },
+    { name: product.name, url: productUrl }
   ]);
 
   return {
@@ -148,11 +125,7 @@ function getHomeSchema() {
         name: 'Beads and Bloom',
         alternateName: ['Beads & Bloom', 'Beads and Bloom India'],
         url: SITE_URL,
-        logo: {
-          '@type': 'ImageObject',
-          url: `${SITE_URL}/logo.png`,
-          caption: 'Beads and Bloom Handcrafted Juttis'
-        },
+        logo: `${SITE_URL}/logo.png`,
         description: 'Luxury handcrafted Punjabi juttis, bridal mojris & festive footwear with genuine leather soles and dual-density memory foam cushioning.',
         email: 'connect@beadsandbloom.in',
         sameAs: ['https://www.instagram.com/beadsnbloom.india'],
@@ -182,19 +155,18 @@ function getHomeSchema() {
   };
 }
 
-// Collection Page Schema Generator
-function getCollectionSchema(title, description, canonicalUrl) {
-  const shortName = title.split('—')[0].replace('The ', '').trim();
+// Collection Page Schema Generator (Uses clean collection displayName, never full page title)
+function getCollectionSchema(displayName, description, canonicalUrl) {
   return {
     '@context': 'https://schema.org',
     '@graph': [
       getBreadcrumbsSchema([
         { name: 'Home', url: '/' },
-        { name: shortName, url: canonicalUrl }
+        { name: displayName, url: canonicalUrl }
       ]),
       {
         '@type': 'CollectionPage',
-        name: title,
+        name: displayName,
         description: description,
         url: canonicalUrl
       }
@@ -203,18 +175,17 @@ function getCollectionSchema(title, description, canonicalUrl) {
 }
 
 // Generic Content Page Schema Generator
-function getContentPageSchema(title, description, canonicalUrl) {
-  const shortName = title.split('—')[0].split('|')[0].trim();
+function getContentPageSchema(displayName, description, canonicalUrl) {
   return {
     '@context': 'https://schema.org',
     '@graph': [
       getBreadcrumbsSchema([
         { name: 'Home', url: '/' },
-        { name: shortName, url: canonicalUrl }
+        { name: displayName, url: canonicalUrl }
       ]),
       {
         '@type': 'WebPage',
-        name: title,
+        name: displayName,
         description: description,
         url: canonicalUrl
       }
@@ -227,6 +198,9 @@ function getContentPageSchema(title, description, canonicalUrl) {
  */
 function injectMetaTags(rawHtml, { title, description, canonical, ogImage, ogUrl, noindex = false, schema = null }) {
   let html = rawHtml;
+
+  // Clean up any stray meta name="title"
+  html = html.replace(/<meta\s+name=["']title["'][^>]*>\s*/gi, '');
 
   // 1. Title tag replacement
   const cleanTitle = escapeHtml(title);
@@ -264,23 +238,26 @@ function injectMetaTags(rawHtml, { title, description, canonical, ogImage, ogUrl
     html = html.replace('</head>', `${robotsDirective}\n</head>`);
   }
 
-  // 5. Open Graph & Twitter Tags
+  // 5. Open Graph & Twitter Tags (Clean replacement without duplicating or leaving template logo.png)
   const targetOgUrl = ogUrl || canonical || SITE_URL;
   const targetOgImage = ogImage || `${SITE_URL}/logo.png`;
 
+  // OG tags
   html = html.replace(/<meta\s+property=["']og:title["'][^>]*>/i, `<meta property="og:title" content="${cleanTitle}" />`);
   html = html.replace(/<meta\s+property=["']og:description["'][^>]*>/i, `<meta property="og:description" content="${cleanDesc}" />`);
   html = html.replace(/<meta\s+property=["']og:url["'][^>]*>/i, `<meta property="og:url" content="${escapeHtml(targetOgUrl)}" />`);
   html = html.replace(/<meta\s+property=["']og:image["'][^>]*>/i, `<meta property="og:image" content="${escapeHtml(targetOgImage)}" />`);
 
-  html = html.replace(/<meta\s+property=["']twitter:title["'][^>]*>/i, `<meta property="twitter:title" content="${cleanTitle}" />`);
-  html = html.replace(/<meta\s+property=["']twitter:description["'][^>]*>/i, `<meta property="twitter:description" content="${cleanDesc}" />`);
-  html = html.replace(/<meta\s+property=["']twitter:url["'][^>]*>/i, `<meta property="twitter:url" content="${escapeHtml(targetOgUrl)}" />`);
-  html = html.replace(/<meta\s+property=["']twitter:image["'][^>]*>/i, `<meta property="twitter:image" content="${escapeHtml(targetOgImage)}" />`);
+  // Twitter tags (standardized to name="twitter:...")
+  html = html.replace(/<meta\s+(?:name|property)=["']twitter:title["'][^>]*>/i, `<meta name="twitter:title" content="${cleanTitle}" />`);
+  html = html.replace(/<meta\s+(?:name|property)=["']twitter:description["'][^>]*>/i, `<meta name="twitter:description" content="${cleanDesc}" />`);
+  html = html.replace(/<meta\s+(?:name|property)=["']twitter:url["'][^>]*>/i, `<meta name="twitter:url" content="${escapeHtml(targetOgUrl)}" />`);
+  html = html.replace(/<meta\s+(?:name|property)=["']twitter:image["'][^>]*>/i, `<meta name="twitter:image" content="${escapeHtml(targetOgImage)}" />`);
 
-  // 6. JSON-LD Structured Data injection into head
+  // 6. JSON-LD Structured Data injection (Pure JSON escaping, escaping '<' to '\u003c')
   if (schema) {
-    const schemaScript = `\n<script type="application/ld+json" id="route-schema-jsonld">\n${JSON.stringify(schema, null, 2)}\n</script>\n`;
+    const jsonEscaped = JSON.stringify(schema, null, 2).replace(/</g, '\\u003c');
+    const schemaScript = `\n<script type="application/ld+json" id="route-schema-jsonld">\n${jsonEscaped}\n</script>\n`;
     if (html.includes('id="route-schema-jsonld"')) {
       html = html.replace(/<script\s+type=["']application\/ld\+json["']\s+id=["']route-schema-jsonld["']>[\s\S]*?<\/script>/i, schemaScript);
     } else {
@@ -313,7 +290,8 @@ async function processSeoRoute(reqPath, rawHtml) {
     return {
       statusCode: 200,
       headers: { 'X-Robots-Tag': 'noindex, nofollow' },
-      html
+      html,
+      lastModified: '2026-10-26T12:00:00.000Z'
     };
   }
 
@@ -321,12 +299,14 @@ async function processSeoRoute(reqPath, rawHtml) {
   if (STATIC_PAGE_CONFIGS[normalizedPath]) {
     const config = STATIC_PAGE_CONFIGS[normalizedPath];
     let schema = null;
+    const displayName = config.displayName || config.title.split('—')[0].split('|')[0].trim();
+
     if (normalizedPath === '/') {
       schema = getHomeSchema();
     } else if (normalizedPath.startsWith('/collection/') || normalizedPath === '/shop' || normalizedPath === '/sale') {
-      schema = getCollectionSchema(config.title, config.description, config.canonical);
+      schema = getCollectionSchema(displayName, config.description, config.canonical);
     } else {
-      schema = getContentPageSchema(config.title, config.description, config.canonical);
+      schema = getContentPageSchema(displayName, config.description, config.canonical);
     }
 
     const html = injectMetaTags(rawHtml, {
@@ -339,7 +319,8 @@ async function processSeoRoute(reqPath, rawHtml) {
     return {
       statusCode: 200,
       headers: {},
-      html
+      html,
+      lastModified: '2026-10-26T12:00:00.000Z'
     };
   }
 
@@ -360,7 +341,8 @@ async function processSeoRoute(reqPath, rawHtml) {
       return {
         statusCode: 200,
         headers: {},
-        html: injectMetaTags(rawHtml, cachedData)
+        html: injectMetaTags(rawHtml, cachedData),
+        lastModified: cachedData.lastModified || '2026-10-26T12:00:00.000Z'
       };
     }
 
@@ -375,6 +357,7 @@ async function processSeoRoute(reqPath, rawHtml) {
         const canonical = `${SITE_URL}/product/${product.slug}`;
         const ogImage = product.images?.[0] || product.image || `${SITE_URL}/logo.png`;
         const schema = getProductSchema(product);
+        const lastModified = product.updatedAt ? product.updatedAt.toISOString() : '2026-10-26T12:00:00.000Z';
 
         const seoPayload = {
           title,
@@ -383,7 +366,8 @@ async function processSeoRoute(reqPath, rawHtml) {
           ogImage,
           ogUrl: canonical,
           noindex: false,
-          schema
+          schema,
+          lastModified
         };
 
         seoCache.set(cacheKey, seoPayload);
@@ -391,7 +375,8 @@ async function processSeoRoute(reqPath, rawHtml) {
         return {
           statusCode: 200,
           headers: {},
-          html: injectMetaTags(rawHtml, seoPayload)
+          html: injectMetaTags(rawHtml, seoPayload),
+          lastModified
         };
       }
 
@@ -429,7 +414,8 @@ function getNotFoundResponse(rawHtml) {
   return {
     statusCode: 404,
     headers: { 'X-Robots-Tag': 'noindex, nofollow' },
-    html
+    html,
+    lastModified: '2026-10-26T12:00:00.000Z'
   };
 }
 

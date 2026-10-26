@@ -77,13 +77,13 @@ const orderLimiter = rateLimit({
   message: { message: 'Too many orders attempted from this IP, please try again after 15 minutes' }
 });
 
-// 3. Auth Limiter (Prevent Brute Force on Login / Register)
+// 3. Auth Limiter (Prevent Brute Force on Login / Register / OTP / Password Reset)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 25,
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: 'Too many login attempts from this IP, please try again after 15 minutes' }
+  message: { message: 'Too many authentication attempts from this IP, please try again after 15 minutes.' }
 });
 
 // 4. Contact Form Limiter (Prevent Email Flooding / Gmail Quota Exhaustion)
@@ -95,7 +95,16 @@ const contactLimiter = rateLimit({
   message: { message: 'Too many contact submissions from this IP, please try again after 15 minutes' }
 });
 
-// 5. Public Read Endpoint Limiter (Permits healthy crawler throughput and catalog browsing)
+// 5. Coupon Verification Limiter (Prevent Coupon Code Brute-Forcing / Enumeration)
+const couponLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many coupon verification attempts from this IP, please try again after 15 minutes.' }
+});
+
+// 6. Public Read Endpoint Limiter (Permits healthy crawler throughput and catalog browsing)
 const publicReadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 2000,
@@ -105,4 +114,4 @@ const publicReadLimiter = rateLimit({
   message: { message: 'Too many catalog requests from this IP, please try again shortly.' }
 });
 
-module.exports = { apiLimiter, orderLimiter, authLimiter, contactLimiter, publicReadLimiter };
+module.exports = { apiLimiter, orderLimiter, authLimiter, contactLimiter, couponLimiter, publicReadLimiter };

@@ -20,11 +20,30 @@ const sitemapRoutes = require('./routes/sitemapRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const { apiLimiter, publicReadLimiter } = require('./middleware/rateLimiter');
 const { processSeoRoute } = require('./utils/seoRenderer');
+const crypto = require('crypto');
 
 const app = express();
 
+// Disable X-Powered-By
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.removeHeader('X-Powered-By');
+  next();
+});
+
 // Trust LiteSpeed front-end reverse proxy (1 hop)
 app.set('trust proxy', 1);
+
+// Debug endpoint for X-Forwarded-For spoofing verification
+app.get('/api/test-ip', (req, res) => {
+  res.json({
+    reqIp: req.ip,
+    reqIps: req.ips,
+    rawXForwardedFor: req.headers['x-forwarded-for'],
+    rawXRealIp: req.headers['x-real-ip'],
+    remoteAddress: req.socket?.remoteAddress
+  });
+});
 
 // 1. WWW to Non-WWW 301 Normalization
 app.use((req, res, next) => {
@@ -136,10 +155,10 @@ app.use(async (req, res, next) => {
     return res.status(404).type('text/plain').send('Asset not found');
   }
 
-  // Prevent caching of SPA shell HTML
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+  // Allow client conditional caching (no-cache allows validation via ETag / Last-Modified)
+  res.setHeader('Cache-Control', 'no-cache');
+  res.removeHeader('Pragma');
+  res.removeHeader('Expires');
 
   const rawHtml = getIndexHtml();
   if (!rawHtml) {
@@ -159,6 +178,25 @@ app.use(async (req, res, next) => {
       for (const [hName, hVal] of Object.entries(result.headers)) {
         res.setHeader(hName, hVal);
       }
+    }
+
+    // Compute deterministic ETag and Last-Modified
+    const etag = `W/"${Buffer.byteLength(result.html).toString(16)}-${crypto.createHash('md5').update(result.html).digest('base64').slice(0, 27)}"`;
+    res.setHeader('ETag', etag);
+
+    const lastMod = result.lastModified ? new Date(result.lastModified).toUTCString() : 'Mon, 26 Oct 2026 12:00:00 GMT';
+    res.setHeader('Last-Modified', lastMod);
+
+    // Conditional 304 Check: If-None-Match
+    const clientEtag = req.headers['if-none-match'];
+    if (clientEtag && (clientEtag === etag || clientEtag === etag.replace(/^W\//, '') || clientEtag.includes(etag))) {
+      return res.status(304).end();
+    }
+
+    // Conditional 304 Check: If-Modified-Since
+    const ifModifiedSince = req.headers['if-modified-since'];
+    if (ifModifiedSince && new Date(ifModifiedSince) >= new Date(lastMod)) {
+      return res.status(304).end();
     }
 
     return res.status(result.statusCode || 200).type('html').send(result.html);

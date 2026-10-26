@@ -16,19 +16,21 @@ const getSitemap = async (req, res) => {
 
     const smStream = new SitemapStream({ hostname });
 
-    // 2. Core Pages & Topical Categories
-    smStream.write({ url: '/', changefreq: 'daily', priority: 1.0 });
-    smStream.write({ url: '/shop', changefreq: 'daily', priority: 0.9 });
-    smStream.write({ url: '/sale', changefreq: 'daily', priority: 0.8 });
-    smStream.write({ url: '/collection/bridal', changefreq: 'weekly', priority: 0.8 });
-    smStream.write({ url: '/collection/festive', changefreq: 'weekly', priority: 0.8 });
-    smStream.write({ url: '/collection/casual', changefreq: 'weekly', priority: 0.8 });
-    smStream.write({ url: '/about', changefreq: 'monthly', priority: 0.7 });
-    smStream.write({ url: '/bridal-guide', changefreq: 'weekly', priority: 0.8 });
-    smStream.write({ url: '/care-guide', changefreq: 'weekly', priority: 0.8 });
-    smStream.write({ url: '/size-chart', changefreq: 'monthly', priority: 0.6 });
-    smStream.write({ url: '/contact', changefreq: 'monthly', priority: 0.5 });
-    smStream.write({ url: '/terms', changefreq: 'monthly', priority: 0.5 });
+    const STATIC_LASTMOD = '2026-10-26T12:00:00.000Z';
+
+    // 2. Core Pages & Topical Categories (Excludes /sale and private routes)
+    smStream.write({ url: '/', changefreq: 'daily', priority: 1.0, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/shop', changefreq: 'daily', priority: 0.9, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/collection/bridal', changefreq: 'weekly', priority: 0.8, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/collection/festive', changefreq: 'weekly', priority: 0.8, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/collection/casual', changefreq: 'weekly', priority: 0.8, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/about', changefreq: 'monthly', priority: 0.7, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/bridal-guide', changefreq: 'weekly', priority: 0.8, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/care-guide', changefreq: 'weekly', priority: 0.8, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/size-chart', changefreq: 'monthly', priority: 0.6, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/contact', changefreq: 'monthly', priority: 0.5, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/terms', changefreq: 'monthly', priority: 0.5, lastmod: STATIC_LASTMOD });
+    smStream.write({ url: '/privacy-policy', changefreq: 'monthly', priority: 0.5, lastmod: STATIC_LASTMOD });
 
     // 3. Dynamic Products from MongoDB with Google Image Extensions
     const products = await Product.find({}, 'name slug images image updatedAt').lean();
