@@ -97,8 +97,9 @@ app.get('/robots.txt', (req, res) => {
   res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /admin/*\nDisallow: /profile\nDisallow: /myorders\nDisallow: /order/\nDisallow: /cart\nDisallow: /checkout\nDisallow: /wishlist\nDisallow: /login\nDisallow: /signup\nDisallow: /forgot-password\nDisallow: /resetpassword/\nDisallow: /track-order\n\nSitemap: https://beadsandbloom.in/sitemap.xml\n`);
 });
 
-// Serve static assets from the 'dist' directory
+// Serve static assets from the 'dist' directory (index: false prevents static middleware from intercepting root '/')
 app.use(express.static(distPath, {
+  index: false,
   maxAge: '1y',
   immutable: true,
   setHeaders: (res, filePath) => {
