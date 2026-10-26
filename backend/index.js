@@ -34,16 +34,6 @@ app.use((req, res, next) => {
 // Trust LiteSpeed front-end reverse proxy (1 hop)
 app.set('trust proxy', 1);
 
-// Debug endpoint for X-Forwarded-For spoofing verification
-app.get('/api/test-ip', (req, res) => {
-  res.json({
-    reqIp: req.ip,
-    reqIps: req.ips,
-    rawXForwardedFor: req.headers['x-forwarded-for'],
-    headers: req.headers
-  });
-});
-
 // 1. WWW to Non-WWW 301 Normalization
 app.use((req, res, next) => {
   const host = req.headers.host || '';
