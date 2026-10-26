@@ -19,7 +19,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import confetti from "canvas-confetti";
+import { fireConfetti } from "../util/confetti";
 
 // REDUX IMPORTS
 import { useDispatch, useSelector } from "react-redux";
@@ -169,7 +169,7 @@ export default function Checkout() {
         setShowAvailableCoupons(false);
         toast.success(`Coupon "${data.code}" applied! Saved ₹${data.discountAmount.toLocaleString()}`);
         try {
-          confetti({
+          fireConfetti({
             particleCount: 80,
             spread: 60,
             origin: { y: 0.6 },

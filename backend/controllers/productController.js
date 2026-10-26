@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 const NodeCache = require("node-cache");
 const { flushSeoCache } = require("../utils/seoRenderer");
+const { pingIndexNow } = require("../utils/indexNow");
 
 const mongoose = require("mongoose");
 
@@ -193,6 +194,11 @@ const createProduct = async (req, res) => {
     const createdProduct = await product.save();
     cache.flushAll(); 
     flushSeoCache();
+    pingIndexNow([
+      `https://beadsandbloom.in/product/${createdProduct.slug}`,
+      'https://beadsandbloom.in/shop',
+      'https://beadsandbloom.in/sitemap.xml'
+    ]).catch(() => {});
     res.status(201).json(createdProduct);
   } catch (error) {
     console.error("Create Product Error:", error);
@@ -287,6 +293,11 @@ const updateProduct = async (req, res) => {
     const updatedProduct = await product.save();
     cache.flushAll(); 
     flushSeoCache();
+    pingIndexNow([
+      `https://beadsandbloom.in/product/${updatedProduct.slug}`,
+      'https://beadsandbloom.in/shop',
+      'https://beadsandbloom.in/sitemap.xml'
+    ]).catch(() => {});
     res.json(updatedProduct);
   } catch (error) {
     console.error("Update Product Error:", error);
@@ -304,6 +315,10 @@ const deleteProduct = async (req, res) => {
       await product.deleteOne();
       cache.flushAll(); 
       flushSeoCache();
+      pingIndexNow([
+        'https://beadsandbloom.in/shop',
+        'https://beadsandbloom.in/sitemap.xml'
+      ]).catch(() => {});
       res.json({ message: "Product removed" });
     } else {
       res.status(404).json({ message: "Product not found" });

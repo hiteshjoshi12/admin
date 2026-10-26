@@ -9,7 +9,9 @@ const {
   renderShopRoot,
   renderCollectionRoot,
   renderProductRoot,
-  renderAboutRoot
+  renderAboutRoot,
+  getOptimizedImageUrl,
+  getImageSrcSet
 } = require('./rootGenerators');
 
 // In-memory cache for dynamic SEO lookups (TTL 5 minutes)
@@ -291,6 +293,29 @@ function injectMetaTags(rawHtml, { title, description, canonical, ogImage, ogUrl
     }
   }
 
+  // 7. Search Engine Verification Tags (Bing & Google)
+  const googleVerification = process.env.GOOGLE_SITE_VERIFICATION || 'google-site-verification-token';
+  const bingVerification = process.env.BING_SITE_VERIFICATION || 'BING_VERIFICATION_TOKEN';
+  if (!html.includes('name="google-site-verification"')) {
+    html = html.replace('</head>', `<meta name="google-site-verification" content="${googleVerification}" />\n</head>`);
+  }
+  if (!html.includes('name="msvalidate.01"')) {
+    html = html.replace('</head>', `<meta name="msvalidate.01" content="${bingVerification}" />\n</head>`);
+  }
+
+  // 8. LCP Image Preload with ImageKit transformations, srcset and sizes
+  if (preloadImage && preloadImage.href) {
+    const preloadTag = `<link rel="preload" as="image" href="${escapeHtml(preloadImage.href)}"${preloadImage.imagesrcset ? ` imagesrcset="${escapeHtml(preloadImage.imagesrcset)}"` : ''}${preloadImage.imagesizes ? ` imagesizes="${escapeHtml(preloadImage.imagesizes)}"` : ''} fetchpriority="high" />`;
+    if (html.includes('rel="preload" as="image"') || html.includes('as="image" rel="preload"')) {
+      html = html.replace(/<link\s+[^>]*rel=["']preload["'][^>]*as=["']image["'][^>]*\/?>/i, preloadTag);
+    } else {
+      html = html.replace('</head>', `${preloadTag}\n</head>`);
+    }
+  } else {
+    // Clean up any default template banner preload if current route does not use it
+    html = html.replace(/<link\s+[^>]*rel=["']preload["'][^>]*as=["']image["'][^>]*\/?>\s*/gi, '');
+  }
+
   return html;
 }
 
@@ -346,6 +371,7 @@ async function processSeoRoute(reqPath, rawHtml) {
     let schema = null;
     let innerRootHtml = '';
     const displayName = config.displayName || config.title.split('—')[0].split('|')[0].trim();
+    let preloadImage = null;
 
     try {
       if (normalizedPath === '/') {
@@ -355,10 +381,23 @@ async function processSeoRoute(reqPath, rawHtml) {
           Product.find({ isActive: { $ne: false } }).sort({ createdAt: -1 }).limit(4).lean()
         ]);
         innerRootHtml = renderHomeRoot(siteContent, featuredProducts);
+        const heroImage = siteContent?.heroSlides?.[0]?.image || 'https://ik.imagekit.io/hiteshh12/editorial/banner1_7npLvX_g6.png';
+        preloadImage = {
+          href: getOptimizedImageUrl(heroImage, 1200),
+          imagesrcset: getImageSrcSet(heroImage, [480, 768, 1200, 1600]),
+          imagesizes: '100vw'
+        };
       } else if (normalizedPath === '/shop' || normalizedPath === '/sale') {
         schema = getCollectionSchema(displayName, config.description, config.canonical);
         const products = await Product.find({ isActive: { $ne: false } }).sort({ createdAt: -1 }).lean();
         innerRootHtml = renderShopRoot(products);
+        if (products.length > 0 && products[0].image) {
+          preloadImage = {
+            href: getOptimizedImageUrl(products[0].image, 600),
+            imagesrcset: getImageSrcSet(products[0].image, [360, 480, 600, 800]),
+            imagesizes: '(max-width: 768px) 50vw, 25vw'
+          };
+        }
       } else if (normalizedPath.startsWith('/collection/')) {
         schema = getCollectionSchema(displayName, config.description, config.canonical);
         let categoryQuery = /bridal/i;
@@ -367,6 +406,13 @@ async function processSeoRoute(reqPath, rawHtml) {
 
         const products = await Product.find({ isActive: { $ne: false }, category: categoryQuery }).sort({ createdAt: -1 }).lean();
         innerRootHtml = renderCollectionRoot(displayName, config.description, products);
+        if (products.length > 0 && products[0].image) {
+          preloadImage = {
+            href: getOptimizedImageUrl(products[0].image, 600),
+            imagesrcset: getImageSrcSet(products[0].image, [360, 480, 600, 800]),
+            imagesizes: '(max-width: 768px) 50vw, 25vw'
+          };
+        }
       } else if (normalizedPath === '/about') {
         schema = getContentPageSchema(displayName, config.description, config.canonical);
         const siteContent = await SiteContent.findOne().lean();
@@ -385,7 +431,8 @@ async function processSeoRoute(reqPath, rawHtml) {
       description: config.description,
       canonical: config.canonical,
       noindex: false,
-      schema
+      schema,
+      preloadImage
     });
 
     if (innerRootHtml) {
@@ -441,6 +488,13 @@ async function processSeoRoute(reqPath, rawHtml) {
         const schema = getProductSchema(product);
         const lastModified = product.updatedAt ? product.updatedAt.toISOString() : '2026-10-26T12:00:00.000Z';
 
+        const lcpImage = product.images?.[0] || product.image;
+        const preloadImage = lcpImage ? {
+          href: getOptimizedImageUrl(lcpImage, 600),
+          imagesrcset: getImageSrcSet(lcpImage, [360, 600, 900, 1200]),
+          imagesizes: '(max-width: 768px) 100vw, 600px'
+        } : null;
+
         let html = injectMetaTags(rawHtml, {
           title,
           description,
@@ -449,7 +503,8 @@ async function processSeoRoute(reqPath, rawHtml) {
           ogUrl: canonical,
           noindex: false,
           schema,
-          lastModified
+          lastModified,
+          preloadImage
         });
 
         // Inject semantic product markup into #root

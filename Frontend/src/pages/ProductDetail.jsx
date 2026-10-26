@@ -319,12 +319,7 @@ export default function ProductDetail() {
       {/* MAIN PRODUCT DETAIL GRID */}
       <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 py-6 flex flex-col lg:flex-row items-start gap-10 xl:gap-14">
         {/* LEFT: GALLERY (Sticky on desktop to eliminate blank space as right info scrolls) */}
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full lg:w-3/5 lg:sticky lg:top-28 lg:self-start"
-        >
+        <div className="w-full lg:w-3/5 lg:sticky lg:top-28 lg:self-start">
           <ProductGallery
             images={currentProduct.images || (currentProduct.image ? [currentProduct.image] : [])}
             productName={currentProduct.name}
@@ -332,15 +327,10 @@ export default function ProductDetail() {
             onToggleWishlist={handleWishlistToggle}
             imageDetails={currentProduct.imageDetails || []}
           />
-        </motion.div>
+        </div>
 
         {/* RIGHT: INFO & ACTIONS */}
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-          className="w-full lg:w-2/5 space-y-6"
-        >
+        <div className="w-full lg:w-2/5 space-y-6">
             {/* Header info */}
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
@@ -752,7 +742,7 @@ export default function ProductDetail() {
                 </li>
               </ul>
             </div>
-          </motion.div>
+          </div>
         </div>
 
       {/* THE ARTISANAL TRIAD (01, 02, 03 Numbered Feature Cards) */}

@@ -95,6 +95,15 @@ const fs = require('fs');
 
 const distPath = path.join(__dirname, 'dist');
 
+const { INDEXNOW_KEY } = require('./utils/indexNow');
+
+// Explicit IndexNow key route
+app.get(`/${INDEXNOW_KEY}.txt`, (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.send(INDEXNOW_KEY);
+});
+
 // Explicit robots.txt handler with short cache header (preventing 1-year immutable caching)
 app.get('/robots.txt', (req, res) => {
   const robotsPath = path.join(distPath, 'robots.txt');

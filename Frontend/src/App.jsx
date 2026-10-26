@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from 'react'; 
+import { Suspense, lazy, useEffect, useState } from 'react'; 
 import { Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'; 
 import { useDispatch, useSelector } from 'react-redux';
 import { syncCartToBackend } from './redux/cartSlice';
@@ -7,10 +7,11 @@ import { Toaster } from 'react-hot-toast';
 
 // ... (Your Static Imports for Admin, Components, Layouts) ...
 import AdminRoute from './components/AdminRoute'; 
-import ChatWidget from './components/ChatWidget';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+
+const ChatWidget = lazy(() => import('./components/ChatWidget'));
 
 // ... (Your Lazy Imports) ...
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -61,12 +62,48 @@ const ScrollToTop = () => {
   return null;
 };
 
+const LazyChatWidget = () => {
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const handleInteraction = () => {
+      setShouldLoad(true);
+      window.removeEventListener('pointerdown', handleInteraction);
+      window.removeEventListener('scroll', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
+
+    window.addEventListener('pointerdown', handleInteraction, { passive: true });
+    window.addEventListener('scroll', handleInteraction, { passive: true });
+    window.addEventListener('touchstart', handleInteraction, { passive: true });
+    window.addEventListener('keydown', handleInteraction, { passive: true });
+
+    const timer = setTimeout(() => setShouldLoad(true), 6000);
+
+    return () => {
+      window.removeEventListener('pointerdown', handleInteraction);
+      window.removeEventListener('scroll', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  if (!shouldLoad) return null;
+  return (
+    <Suspense fallback={null}>
+      <ChatWidget />
+    </Suspense>
+  );
+};
+
 const PublicLayout = () => (
   <>
     <Navbar />
     <main className="min-h-screen"> <Outlet /> </main>
     <Footer />
-    <ChatWidget />
+    <LazyChatWidget />
   </>
 );
 

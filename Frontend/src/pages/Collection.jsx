@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { ChevronDown, Loader2, Heart, Sparkles, HeartHandshake, Ruler } from "lucide-react";
-import { getOptimizedImage } from "../util/imageUtils";
+import { getOptimizedImage, getImageSrcSet } from "../util/imageUtils";
 import { toast } from "react-hot-toast";
 
 // REDUX
@@ -278,12 +278,13 @@ export default function Collection() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16">
-            {sortedProducts.map((product) => (
+            {sortedProducts.map((product, idx) => (
               <ProductCard 
                 key={product._id} 
                 product={product} 
                 wishlist={wishlistItems} 
                 textColor={config.text}
+                isLcp={idx === 0}
               />
             ))}
           </div>
@@ -412,7 +413,7 @@ export default function Collection() {
 }
 
 // --- REUSABLE PRODUCT CARD (Matches Shop.jsx) ---
-function ProductCard({ product, wishlist, textColor }) {
+function ProductCard({ product, wishlist, textColor, isLcp = false }) {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
   
@@ -420,6 +421,7 @@ function ProductCard({ product, wishlist, textColor }) {
   const isOutOfStock = product.totalStock === 0;
 
   const optimizedMain = getOptimizedImage(product.image, 600);
+  const srcSetMain = getImageSrcSet(product.image, [360, 480, 600, 800]);
   const optimizedHover = product.images?.[1] ? getOptimizedImage(product.images[1], 600) : optimizedMain;
   
   const handleWishlist = (e) => {
@@ -441,6 +443,12 @@ function ProductCard({ product, wishlist, textColor }) {
           <div className="relative aspect-[3/4] bg-[#f0f0f0] overflow-hidden rounded-xl">
              <img 
                src={optimizedMain} 
+               srcSet={srcSetMain}
+               sizes="(max-width: 768px) 50vw, 25vw"
+               width="300"
+               height="400"
+               loading={isLcp ? "eager" : "lazy"}
+               fetchPriority={isLcp ? "high" : "auto"}
                alt={product.name} 
                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isOutOfStock ? "grayscale opacity-80" : "group-hover:scale-105"} ${optimizedHover !== optimizedMain ? "group-hover:opacity-0" : ""}`} 
              />
@@ -448,6 +456,9 @@ function ProductCard({ product, wishlist, textColor }) {
              {optimizedHover !== optimizedMain && !isOutOfStock && (
                 <img 
                   src={optimizedHover} 
+                  loading="lazy"
+                  width="300"
+                  height="400"
                   alt={product.name} 
                   className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] opacity-0 group-hover:opacity-100 group-hover:scale-105" 
                 />

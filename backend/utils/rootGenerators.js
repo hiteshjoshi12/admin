@@ -14,6 +14,25 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;');
 }
 
+function getOptimizedImageUrl(url, width = 600) {
+  if (!url) return '';
+  let safeUrl = String(url).trim().replace(/ /g, '%20');
+  if (safeUrl.includes('ik.imagekit.io')) {
+    const transformation = `tr=w-${width},f-webp,q-auto`;
+    if (safeUrl.includes('?')) {
+      if (safeUrl.includes('tr=')) return safeUrl;
+      return `${safeUrl}&${transformation}`;
+    }
+    return `${safeUrl}?${transformation}`;
+  }
+  return safeUrl;
+}
+
+function getImageSrcSet(url, widths = [360, 600, 900, 1200]) {
+  if (!url || !url.includes('ik.imagekit.io')) return '';
+  return widths.map(w => `${getOptimizedImageUrl(url, w)} ${w}w`).join(', ');
+}
+
 /**
  * 1. Homepage Semantic Markup
  * Uses the exact same slide data as React's HeroNew.jsx (/api/content / SiteContent)
@@ -33,7 +52,17 @@ function renderHomeRoot(siteContent, featuredProducts = []) {
     <div class="group relative flex flex-col">
       <a href="/product/${p.slug}" class="block relative mb-4">
         <div class="relative aspect-[3/4] bg-[#f8f8f8] overflow-hidden rounded-xl">
-          <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" class="w-full h-full object-cover" />
+          <img 
+            src="${escapeHtml(getOptimizedImageUrl(p.image, 600))}" 
+            srcset="${escapeHtml(getImageSrcSet(p.image, [360, 480, 600, 800]))}"
+            sizes="(max-width: 768px) 50vw, 25vw"
+            width="300"
+            height="400"
+            alt="${escapeHtml(p.name)}" 
+            loading="lazy" 
+            decoding="async" 
+            class="w-full h-full object-cover" 
+          />
         </div>
       </a>
       <div class="text-center">
@@ -50,7 +79,16 @@ function renderHomeRoot(siteContent, featuredProducts = []) {
       <!-- 1. Hero Showcase -->
       <section class="relative h-[88vh] md:h-screen w-full overflow-hidden bg-[#1C1917]">
         <div class="absolute inset-0">
-          <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(line1)} ${escapeHtml(line2)}" fetchpriority="high" class="w-full h-full object-cover object-center" />
+          <img 
+            src="${escapeHtml(getOptimizedImageUrl(heroImage, 1200))}" 
+            srcset="${escapeHtml(getImageSrcSet(heroImage, [480, 768, 1200, 1600]))}"
+            sizes="100vw"
+            width="1200"
+            height="800"
+            alt="${escapeHtml(line1)} ${escapeHtml(line2)}" 
+            fetchpriority="high" 
+            class="w-full h-full object-cover object-center" 
+          />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/40"></div>
         </div>
         <div class="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4 pt-16 md:pt-20">
@@ -205,9 +243,13 @@ function renderCollectionRoot(displayName, description, products = []) {
       <a href="/product/${p.slug}" class="block relative mb-4">
         <div class="relative aspect-[3/4] bg-[#f8f8f8] overflow-hidden rounded-xl">
           <img 
-            src="${escapeHtml(p.image)}" 
+            src="${escapeHtml(getOptimizedImageUrl(p.image, 600))}" 
+            srcset="${escapeHtml(getImageSrcSet(p.image, [360, 480, 600, 800]))}"
+            sizes="(max-width: 768px) 50vw, 25vw"
+            width="300"
+            height="400"
             alt="${escapeHtml(p.name)}" 
-            ${idx < 4 ? 'fetchpriority="high"' : 'loading="lazy"'} 
+            ${idx === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} 
             decoding="async" 
             class="w-full h-full object-cover" 
           />
@@ -286,7 +328,11 @@ function renderProductRoot(product) {
         <div class="w-full lg:w-3/5">
           <div class="relative aspect-[3/4] bg-[#f8f8f8] overflow-hidden rounded-2xl shadow-xs">
             <img 
-              src="${escapeHtml(mainImage)}" 
+              src="${escapeHtml(getOptimizedImageUrl(mainImage, 600))}" 
+              srcset="${escapeHtml(getImageSrcSet(mainImage, [360, 600, 900, 1200]))}"
+              sizes="(max-width: 768px) 100vw, 600px"
+              width="600"
+              height="600"
               alt="${escapeHtml(product.name)}" 
               fetchpriority="high" 
               class="w-full h-full object-cover object-center" 
@@ -296,7 +342,14 @@ function renderProductRoot(product) {
             <div class="grid grid-cols-4 gap-3 mt-4">
               ${images.slice(0, 4).map(img => `
                 <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                  <img src="${escapeHtml(img)}" alt="${escapeHtml(product.name)}" loading="lazy" class="w-full h-full object-cover" />
+                  <img 
+                    src="${escapeHtml(getOptimizedImageUrl(img, 200))}" 
+                    width="100" 
+                    height="100" 
+                    alt="${escapeHtml(product.name)}" 
+                    loading="lazy" 
+                    class="w-full h-full object-cover" 
+                  />
                 </div>
               `).join('')}
             </div>
@@ -495,5 +548,7 @@ module.exports = {
   renderCollectionRoot,
   renderProductRoot,
   renderAboutRoot,
-  escapeHtml
+  escapeHtml,
+  getOptimizedImageUrl,
+  getImageSrcSet
 };

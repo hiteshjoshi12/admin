@@ -28,3 +28,8 @@ export const getOptimizedImage = (url, width = 600) => {
   // Fallback: Return safely spaced URL
   return safeUrl;
 };
+
+export const getImageSrcSet = (url, widths = [360, 600, 900, 1200]) => {
+  if (!url || !url.includes('ik.imagekit.io')) return '';
+  return widths.map(w => `${getOptimizedImage(url, w)} ${w}w`).join(', ');
+};

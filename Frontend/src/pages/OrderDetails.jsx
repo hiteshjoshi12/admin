@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '../util/confetti';
 import { API_BASE_URL } from '../util/config';
 import SEO from '../components/seo/SEO';
 
@@ -26,7 +26,7 @@ export default function OrderDetails() {
   useEffect(() => {
     if (isNewOrder) {
       try {
-        confetti({
+        fireConfetti({
           particleCount: 90,
           spread: 70,
           origin: { y: 0.6 },

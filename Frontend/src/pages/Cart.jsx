@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ArrowLeft, Tag, X, MapPin, ShieldCheck, Truck, RotateCcw, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion'; 
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '../util/confetti';
 import { toast } from 'react-hot-toast'; 
 import SEO from '../components/seo/SEO';
 
@@ -192,7 +192,7 @@ export default function Cart() {
         }));
         setCouponCode('');
         toast.success(`Coupon "${data.code}" Applied!`);
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FF2865', '#1C1917', '#ffffff'] });
+        fireConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FF2865', '#1C1917', '#ffffff'] });
       } else {
         setError(data.message);
         toast.error(data.message);

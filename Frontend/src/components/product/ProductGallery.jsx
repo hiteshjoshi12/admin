@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ZoomIn, ChevronLeft, ChevronRight, Heart, Sparkles, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getOptimizedImage } from '../../util/imageUtils';
+import { getOptimizedImage, getImageSrcSet } from '../../util/imageUtils';
 
 const DEFAULT_PERSPECTIVES = [
   'On-Foot / Model',
@@ -155,8 +155,11 @@ export default function ProductGallery({
               <motion.img 
                 key={activeIndex}
                 src={optimizedImages[activeIndex]} 
-                alt={`${productName} view ${activeIndex + 1} - ${getPerspectiveLabel(activeIndex)}`} 
-                initial={{ opacity: 0.5, scale: 0.98 }}
+                srcSet={getImageSrcSet(validImages[activeIndex], [360, 600, 900, 1200])}
+                sizes="(max-width: 768px) 100vw, 600px"
+                width="600"
+                height="600"
+                initial={activeIndex === 0 ? false : { opacity: 0.5, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0.5, scale: 0.98 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
