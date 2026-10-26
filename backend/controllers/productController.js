@@ -9,6 +9,10 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 320 });
 
 const getProductBySlug = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     const slugOrId = req.params.slug;
     const isObjectId = mongoose.Types.ObjectId.isValid(slugOrId);
 

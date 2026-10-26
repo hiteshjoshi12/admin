@@ -32,18 +32,24 @@ export const fetchProductDetails = createAsyncThunk(
   'products/fetchDetails', 
   async (slug, { rejectWithValue }) => {
     try {
-      // ✅ Now calling the slug-based endpoint
-      const response = await fetch(`${API_BASE_URL}/api/products/${slug}`);
+      const url = `${API_BASE_URL}/api/products/${slug}?_cb=${Date.now()}`;
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'application/json'
+        },
+        cache: 'no-store'
+      });
       
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Product not found');
+        throw new Error(data.message || `HTTP ${response.status}: Product not found`);
       }
       
       return data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      console.error('[fetchProductDetails Error]:', slug, error.message);
+      return rejectWithValue(error.message || 'Product not found');
     }
   }
 );

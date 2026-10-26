@@ -231,15 +231,18 @@ export default function ProductDetail() {
 
   if (loading || (!currentProduct && !error)) return <ProductDetailSkeleton />;
 
-  if (error || !currentProduct)
+  if (error || !currentProduct) {
     return (
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+      <div className="min-h-screen flex items-center justify-center flex-col gap-4 text-center px-4">
         <p className="text-xl font-serif text-red-500">Product Not Found</p>
-        <Link to="/shop" className="underline hover:text-[#FF2865]">
+        {error && <p className="text-xs text-red-400 font-mono">Error: {String(error)}</p>}
+        <p className="text-xs text-gray-400 font-mono">Slug: {slug}</p>
+        <Link to="/shop" className="underline hover:text-[#FF2865] mt-2 text-sm font-semibold">
           Return to Shop
         </Link>
       </div>
     );
+  }
 
   const productUrl = `${SITE_URL}/product/${currentProduct.slug}`;
   const mainImage = currentProduct.images?.[0] || currentProduct.image || `${SITE_URL}/logo.png`;
