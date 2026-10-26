@@ -23,6 +23,9 @@ const { processSeoRoute } = require('./utils/seoRenderer');
 
 const app = express();
 
+// Trust LiteSpeed front-end reverse proxy (1 hop)
+app.set('trust proxy', 1);
+
 // 1. WWW to Non-WWW 301 Normalization
 app.use((req, res, next) => {
   const host = req.headers.host || '';
@@ -53,18 +56,6 @@ app.use(express.json({
 
 // Database Connection
 connectDB();
-
-// Temporary debug route for trust proxy hop inspection
-app.get('/api/debug-proxy', (req, res) => {
-  res.json({
-    reqIp: req.ip,
-    remoteAddress: req.socket?.remoteAddress,
-    xForwardedFor: req.headers['x-forwarded-for'],
-    xRealIp: req.headers['x-real-ip'],
-    trustProxy: app.get('trust proxy'),
-    ips: req.ips
-  });
-});
 
 // Public GET read endpoints receive generous throughput
 app.use('/api/products', publicReadLimiter);
