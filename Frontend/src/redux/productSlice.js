@@ -4,10 +4,11 @@ import { API_BASE_URL } from '../util/config';
 // 1. ASYNC THUNK: Fetch All Products
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async ({ pageNumber = 1, keyword = '', category, size, priceRange, sort }, { rejectWithValue }) => {
+  async ({ pageNumber = 1, pageSize = 50, keyword = '', category, size, priceRange, sort } = {}, { rejectWithValue }) => {
     try {
       const params = new URLSearchParams();
       params.append('pageNumber', pageNumber);
+      if (pageSize) params.append('pageSize', pageSize);
       if (keyword) params.append('keyword', keyword);
       if (category && category.length > 0) params.append('category', category.join(','));
       if (size && size.length > 0) params.append('size', size.join(','));

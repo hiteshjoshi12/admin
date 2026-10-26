@@ -45,7 +45,7 @@ const getProductById = async (req, res) => {
 
 const getProducts = async (req, res) => {
   try {
-    const pageSize = Number(req.query.pageSize) || 12;
+    const pageSize = Number(req.query.pageSize) || 50;
     const page = Number(req.query.pageNumber) || 1;
     const cacheKey = `products_${JSON.stringify(req.query)}`;
 

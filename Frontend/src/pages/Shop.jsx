@@ -29,8 +29,6 @@ export default function Shop() {
   const { items: wishlistItems } = useSelector((state) => state.wishlist);
 
   // Local State
-  const [allProducts, setAllProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [sortOption, setSortOption] = useState("newest");
   const [filters, setFilters] = useState({
@@ -39,37 +37,23 @@ export default function Shop() {
     priceRange: null,
   });
 
-  // --- FETCH & SYNC LOGIC (Same as before) ---
+  // --- FETCH ALL PRODUCTS (No ?page=N pagination) ---
   useEffect(() => {
     dispatch(
       fetchProducts({
-        pageNumber: currentPage,
+        pageNumber: 1,
+        pageSize: 100,
         category: filters.category,
         size: filters.size,
         priceRange: filters.priceRange,
         sort: sortOption,
       })
     );
-  }, [dispatch, currentPage, filters, sortOption]);
+  }, [dispatch, filters, sortOption]);
 
-  useEffect(() => {
-    if (!loading) {
-      if (currentPage === 1) {
-        setAllProducts(reduxProducts);
-      } else {
-        setAllProducts((prev) => {
-            const existingIds = new Set(prev.map(p => p._id));
-            const newItems = reduxProducts.filter(p => !existingIds.has(p._id));
-            return [...prev, ...newItems];
-        });
-      }
-    }
-  }, [reduxProducts, loading, currentPage]);
-
-  const handleLoadMore = () => { if (currentPage < pages) setCurrentPage((prev) => prev + 1); };
+  const allProducts = reduxProducts || [];
 
   const toggleFilter = (type, value) => {
-    setCurrentPage(1);
     setFilters((prev) => {
       const current = prev[type];
       if (Array.isArray(current)) {
@@ -84,12 +68,10 @@ export default function Shop() {
   };
 
   const clearFilters = () => {
-    setCurrentPage(1);
     setFilters({ category: [], size: [], priceRange: null });
   };
 
   const handleSortChange = (e) => {
-    setCurrentPage(1);
     setSortOption(e.target.value);
   };
 
@@ -200,13 +182,13 @@ export default function Shop() {
         {/* MAIN CONTENT */}
         <div className="flex-1 min-h-[60vh]">
           
-          {/* PRODUCT GRID - More gap for 'gallery' feel */}
+          {/* PRODUCT GRID - All 34 Products in Gallery Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16">
             {allProducts.map((product) => (
               <ProductCard key={product._id} product={product} wishlist={wishlistItems} />
             ))}
             
-            {loading && currentPage === 1 && [...Array(8)].map((_, i) => <ProductSkeleton key={i} />)}
+            {loading && allProducts.length === 0 && [...Array(8)].map((_, i) => <ProductSkeleton key={i} />)}
           </div>
 
           {/* EMPTY STATE */}
@@ -220,30 +202,16 @@ export default function Shop() {
             </div>
           )}
 
-          {/* LOAD MORE - Elegant Button */}
-          <div className="text-center mt-24 mb-16">
-            {loading && currentPage > 1 ? (
-                <div className="flex items-center justify-center gap-2">
-                   <Loader2 className="w-5 h-5 animate-spin text-[#1C1917]" />
-                   <span className="text-xs uppercase tracking-widest text-gray-400">Loading...</span>
-                </div>
-            ) : (
-                currentPage < pages && (
-                    <button onClick={handleLoadMore} className="group relative px-10 py-4 overflow-hidden rounded-full border border-[#1C1917] bg-transparent text-[#1C1917] transition-all hover:bg-[#1C1917] hover:text-white">
-                       <span className="relative z-10 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
-                          Load More
-                       </span>
-                    </button>
-                )
-            )}
-            {!loading && allProducts.length > 0 && currentPage >= pages && (
-               <div className="flex items-center justify-center gap-4 opacity-30 mt-12">
-                  <div className="h-[1px] w-16 bg-gray-900"></div>
-                  <span className="text-[9px] uppercase tracking-[0.3em] font-serif italic">Fin</span>
-                  <div className="h-[1px] w-16 bg-gray-900"></div>
-               </div>
-            )}
-          </div>
+          {/* CATALOG FOOTER */}
+          {!loading && allProducts.length > 0 && (
+            <div className="text-center mt-20 mb-12">
+              <div className="flex items-center justify-center gap-4 opacity-40">
+                <div className="h-[1px] w-16 bg-gray-900"></div>
+                <span className="text-[10px] uppercase tracking-[0.3em] font-serif italic text-gray-700">All {allProducts.length} Artisanal Styles Displayed</span>
+                <div className="h-[1px] w-16 bg-gray-900"></div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -373,6 +341,8 @@ function ProductCard({ product, wishlist }) {
              <img 
                src={optimizedMain} 
                alt={product.name} 
+               loading="lazy"
+               decoding="async"
                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isOutOfStock ? "grayscale opacity-80" : "group-hover:scale-105"} ${optimizedHover !== optimizedMain ? "group-hover:opacity-0" : ""}`} 
              />
              
@@ -381,6 +351,8 @@ function ProductCard({ product, wishlist }) {
                 <img 
                   src={optimizedHover} 
                   alt={product.name} 
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] opacity-0 group-hover:opacity-100 group-hover:scale-105" 
                 />
              )}

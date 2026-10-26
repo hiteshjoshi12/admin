@@ -2,10 +2,28 @@ const fs = require('fs');
 const path = require('path');
 const NodeCache = require('node-cache');
 const Product = require('../models/Product');
+const SiteContent = require('../models/SiteContent');
 const routesManifest = require('./routesManifest.json');
+const {
+  renderHomeRoot,
+  renderShopRoot,
+  renderCollectionRoot,
+  renderProductRoot
+} = require('./rootGenerators');
 
 // In-memory cache for dynamic SEO lookups (TTL 5 minutes)
 const seoCache = new NodeCache({ stdTTL: 300, checkperiod: 320 });
+
+// Load build-time prerendered static routes
+let prerenderedStatic = {};
+try {
+  const prerenderFile = path.join(__dirname, 'prerendered-static.json');
+  if (fs.existsSync(prerenderFile)) {
+    prerenderedStatic = JSON.parse(fs.readFileSync(prerenderFile, 'utf8'));
+  }
+} catch (e) {
+  console.warn('Could not load prerendered-static.json:', e.message);
+}
 
 const SITE_URL = routesManifest.siteUrl || 'https://beadsandbloom.in';
 const STATIC_PAGE_CONFIGS = routesManifest.staticRoutes;
@@ -269,6 +287,14 @@ function injectMetaTags(rawHtml, { title, description, canonical, ogImage, ogUrl
 }
 
 /**
+ * Injects semantic SSR markup into <div id="root">
+ */
+function injectRootHtml(html, innerRootHtml) {
+  if (!innerRootHtml) return html;
+  return html.replace(/<div\s+id=["']root["'][^>]*>[\s\S]*?<\/div>/i, `<div id="root">${innerRootHtml}</div>`);
+}
+
+/**
  * Main SEO request processor for Express fallback
  */
 async function processSeoRoute(reqPath, rawHtml) {
@@ -297,30 +323,73 @@ async function processSeoRoute(reqPath, rawHtml) {
 
   // 2. Check Static Known Routes
   if (STATIC_PAGE_CONFIGS[normalizedPath]) {
-    const config = STATIC_PAGE_CONFIGS[normalizedPath];
-    let schema = null;
-    const displayName = config.displayName || config.title.split('—')[0].split('|')[0].trim();
-
-    if (normalizedPath === '/') {
-      schema = getHomeSchema();
-    } else if (normalizedPath.startsWith('/collection/') || normalizedPath === '/shop' || normalizedPath === '/sale') {
-      schema = getCollectionSchema(displayName, config.description, config.canonical);
-    } else {
-      schema = getContentPageSchema(displayName, config.description, config.canonical);
+    const cacheKey = `seo_static_${normalizedPath}`;
+    const cachedData = seoCache.get(cacheKey);
+    if (cachedData) {
+      return {
+        statusCode: 200,
+        headers: {},
+        html: cachedData.html,
+        lastModified: cachedData.lastModified || '2026-10-26T12:00:00.000Z'
+      };
     }
 
-    const html = injectMetaTags(rawHtml, {
+    const config = STATIC_PAGE_CONFIGS[normalizedPath];
+    let schema = null;
+    let innerRootHtml = '';
+    const displayName = config.displayName || config.title.split('—')[0].split('|')[0].trim();
+
+    try {
+      if (normalizedPath === '/') {
+        schema = getHomeSchema();
+        const [siteContent, featuredProducts] = await Promise.all([
+          SiteContent.findOne().lean(),
+          Product.find({ isActive: { $ne: false } }).sort({ createdAt: -1 }).limit(4).lean()
+        ]);
+        innerRootHtml = renderHomeRoot(siteContent, featuredProducts);
+      } else if (normalizedPath === '/shop' || normalizedPath === '/sale') {
+        schema = getCollectionSchema(displayName, config.description, config.canonical);
+        const products = await Product.find({ isActive: { $ne: false } }).sort({ createdAt: -1 }).lean();
+        innerRootHtml = renderShopRoot(products);
+      } else if (normalizedPath.startsWith('/collection/')) {
+        schema = getCollectionSchema(displayName, config.description, config.canonical);
+        let categoryQuery = /bridal/i;
+        if (normalizedPath.includes('festive')) categoryQuery = /festive|party/i;
+        if (normalizedPath.includes('casual')) categoryQuery = /casual|everyday|office/i;
+
+        const products = await Product.find({ isActive: { $ne: false }, category: categoryQuery }).sort({ createdAt: -1 }).lean();
+        innerRootHtml = renderCollectionRoot(displayName, config.description, products);
+      } else {
+        schema = getContentPageSchema(displayName, config.description, config.canonical);
+        innerRootHtml = prerenderedStatic[normalizedPath] || '';
+      }
+    } catch (err) {
+      console.error(`Error generating #root HTML for ${normalizedPath}:`, err.message);
+    }
+
+    let html = injectMetaTags(rawHtml, {
       title: config.title,
       description: config.description,
       canonical: config.canonical,
       noindex: false,
       schema
     });
+
+    if (innerRootHtml) {
+      html = injectRootHtml(html, innerRootHtml);
+    }
+
+    const payload = {
+      html,
+      lastModified: '2026-10-26T12:00:00.000Z'
+    };
+    seoCache.set(cacheKey, payload);
+
     return {
       statusCode: 200,
       headers: {},
       html,
-      lastModified: '2026-10-26T12:00:00.000Z'
+      lastModified: payload.lastModified
     };
   }
 
@@ -341,7 +410,7 @@ async function processSeoRoute(reqPath, rawHtml) {
       return {
         statusCode: 200,
         headers: {},
-        html: injectMetaTags(rawHtml, cachedData),
+        html: cachedData.html,
         lastModified: cachedData.lastModified || '2026-10-26T12:00:00.000Z'
       };
     }
@@ -359,7 +428,7 @@ async function processSeoRoute(reqPath, rawHtml) {
         const schema = getProductSchema(product);
         const lastModified = product.updatedAt ? product.updatedAt.toISOString() : '2026-10-26T12:00:00.000Z';
 
-        const seoPayload = {
+        let html = injectMetaTags(rawHtml, {
           title,
           description,
           canonical,
@@ -368,6 +437,15 @@ async function processSeoRoute(reqPath, rawHtml) {
           noindex: false,
           schema,
           lastModified
+        });
+
+        // Inject semantic product markup into #root
+        const innerRootHtml = renderProductRoot(product);
+        html = injectRootHtml(html, innerRootHtml);
+
+        const seoPayload = {
+          html,
+          lastModified
         };
 
         seoCache.set(cacheKey, seoPayload);
@@ -375,7 +453,7 @@ async function processSeoRoute(reqPath, rawHtml) {
         return {
           statusCode: 200,
           headers: {},
-          html: injectMetaTags(rawHtml, seoPayload),
+          html,
           lastModified
         };
       }
