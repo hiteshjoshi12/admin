@@ -1,6 +1,7 @@
 const SiteContent = require('../models/SiteContent');
 const defaultFestiveContent = require('../data/defaultFestiveContent');
 const defaultAboutContent = require('../data/defaultAboutContent');
+const { flushSeoCache } = require('../utils/seoRenderer');
 
 // @desc    Get site content
 const getContent = async (req, res) => {
@@ -88,6 +89,7 @@ const updateContent = async (req, res) => {
         content.markModified('aboutContent');
       }
       const updatedContent = await content.save();
+      flushSeoCache();
       res.json(updatedContent);
     } else {
       // Create new
@@ -104,6 +106,7 @@ const updateContent = async (req, res) => {
         aboutContent: req.body.aboutContent || defaultAboutContent
       });
       const savedContent = await newContent.save();
+      flushSeoCache();
       res.status(201).json(savedContent);
     }
   } catch (error) {

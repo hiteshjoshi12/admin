@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'Frontend/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 jobs:
@@ -26,6 +28,10 @@ jobs:
           npm install
           npm run build
 
+      - name: Regenerate Prerendered Static Snapshot
+        run: |
+          node scripts/prerender.js
+
       - name: Sync Frontend Build into dist/
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -35,3 +41,13 @@ jobs:
           port: 21
           local-dir: ./Frontend/dist/
           server-dir: ./dist/  # Uploads build directly into your server's dist directory
+
+      - name: Sync Prerendered Snapshot to Server Utils
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          local-dir: ./backend/utils/
+          server-dir: ./utils/

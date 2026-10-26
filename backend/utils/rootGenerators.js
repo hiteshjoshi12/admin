@@ -68,7 +68,6 @@ function renderHomeRoot(siteContent, featuredProducts = []) {
               <span class="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl italic font-light mt-1 md:mt-2 text-[#FD61A7]">
                 ${escapeHtml(line2)}
               </span>
-              <span class="sr-only"> — Handcrafted Punjabi Juttis &amp; Ethnic Footwear</span>
             </h1>
             <div class="mt-6 md:mt-8">
               <a href="${escapeHtml(link)}" class="inline-flex items-center gap-2.5 bg-white text-[#1C1917] px-6 py-2.5 md:px-8 md:py-3.5 text-[11px] md:text-xs font-bold uppercase tracking-[0.2em] rounded-full shadow-2xl">
@@ -79,7 +78,15 @@ function renderHomeRoot(siteContent, featuredProducts = []) {
         </div>
       </section>
 
-      <!-- 2. Category Portals -->
+      <!-- 2. Brand Intro Section -->
+      <section class="max-w-4xl mx-auto px-6 py-10 md:py-14 text-center">
+        <h2 class="text-xs md:text-sm font-bold uppercase tracking-[0.25em] text-[#8B5E3C] mb-3">Handcrafted Punjabi Juttis &amp; Bridal Mojaris</h2>
+        <p class="text-sm md:text-base text-gray-700 font-serif leading-relaxed">
+          Beads &amp; Bloom crafts luxury handcrafted Punjabi juttis and bridal mojaris, embroidered by master artisans with pure leather soles and double-padded cushioning. Designed for modern weddings, festive occasions, and everyday elegance. Enjoy Cash on Delivery (COD) across India and express worldwide shipping for trousseaus across the globe.
+        </p>
+      </section>
+
+      <!-- 3. Category Portals -->
       <section class="max-w-[1440px] mx-auto px-6 md:px-12 py-16">
         <div class="text-center max-w-xl mx-auto mb-12">
           <span class="text-[#8B5E3C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-2 block">Curated Editions</span>
@@ -353,10 +360,140 @@ function renderProductRoot(product) {
   `;
 }
 
+/**
+ * 5. About Page Semantic Markup (CMS-Driven from SiteContent.aboutContent)
+ */
+function renderAboutRoot(aboutContent = {}) {
+  const hero = aboutContent.hero || {};
+  const mission = aboutContent.mission || {};
+  const stats = Array.isArray(aboutContent.stats) && aboutContent.stats.length > 0 ? aboutContent.stats : [
+    { number: "15,000+", label: "Happy Feet", desc: "Celebrated across India & 18+ international countries" },
+    { number: "24+ Hrs", label: "Karigari Per Pair", desc: "Meticulous hand-embroidery by master artisans in Punjab" },
+    { number: "100%", label: "Genuine Leather", desc: "Chemical-free, vegetable-tanned soles that naturally breathe" },
+    { number: "4.9 ★", label: "Patron Rating", desc: "Consistently loved for 10+ hours of continuous, bite-free wear" }
+  ];
+  const pillars = Array.isArray(aboutContent.pillars) ? aboutContent.pillars : [];
+  const values = Array.isArray(aboutContent.values) ? aboutContent.values : [];
+  const founderNote = aboutContent.founderNote || {};
+
+  const statsHtml = stats.map(s => `
+    <div class="p-3">
+      <span class="font-serif text-3xl md:text-4xl font-bold text-[#1C1917] block mb-1">${escapeHtml(s.number)}</span>
+      <span class="text-xs font-bold uppercase tracking-wider text-[#C5A059] block mb-1">${escapeHtml(s.label)}</span>
+      <p class="text-[11px] text-gray-500 font-light leading-snug">${escapeHtml(s.desc)}</p>
+    </div>
+  `).join('');
+
+  const pillarsHtml = pillars.map(p => `
+    <div class="bg-white p-6 md:p-8 rounded-2xl border border-[#EAE0D0] shadow-sm">
+      <span class="text-xs font-bold text-[#C5A059] uppercase tracking-widest block mb-2">${escapeHtml(p.tag || p.number || 'Craft')}</span>
+      <h3 class="font-serif text-xl text-[#1C1917] mb-3">${escapeHtml(p.title)}</h3>
+      <p class="text-sm text-gray-600 font-light leading-relaxed">${escapeHtml(p.desc)}</p>
+    </div>
+  `).join('');
+
+  const valuesHtml = values.map(v => `
+    <div class="bg-white/60 p-6 rounded-xl border border-[#EAE0D0]">
+      <h4 class="font-serif text-lg text-[#1C1917] mb-2">${escapeHtml(v.title)}</h4>
+      <p class="text-xs text-gray-600 font-light leading-relaxed">${escapeHtml(v.desc)}</p>
+    </div>
+  `).join('');
+
+  return `
+    <div class="bg-[#FAF8F5] text-[#1C1917] min-h-screen pt-20">
+      <!-- 1. Hero Section -->
+      <section class="relative w-full pt-10 pb-16 md:pt-16 md:pb-24 px-6 md:px-12 bg-gradient-to-b from-[#FBF8F2] via-[#FAF6ED] to-[#FAF8F5] border-b border-[#EAE0D0]/80">
+        <div class="max-w-5xl mx-auto text-center">
+          <nav aria-label="Breadcrumb" class="mb-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#8B5E3C] font-semibold">
+            <a href="/" class="hover:text-[#1C1917]">Home</a>
+            <span class="opacity-40">/</span>
+            <span class="text-[#1C1917] font-bold">About Us</span>
+          </nav>
+          <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#FAF0DC] border border-[#E4CE9E] text-[#8A5B28] text-[10px] font-bold uppercase tracking-[0.2em] mb-5">
+            <span>${escapeHtml(hero.badge || "The Story Behind Beads & Bloom")}</span>
+          </div>
+          <h1 class="font-serif text-3xl sm:text-5xl md:text-6xl text-[#1C1917] tracking-tight leading-tight mb-6 max-w-4xl mx-auto">
+            ${escapeHtml(hero.title || "Handcrafted Luxury Rooted in Punjab's Timeless Karigari")}
+          </h1>
+          <p class="text-sm md:text-base text-gray-600 font-light max-w-3xl mx-auto leading-relaxed mb-10">
+            ${escapeHtml(hero.subtitle || "Born from a passion to preserve authentic Indian needlecraft while solving the age-old problem of painful ethnic footwear. We engineer heirloom Punjabi juttis with pure leather soles and double-cushioned orthopedic comfort.")}
+          </p>
+          ${hero.heroImage ? `
+            <div class="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-md border border-[#EAE0D0] relative aspect-[16/9] md:aspect-[21/9] bg-[#EFE8DD]">
+              <img src="${escapeHtml(hero.heroImage)}" alt="Beads & Bloom Master Karigari" class="w-full h-full object-cover" />
+            </div>
+          ` : ''}
+        </div>
+      </section>
+
+      <!-- 2. Trust Numbers -->
+      <section class="bg-white border-b border-[#EAE0D0] py-8 px-6">
+        <div class="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
+          ${statsHtml}
+        </div>
+      </section>
+
+      <!-- 3. Brand Genesis / Mission -->
+      ${mission.headline || mission.paragraph1 ? `
+        <section class="py-16 md:py-24 px-6 md:px-12 max-w-5xl mx-auto text-center">
+          <span class="text-xs font-bold uppercase tracking-[0.25em] text-[#8B5E3C] mb-3 block">${escapeHtml(mission.tagline || 'Artisan Heritage')}</span>
+          <h2 class="text-2xl md:text-4xl font-serif text-[#1C1917] mb-6">${escapeHtml(mission.headline || 'Where Heritage Meets Cloud Comfort')}</h2>
+          <div class="space-y-4 max-w-3xl mx-auto text-sm md:text-base text-gray-600 font-light leading-relaxed">
+            ${mission.paragraph1 ? `<p>${escapeHtml(mission.paragraph1)}</p>` : ''}
+            ${mission.paragraph2 ? `<p>${escapeHtml(mission.paragraph2)}</p>` : ''}
+          </div>
+          ${mission.quote ? `
+            <blockquote class="mt-8 font-serif italic text-base md:text-lg text-[#8B5E3C] max-w-2xl mx-auto">
+              "${escapeHtml(mission.quote)}"
+            </blockquote>
+          ` : ''}
+        </section>
+      ` : ''}
+
+      <!-- 4. Craftsmanship Pillars -->
+      ${pillars.length > 0 ? `
+        <section class="py-16 px-6 md:px-12 max-w-6xl mx-auto">
+          <div class="text-center max-w-xl mx-auto mb-12">
+            <span class="text-xs font-bold uppercase tracking-[0.25em] text-[#8B5E3C] mb-2 block">Our Craft Principles</span>
+            <h2 class="text-2xl md:text-3xl font-serif text-[#1C1917]">Heirloom Construction</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            ${pillarsHtml}
+          </div>
+        </section>
+      ` : ''}
+
+      <!-- 5. Core Values -->
+      ${values.length > 0 ? `
+        <section class="py-16 px-6 md:px-12 max-w-5xl mx-auto">
+          <div class="text-center max-w-xl mx-auto mb-10">
+            <h2 class="text-2xl md:text-3xl font-serif text-[#1C1917]">Our Commitment</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${valuesHtml}
+          </div>
+        </section>
+      ` : ''}
+
+      <!-- 6. Founder Note -->
+      ${founderNote.message ? `
+        <section class="py-16 px-6 md:px-12 max-w-4xl mx-auto text-center border-t border-[#EAE0D0]">
+          <h3 class="font-serif text-xl md:text-2xl text-[#1C1917] mb-4">${escapeHtml(founderNote.title || 'A Note from the Founder')}</h3>
+          <p class="text-sm md:text-base text-gray-600 font-serif italic leading-relaxed max-w-2xl mx-auto mb-4">
+            "${escapeHtml(founderNote.message)}"
+          </p>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#8B5E3C] block">${escapeHtml(founderNote.signature || 'Hitesh Joshi, Founder')}</span>
+        </section>
+      ` : ''}
+    </div>
+  `;
+}
+
 module.exports = {
   renderHomeRoot,
   renderShopRoot,
   renderCollectionRoot,
   renderProductRoot,
+  renderAboutRoot,
   escapeHtml
 };

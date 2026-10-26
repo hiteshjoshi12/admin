@@ -113,7 +113,7 @@ export const getProductSchema = (product) => {
     name: product.name,
     image: product.images && product.images.length > 0 ? product.images : [fullImageUrl],
     description: product.description || `Handcrafted ${product.name} ethnic jutti with double-cushioned comfort by Beads and Bloom.`,
-    sku: product._id || product.slug,
+    sku: (product.sku && String(product.sku).trim()) || String(product.slug),
     brand: {
       '@type': 'Brand',
       name: 'Beads and Bloom',
@@ -123,7 +123,6 @@ export const getProductSchema = (product) => {
       url: `${SITE_URL}/product/${product.slug}`,
       priceCurrency: 'INR',
       price: product.price,
-      priceValidUntil: '2027-12-31',
       itemCondition: 'https://schema.org/NewCondition',
       availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       seller: {
@@ -160,7 +159,8 @@ export const getProductSchema = (product) => {
     },
   };
 
-  if (product.numReviews > 0 && product.rating > 0) {
+  // Only add aggregateRating if real, visible reviews exist on the product
+  if (product.numReviews > 0 && Array.isArray(product.reviews) && product.reviews.length > 0 && product.rating > 0) {
     schema.aggregateRating = {
       '@type': 'AggregateRating',
       ratingValue: product.rating.toFixed(1),

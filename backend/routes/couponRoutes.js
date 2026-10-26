@@ -10,11 +10,11 @@ const {
   getStorefrontCoupons 
 } = require('../controllers/couponController');
 const { protect, admin } = require('../middleware/authMiddleware');
-const { couponLimiter } = require('../middleware/rateLimiter');
+const { couponLimiter, accountCouponLimiter } = require('../middleware/rateLimiter');
 
 // --- 1. STATIC ROUTES (MUST BE AT TOP) ---
 // If these are at the bottom, '/:id' will catch them by mistake
-router.post('/verify', couponLimiter, verifyCoupon);
+router.post('/verify', couponLimiter, accountCouponLimiter, verifyCoupon);
 router.get('/active', getStorefrontCoupons);
 
 // --- 2. ROOT ROUTE ---

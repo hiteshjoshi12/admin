@@ -52,7 +52,15 @@ const HomePage = () => {
       {/* 1. Cinematic Hero Showcase */}
       <Hero />
 
-      {/* 2. Editorial Hallmarks Ribbon */}
+      {/* 2. Brand Intro Section */}
+      <section className="max-w-4xl mx-auto px-6 py-10 md:py-14 text-center">
+        <h2 className="text-xs md:text-sm font-bold uppercase tracking-[0.25em] text-[#8B5E3C] mb-3">Handcrafted Punjabi Juttis &amp; Bridal Mojaris</h2>
+        <p className="text-sm md:text-base text-gray-700 font-serif leading-relaxed">
+          Beads &amp; Bloom crafts luxury handcrafted Punjabi juttis and bridal mojaris, embroidered by master artisans with pure leather soles and double-padded cushioning. Designed for modern weddings, festive occasions, and everyday elegance. Enjoy Cash on Delivery (COD) across India and express worldwide shipping for trousseaus across the globe.
+        </p>
+      </section>
+
+      {/* 3. Editorial Hallmarks Ribbon */}
       <EditorialBanner />
 
       {/* 3. Arch Category Portals */}

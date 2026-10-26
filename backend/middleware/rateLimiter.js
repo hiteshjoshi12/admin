@@ -114,4 +114,75 @@ const publicReadLimiter = rateLimit({
   message: { message: 'Too many catalog requests from this IP, please try again shortly.' }
 });
 
-module.exports = { apiLimiter, orderLimiter, authLimiter, contactLimiter, couponLimiter, publicReadLimiter };
+// 7. Per-Account Rate Limiter Generator (Email/Identifier based, independent of client IP/headers)
+function createAccountRateLimiter({
+  windowMs = 5 * 60 * 1000,
+  max = 5,
+  message = 'Too many attempts for this account. Please wait a few moments before trying again.',
+  getKey = (req) => (req.body?.email || req.body?.phoneNumber || '').trim().toLowerCase()
+}) {
+  const store = new Map();
+
+  // Periodic cleanup every 2 minutes
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, record] of store.entries()) {
+      if (now > record.resetTime) {
+        store.delete(key);
+      }
+    }
+  }, 2 * 60 * 1000).unref();
+
+  return (req, res, next) => {
+    try {
+      const key = getKey(req);
+      if (!key) {
+        return next(); // If no identifier provided, defer to IP rate limiter
+      }
+
+      const now = Date.now();
+      let record = store.get(key);
+
+      if (!record || now > record.resetTime) {
+        store.set(key, { count: 1, resetTime: now + windowMs });
+        return next();
+      }
+
+      record.count += 1;
+      if (record.count > max) {
+        return res.status(429).json({ message });
+      }
+
+      next();
+    } catch (err) {
+      next();
+    }
+  };
+}
+
+// Per-account limiter on login, register, and forgot-password (max 5 per 5m)
+const accountAuthLimiter = createAccountRateLimiter({
+  windowMs: 5 * 60 * 1000,
+  max: 5,
+  message: 'Too many attempts for this account. Please wait a few minutes before trying again.'
+});
+
+// Per-account/cart limiter on coupon verify (max 8 per 5m)
+const accountCouponLimiter = createAccountRateLimiter({
+  windowMs: 5 * 60 * 1000,
+  max: 8,
+  message: 'Too many coupon attempts. Please wait a few moments before trying again.',
+  getKey: (req) => (req.body?.email || req.user?.email || req.body?.cartId || '').trim().toLowerCase()
+});
+
+module.exports = { 
+  apiLimiter, 
+  orderLimiter, 
+  authLimiter, 
+  contactLimiter, 
+  couponLimiter, 
+  publicReadLimiter,
+  accountAuthLimiter,
+  accountCouponLimiter
+};
+

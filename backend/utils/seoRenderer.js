@@ -8,21 +8,29 @@ const {
   renderHomeRoot,
   renderShopRoot,
   renderCollectionRoot,
-  renderProductRoot
+  renderProductRoot,
+  renderAboutRoot
 } = require('./rootGenerators');
 
 // In-memory cache for dynamic SEO lookups (TTL 5 minutes)
 const seoCache = new NodeCache({ stdTTL: 300, checkperiod: 320 });
 
-// Load build-time prerendered static routes
-let prerenderedStatic = {};
-try {
-  const prerenderFile = path.join(__dirname, 'prerendered-static.json');
-  if (fs.existsSync(prerenderFile)) {
-    prerenderedStatic = JSON.parse(fs.readFileSync(prerenderFile, 'utf8'));
+// Dynamic build-time prerendered static snapshot loader
+function getPrerenderedStatic() {
+  const candidatePaths = [
+    path.join(__dirname, 'prerendered-static.json'),
+    path.join(__dirname, '../dist/prerendered-static.json'),
+    path.join(process.cwd(), 'dist/prerendered-static.json'),
+    path.join(process.cwd(), 'utils/prerendered-static.json')
+  ];
+  for (const c of candidatePaths) {
+    if (fs.existsSync(c)) {
+      try {
+        return JSON.parse(fs.readFileSync(c, 'utf8'));
+      } catch (e) {}
+    }
   }
-} catch (e) {
-  console.warn('Could not load prerendered-static.json:', e.message);
+  return {};
 }
 
 const SITE_URL = routesManifest.siteUrl || 'https://beadsandbloom.in';
@@ -100,7 +108,6 @@ function getProductSchema(product) {
       url: productUrl,
       priceCurrency: 'INR',
       price: product.price,
-      priceValidUntil: '2027-12-31',
       itemCondition: 'https://schema.org/NewCondition',
       availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       seller: {
@@ -110,7 +117,8 @@ function getProductSchema(product) {
     }
   };
 
-  if (product.numReviews > 0 && product.rating > 0) {
+  // Only add aggregateRating if real, visible reviews exist on the product
+  if (product.numReviews > 0 && Array.isArray(product.reviews) && product.reviews.length > 0 && product.rating > 0) {
     productSchema.aggregateRating = {
       '@type': 'AggregateRating',
       ratingValue: Number(product.rating).toFixed(1),
@@ -328,7 +336,7 @@ async function processSeoRoute(reqPath, rawHtml) {
     if (cachedData) {
       return {
         statusCode: 200,
-        headers: {},
+        headers: { 'X-Cache': 'HIT' },
         html: cachedData.html,
         lastModified: cachedData.lastModified || '2026-10-26T12:00:00.000Z'
       };
@@ -359,9 +367,14 @@ async function processSeoRoute(reqPath, rawHtml) {
 
         const products = await Product.find({ isActive: { $ne: false }, category: categoryQuery }).sort({ createdAt: -1 }).lean();
         innerRootHtml = renderCollectionRoot(displayName, config.description, products);
+      } else if (normalizedPath === '/about') {
+        schema = getContentPageSchema(displayName, config.description, config.canonical);
+        const siteContent = await SiteContent.findOne().lean();
+        innerRootHtml = renderAboutRoot(siteContent?.aboutContent || {});
       } else {
         schema = getContentPageSchema(displayName, config.description, config.canonical);
-        innerRootHtml = prerenderedStatic[normalizedPath] || '';
+        const staticSnapshots = getPrerenderedStatic();
+        innerRootHtml = staticSnapshots[normalizedPath] || '';
       }
     } catch (err) {
       console.error(`Error generating #root HTML for ${normalizedPath}:`, err.message);
@@ -387,7 +400,7 @@ async function processSeoRoute(reqPath, rawHtml) {
 
     return {
       statusCode: 200,
-      headers: {},
+      headers: { 'X-Cache': 'MISS' },
       html,
       lastModified: payload.lastModified
     };
@@ -409,7 +422,7 @@ async function processSeoRoute(reqPath, rawHtml) {
       }
       return {
         statusCode: 200,
-        headers: {},
+        headers: { 'X-Cache': 'HIT' },
         html: cachedData.html,
         lastModified: cachedData.lastModified || '2026-10-26T12:00:00.000Z'
       };
@@ -452,7 +465,7 @@ async function processSeoRoute(reqPath, rawHtml) {
 
         return {
           statusCode: 200,
-          headers: {},
+          headers: { 'X-Cache': 'MISS' },
           html,
           lastModified
         };
