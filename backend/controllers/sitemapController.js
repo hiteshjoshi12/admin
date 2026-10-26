@@ -30,15 +30,30 @@ const getSitemap = async (req, res) => {
     smStream.write({ url: '/contact', changefreq: 'monthly', priority: 0.5 });
     smStream.write({ url: '/terms', changefreq: 'monthly', priority: 0.5 });
 
-    // 3. Dynamic Products from MongoDB
-    const products = await Product.find({}, 'slug updatedAt').lean();
+    // 3. Dynamic Products from MongoDB with Google Image Extensions
+    const products = await Product.find({}, 'name slug images image updatedAt').lean();
     products.forEach((product) => {
       if (product.slug) {
+        const imageList = [];
+        if (product.image) imageList.push(product.image);
+        if (Array.isArray(product.images)) {
+          product.images.forEach((img) => {
+            if (img && !imageList.includes(img)) imageList.push(img);
+          });
+        }
+
+        const imgEntries = imageList.map((imgUrl) => ({
+          url: imgUrl,
+          title: product.name,
+          caption: `${product.name} — Handcrafted Punjabi Jutti by Beads and Bloom`
+        }));
+
         smStream.write({
           url: `/product/${product.slug}`,
           changefreq: 'weekly',
           priority: 0.8,
           lastmod: product.updatedAt ? product.updatedAt.toISOString() : undefined,
+          ...(imgEntries.length > 0 ? { img: imgEntries } : {})
         });
       }
     });

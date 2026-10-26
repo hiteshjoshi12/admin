@@ -276,12 +276,15 @@ export default function ProductDetail() {
   return (
     <div className="bg-[#FAF9F6] min-h-screen pt-20 text-[#1C1917]">
       <SEO
-        title={`${currentProduct.name} Handcrafted Jutti | Beads and Bloom`}
-        description={`Shop ${currentProduct.name}. Premium handcrafted Indian ethnic footwear featuring intricate embroidery and plush double-cushioned comfort in sizes 36-41.`}
+        title={
+          (currentProduct.name + ' | Beads and Bloom').length <= 60
+            ? `${currentProduct.name} | Beads and Bloom`
+            : currentProduct.name
+        }
+        description={`Shop ${currentProduct.name}. Handcrafted Indian jutti with pure leather soles & double-cushioned comfort in EU sizes 36-41.`}
         canonical={`/product/${currentProduct.slug}`}
         type="product"
         image={getOptimizedImage(mainImage, 1000)}
-        keywords={`${currentProduct.name}, handcrafted jutti, bridal mojri, ethnic footwear, punjabi juttis, double cushioned flats`}
         schema={productSchema}
       />
 

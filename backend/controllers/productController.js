@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const NodeCache = require("node-cache");
+const { flushSeoCache } = require("../utils/seoRenderer");
 
 const mongoose = require("mongoose");
 
@@ -191,6 +192,7 @@ const createProduct = async (req, res) => {
 
     const createdProduct = await product.save();
     cache.flushAll(); 
+    flushSeoCache();
     res.status(201).json(createdProduct);
   } catch (error) {
     console.error("Create Product Error:", error);
@@ -284,6 +286,7 @@ const updateProduct = async (req, res) => {
 
     const updatedProduct = await product.save();
     cache.flushAll(); 
+    flushSeoCache();
     res.json(updatedProduct);
   } catch (error) {
     console.error("Update Product Error:", error);
@@ -300,6 +303,7 @@ const deleteProduct = async (req, res) => {
     if (product) {
       await product.deleteOne();
       cache.flushAll(); 
+      flushSeoCache();
       res.json({ message: "Product removed" });
     } else {
       res.status(404).json({ message: "Product not found" });
@@ -324,6 +328,7 @@ const migrateSlugs = async (req, res) => {
       }
     }
     cache.flushAll();
+    flushSeoCache();
     res.json({ message: "Migration successful: Slugs updated." });
   } catch (error) {
     res.status(500).json({ message: error.message });

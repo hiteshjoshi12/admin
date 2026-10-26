@@ -1,4 +1,5 @@
 const Collection = require('../models/Collection');
+const { flushSeoCache } = require('../utils/seoRenderer');
 
 // @desc    Fetch all collections
 // @route   GET /api/collections
@@ -27,6 +28,7 @@ const createCollection = async (req, res) => {
       image,
       isActive
     });
+    flushSeoCache();
     res.status(201).json(collection);
   } catch (error) {
     res.status(500).json({ message: error.message });

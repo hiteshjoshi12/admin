@@ -1,6 +1,7 @@
 const BestSeller = require('../models/BestSeller');
 const Collection = require('../models/Collection');
 const RunwayVideo = require('../models/RunwayVideo');
+const { flushSeoCache } = require('../utils/seoRenderer');
 
 // ==========================================
 // BEST SELLERS MANAGEMENT
@@ -80,6 +81,7 @@ const createCollection = async (req, res) => {
   try {
     const newItem = new Collection(req.body);
     const saved = await newItem.save();
+    flushSeoCache();
     res.status(201).json(saved);
   } catch (error) {
     res.status(500).json({ message: 'Failed to create collection' });
@@ -92,6 +94,7 @@ const createCollection = async (req, res) => {
 const deleteCollection = async (req, res) => {
   try {
     await Collection.findByIdAndDelete(req.params.id);
+    flushSeoCache();
     res.json({ message: 'Deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });

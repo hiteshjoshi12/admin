@@ -130,14 +130,6 @@ export const getProductSchema = (product) => {
         '@type': 'Organization',
         name: 'Beads and Bloom',
       },
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'IN',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 2,
-        returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/FreeReturn',
-      },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
         shippingRate: {

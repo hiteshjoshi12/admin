@@ -57,6 +57,14 @@ const apiLimiter = rateLimit({
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Let public catalog GET requests be governed by publicReadLimiter
+    if (req.method === 'GET') {
+      const p = req.baseUrl || req.path || '';
+      return p.includes('/products') || p.includes('/collections') || p.includes('/content') || p.includes('/bestsellers');
+    }
+    return false;
+  },
   message: { message: 'Too many requests from this IP, please try again after 15 minutes' }
 });
 
@@ -87,4 +95,14 @@ const contactLimiter = rateLimit({
   message: { message: 'Too many contact submissions from this IP, please try again after 15 minutes' }
 });
 
-module.exports = { apiLimiter, orderLimiter, authLimiter, contactLimiter };
+// 5. Public Read Endpoint Limiter (Permits healthy crawler throughput and catalog browsing)
+const publicReadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 2000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method !== 'GET',
+  message: { message: 'Too many catalog requests from this IP, please try again shortly.' }
+});
+
+module.exports = { apiLimiter, orderLimiter, authLimiter, contactLimiter, publicReadLimiter };

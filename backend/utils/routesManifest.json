@@ -1,0 +1,82 @@
+{
+  "siteUrl": "https://beadsandbloom.in",
+  "staticRoutes": {
+    "/": {
+      "title": "Handcrafted Punjabi Juttis | Luxury Bridal, Festive & Casual Mojaris - Beads and Bloom",
+      "description": "Discover luxury handcrafted Punjabi juttis, bridal mojris & festive footwear at Beads and Bloom. Made with pure leather soles & double cushioning. Worldwide shipping & Cash on Delivery (COD) available.",
+      "canonical": "https://beadsandbloom.in/"
+    },
+    "/shop": {
+      "title": "The Collection — Handcrafted Juttis & Mojris | Beads and Bloom",
+      "description": "Explore our complete catalog of handcrafted juttis. From opulent bridal zardosi to chic everyday ethnic flats, find your perfect pair with cushioned comfort.",
+      "canonical": "https://beadsandbloom.in/shop"
+    },
+    "/sale": {
+      "title": "Archive Sale — Exclusive Offers on Handcrafted Juttis | Beads and Bloom",
+      "description": "Limited-time archive event. Enjoy exceptional prices on handcrafted juttis and artisanal mojris. Extra 10% off with code INAUGURAL10.",
+      "canonical": "https://beadsandbloom.in/shop"
+    },
+    "/collection/bridal": {
+      "title": "The Bridal Edit — Luxury Wedding Juttis & Mojris | Beads and Bloom",
+      "description": "Walk down the aisle in sublime comfort. Shop exquisite handcrafted bridal juttis featuring heavy zardosi, pearls, and double-padded soles for wedding ceremonies.",
+      "canonical": "https://beadsandbloom.in/collection/bridal"
+    },
+    "/collection/festive": {
+      "title": "The Festive Edit — Handcrafted Festive Juttis & Mojris | Beads and Bloom",
+      "description": "Shop luxury handcrafted festive juttis & party wear mojris at Beads and Bloom. Featuring authentic mirror work (sheesha), zardozi, dabka & double-cushioned soles.",
+      "canonical": "https://beadsandbloom.in/collection/festive"
+    },
+    "/collection/casual": {
+      "title": "Everyday Chic — Casual & Office Wear Juttis | Beads and Bloom",
+      "description": "Step into effortless elegance with our casual handcrafted juttis. Designed for daily wear and office rotations with lightweight, bite-free cushioned soles.",
+      "canonical": "https://beadsandbloom.in/collection/casual"
+    },
+    "/about": {
+      "title": "Our Story & Artisan Heritage — Handcrafted Luxury Juttis | Beads and Bloom",
+      "description": "Discover Beads & Bloom. Explore our brand story, Punjab artisan heritage, orthopedic dual-density memory foam soles, and ethical craftsmanship.",
+      "canonical": "https://beadsandbloom.in/about"
+    },
+    "/contact": {
+      "title": "Contact Customer Support & Bridal Assistance | Beads and Bloom",
+      "description": "Get in touch with Beads & Bloom. Reach our concierge for sizing guidance, order tracking, bridal customizations, or wholesale inquiries.",
+      "canonical": "https://beadsandbloom.in/contact"
+    },
+    "/size-chart": {
+      "title": "Footwear Size Chart & Fit Guide | Beads and Bloom",
+      "description": "Find your perfect jutti fit with our standard EU size guide. Tips for measuring length, width, and choosing between sizes for handcrafted leather footwear.",
+      "canonical": "https://beadsandbloom.in/size-chart"
+    },
+    "/care-guide": {
+      "title": "Handcrafted Jutti Care & Cleaning Manual | Beads and Bloom",
+      "description": "Learn how to clean, store, and preserve genuine leather and delicate hand-embroidered juttis. Practical tips to protect dabka, zardozi, and mirrors.",
+      "canonical": "https://beadsandbloom.in/care-guide"
+    },
+    "/bridal-guide": {
+      "title": "Bridal Trousseau & Footwear Styling Guide | Beads and Bloom",
+      "description": "Expert styling advice for brides. How to pair bridal juttis with lehengas, sarees, and suits for ceremonies from mehendi to pheras and receptions.",
+      "canonical": "https://beadsandbloom.in/bridal-guide"
+    },
+    "/terms": {
+      "title": "Terms of Service, Shipping & Return Policies | Beads and Bloom",
+      "description": "Read Beads and Bloom terms of service, nationwide shipping details, 48-hour exchange window, and mandatory unboxing video policy.",
+      "canonical": "https://beadsandbloom.in/terms"
+    }
+  },
+  "collectionRoutes": ["bridal", "festive", "casual"],
+  "privateRoutes": [
+    "/cart",
+    "/checkout",
+    "/order-confirmation",
+    "/order-success",
+    "/order",
+    "/track-order",
+    "/wishlist",
+    "/profile",
+    "/myorders",
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/resetpassword",
+    "/admin"
+  ]
+}
