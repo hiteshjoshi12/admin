@@ -164,6 +164,7 @@ const createProduct = async (req, res) => {
 
     const product = new Product({
       name: String(req.body.name || '').trim(),
+      slug: req.body.slug ? String(req.body.slug).trim() : undefined,
       description: String(req.body.description || '').trim(),
       price,
       originalPrice,
@@ -174,8 +175,8 @@ const createProduct = async (req, res) => {
       totalStock,
       isNewArrival: Boolean(req.body.isNewArrival),
       isBestSeller: Boolean(req.body.isBestSeller),
-      rating: req.body.rating ? Number(req.body.rating) : 0,
-      numReviews: req.body.numReviews ? Number(req.body.numReviews) : 0,
+      rating: req.body.rating !== undefined && !isNaN(Number(req.body.rating)) ? Number(req.body.rating) : 0,
+      numReviews: req.body.numReviews !== undefined && !isNaN(Number(req.body.numReviews)) ? Number(req.body.numReviews) : 0,
       
       // Artisanal Specifications
       sku: String(req.body.sku || '').trim(),
@@ -256,7 +257,12 @@ const updateProduct = async (req, res) => {
     
     if (req.body.isNewArrival !== undefined) product.isNewArrival = Boolean(req.body.isNewArrival);
     if (req.body.isBestSeller !== undefined) product.isBestSeller = Boolean(req.body.isBestSeller);
-    if (req.body.slug) product.slug = req.body.slug;
+    if (req.body.slug) product.slug = String(req.body.slug).trim();
+    if (req.body.rating !== undefined && !isNaN(Number(req.body.rating))) product.rating = Number(req.body.rating);
+    if (req.body.numReviews !== undefined && !isNaN(Number(req.body.numReviews))) product.numReviews = Number(req.body.numReviews);
+    if (req.body.oldSlugs && Array.isArray(req.body.oldSlugs)) {
+      product.oldSlugs = req.body.oldSlugs.map(s => String(s).trim()).filter(Boolean);
+    }
 
     // Artisanal Specifications
     if (req.body.sku !== undefined) product.sku = String(req.body.sku).trim();

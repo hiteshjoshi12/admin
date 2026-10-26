@@ -55,15 +55,16 @@ productSchema.index({ createdAt: -1 });
 productSchema.index({ price: 1 });
 
 productSchema.pre('save', async function () {
-  if (this.isModified('name') || !this.slug) {
-    const baseSlug = this.name
+  if (this.isModified('slug') || this.isModified('name') || !this.slug) {
+    const raw = (this.isModified('slug') && this.slug) ? this.slug : (this.name || 'product');
+    const baseSlug = String(raw)
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '') 
       .replace(/[\s_-]+/g, '-')  
       .replace(/^-+|-+$/g, ''); 
 
-    let slug = baseSlug;
+    let slug = baseSlug || 'product';
     let count = 1;
     while (await mongoose.models.Product?.findOne({ slug, _id: { $ne: this._id } })) {
       slug = `${baseSlug}-${count}`;

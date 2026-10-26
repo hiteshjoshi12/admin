@@ -85,7 +85,7 @@ export default function ProductDetail() {
 
   // --- RECENTLY VIEWED LOGIC ---
   useEffect(() => {
-    if (currentProduct && currentProduct.slug === slug) {
+    if (currentProduct && (currentProduct.slug === slug || currentProduct.oldSlugs?.includes(slug))) {
       try {
         const stored = localStorage.getItem("recentlyViewed");
         const existing = stored ? JSON.parse(stored) : [];
@@ -110,6 +110,13 @@ export default function ProductDetail() {
       }
     }
   }, [currentProduct, slug]);
+
+  // CANONICAL SLUG SYNCHRONIZATION (Redirect legacy/old slugs to canonical slug in URL bar)
+  useEffect(() => {
+    if (currentProduct && currentProduct.slug && currentProduct.slug !== slug) {
+      navigate(`/product/${currentProduct.slug}`, { replace: true });
+    }
+  }, [currentProduct, slug, navigate]);
 
   // SCROLL OBSERVER FOR MOBILE STICKY BAR
   useEffect(() => {
@@ -222,7 +229,7 @@ export default function ProductDetail() {
     }
   };
 
-  if (loading) return <ProductDetailSkeleton />;
+  if (loading || (!currentProduct && !error)) return <ProductDetailSkeleton />;
 
   if (error || !currentProduct)
     return (
@@ -730,10 +737,16 @@ export default function ProductDetail() {
                 </Link>
               </div>
               <ul className="text-xs text-gray-600 space-y-1.5 list-disc pl-4 leading-relaxed">
-                <li>
-                  {currentProduct.careInstructions ||
-                    "Keep away from water and damp surfaces; authentic leather absorbs moisture."}
-                </li>
+                {Array.isArray(currentProduct.careInstructions) && currentProduct.careInstructions.length > 0 ? (
+                  currentProduct.careInstructions.map((inst, idx) => (
+                    <li key={idx}>{inst}</li>
+                  ))
+                ) : (
+                  <li>
+                    {currentProduct.careInstructions ||
+                      "Keep away from water and damp surfaces; authentic leather absorbs moisture."}
+                  </li>
+                )}
                 <li>
                   Store in the breathable cotton dust bag provided with silica gel packets.
                 </li>
