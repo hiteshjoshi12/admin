@@ -224,7 +224,7 @@ function getContentPageSchema(displayName, description, canonicalUrl) {
 /**
  * Injects head tags and JSON-LD schema into raw index.html
  */
-function injectMetaTags(rawHtml, { title, description, canonical, ogImage, ogUrl, noindex = false, schema = null }) {
+function injectMetaTags(rawHtml, { title, description, canonical, ogImage, ogUrl, noindex = false, schema = null, preloadImage = null }) {
   let html = rawHtml;
 
   // Clean up any stray meta name="title"
