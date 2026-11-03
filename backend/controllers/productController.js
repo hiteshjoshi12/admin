@@ -50,9 +50,12 @@ const getProductById = async (req, res) => {
 
 const getProducts = async (req, res) => {
   try {
-    const pageSize = Number(req.query.pageSize) || 50;
-    const page = Number(req.query.pageNumber) || 1;
+    const pageSize = Math.min(100, Math.max(1, Number(req.query.pageSize) || 50));
+    const page = Math.max(1, Number(req.query.pageNumber) || 1);
     const cacheKey = `products_${JSON.stringify(req.query)}`;
+
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    res.setHeader('Vary', 'Accept-Encoding, Origin');
 
     if (cache.has(cacheKey)) return res.json(cache.get(cacheKey));
 
@@ -78,10 +81,19 @@ const getProducts = async (req, res) => {
       else if (req.query.priceRange === "above-5000") query.price = { $gt: 5000 };
     }
 
+    let sortOption = { createdAt: -1 };
+    if (req.query.sort === 'price-low') {
+      sortOption = { price: 1 };
+    } else if (req.query.sort === 'price-high') {
+      sortOption = { price: -1 };
+    } else if (req.query.sort === 'newest') {
+      sortOption = { createdAt: -1 };
+    }
+
     const count = await Product.countDocuments(query);
     const products = await Product.find(query)
-      .select("-description") 
-      .sort({ createdAt: -1 })
+      .select("-description -careInstructions -imageDetails -comfortNotes -fitTip") 
+      .sort(sortOption)
       .limit(pageSize)
       .skip(pageSize * (page - 1))
       .lean();

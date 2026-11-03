@@ -1,17 +1,30 @@
 const cors = require('cors');
 
 module.exports = (app) => {
-  const allowedOrigins = process.env.FRONTEND_URL 
+  const defaultAllowed = [
+    'http://localhost:5173',
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'https://beadsandbloom.in',
+    'https://www.beadsandbloom.in'
+  ];
+
+  const envOrigins = process.env.FRONTEND_URL 
     ? process.env.FRONTEND_URL.split(',').map(url => url.trim().replace(/\/$/, '')) 
-    : ['http://localhost:5173'];
+    : [];
+
+  const allowedOrigins = Array.from(new Set([...defaultAllowed, ...envOrigins]));
 
   const corsOptions = {
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+      const isAllowed = allowedOrigins.includes(origin) || 
+        /^https?:\/\/([a-z0-9-]+\.)?beadsandbloom\.in(:\d+)?$/.test(origin);
+      if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        // Return null, false to deny CORS cleanly without throwing an unhandled 500 error
+        callback(null, false);
       }
     },
     credentials: true,
@@ -20,6 +33,6 @@ module.exports = (app) => {
 
   app.use(cors(corsOptions));
 
-  // Fix: Use regex for the wildcard to avoid PathError
+  // Handle preflight requests cleanly
   app.options(/(.*)/, cors(corsOptions));
 };
