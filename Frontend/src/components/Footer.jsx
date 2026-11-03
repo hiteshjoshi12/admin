@@ -1,3 +1,4 @@
+import siteNavigation from "@shared/siteNavigation.json";
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
@@ -53,27 +54,33 @@ export default function Footer() {
 
         {/* Links Column 1 */}
         <div>
-          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Handcrafted Juttis</h4>
+          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">
+            {siteNavigation.footerSections.collections.title}
+          </h4>
           <ul className="space-y-4 text-sm text-gray-400">
-            <li><Link to="/shop" className="hover:text-white transition-colors">Complete Jutti Range</Link></li>
-            <li><Link to="/collection/bridal" className="hover:text-white transition-colors">Bridal & Wedding Juttis</Link></li>
-            <li><Link to="/collection/festive" className="hover:text-white transition-colors">Festive & Sangeet Juttis</Link></li>
-            <li><Link to="/collection/casual" className="hover:text-white transition-colors">Casual Everyday Chic</Link></li>
-            <li><Link to="/sale" className="hover:text-white transition-colors">Archive Festive Sale</Link></li>
+            {siteNavigation.footerSections.collections.links.map((link) => (
+              <li key={link.path}>
+                <Link to={link.path} className="hover:text-white transition-colors">
+                  {link.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
         {/* Links Column 2 */}
         <div>
-          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">About & Support</h4>
+          <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">
+            {siteNavigation.footerSections.support.title}
+          </h4>
           <ul className="space-y-4 text-sm text-gray-400">
-            <li><Link to="/about" className="hover:text-white transition-colors">Our Story & Heritage</Link></li>
-            <li><Link to="/bridal-guide" className="hover:text-white transition-colors">Bridal Footwear Guide</Link></li>
-            <li><Link to="/care-guide" className="hover:text-white transition-colors">Jutti Care & Cleaning</Link></li>
-            <li><Link to="/size-chart" className="hover:text-white transition-colors">Size Guide & Fit</Link></li>
-            <li><Link to="/terms" className="hover:text-white transition-colors">Worldwide Shipping & COD</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition-colors">Customer Care & Contact</Link></li>
-            <li><Link to="/track-order" className="hover:text-white transition-colors">Track Your Order</Link></li>
+            {siteNavigation.footerSections.support.links.map((link) => (
+              <li key={link.path}>
+                <Link to={link.path} className="hover:text-white transition-colors">
+                  {link.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -97,7 +104,7 @@ export default function Footer() {
 
       {/* SEO Keyword Footer Strip */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 pb-8 text-[11px] text-gray-400 leading-relaxed text-center md:text-left">
-        <span className="text-gray-300 font-semibold">Specializing in:</span> Handcrafted Punjabi Juttis • Designer Bridal Mojaris • Festive & Party Wear Juttis • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Genuine Leather Footwear • Cash on Delivery (COD) across India • Worldwide Delivery (USA, UK, Canada, Australia, UAE).
+        <span className="text-gray-300 font-semibold">Specializing in:</span> {siteNavigation.brand.specializingIn}
       </div>
 
       {/* Copyright Line */}

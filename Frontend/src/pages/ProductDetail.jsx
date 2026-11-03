@@ -1,3 +1,4 @@
+import siteNavigation from "@shared/siteNavigation.json";
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -251,13 +252,7 @@ export default function ProductDetail() {
       ? currentProduct.category[0]
       : null;
 
-  const knownCollections = {
-    bridal: { name: 'The Bridal Edit', route: '/collection/bridal' },
-    festive: { name: 'The Festive Edit', route: '/collection/festive' },
-    casual: { name: 'Everyday Chic', route: '/collection/casual' },
-    party: { name: 'The Festive Edit', route: '/collection/festive' },
-    everyday: { name: 'Everyday Chic', route: '/collection/casual' },
-  };
+  const knownCollections = siteNavigation.knownCollections;
 
   const matchedCat = primaryCategory ? primaryCategory.toLowerCase() : null;
   const collectionInfo =
@@ -483,7 +478,7 @@ export default function ProductDetail() {
                     Fit Tip:
                   </strong>
                   {currentProduct.fitTip ||
-                    "Our juttis fit true to EU sizes. If you have broad feet or fall between sizes, we recommend sizing up for effortless all-day comfort."}
+                    siteNavigation.policies.defaultFitTip}
                 </p>
               </div>
             </div>

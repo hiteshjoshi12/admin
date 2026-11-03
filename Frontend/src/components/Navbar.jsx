@@ -1,3 +1,4 @@
+import siteNavigation from "@shared/siteNavigation.json";
 import { ShoppingBag, Menu, X, User, LogOut, Package, ChevronDown, Heart, Search, ArrowRight, Loader2 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
@@ -50,14 +51,7 @@ export default function Navbar() {
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const wishlistCount = wishlistItems.length;
 
-  const navLinks = [
-    { name: 'The Collection', path: '/shop' },
-    { name: 'Bridal', path: '/collection/bridal' }, 
-    { name: 'Festive', path: '/collection/festive' },
-    { name: 'Casual', path: '/collection/casual' },
-    { name: 'Our Story', path: '/about' },
-    { name: 'Sale', path: '/sale', isSpecial: true },
-  ];
+  const navLinks = siteNavigation.navLinks;
 
   const isLinkActive = (path) => {
     if (path === '/') return location.pathname === '/';

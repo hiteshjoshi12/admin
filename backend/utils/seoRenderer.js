@@ -10,6 +10,7 @@ const {
   renderCollectionRoot,
   renderProductRoot,
   renderAboutRoot,
+  renderNotFoundRoot,
   getOptimizedImageUrl,
   getImageSrcSet
 } = require('./rootGenerators');
@@ -495,6 +496,31 @@ async function processSeoRoute(reqPath, rawHtml) {
           imagesizes: '(max-width: 768px) 100vw, 600px'
         } : null;
 
+        // Query related products (same category matching rule as React, limit 4, stable sort createdAt: -1, field projection)
+        const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean);
+        let relatedProducts = [];
+        if (categories.length > 0) {
+          relatedProducts = await Product.find({
+            _id: { $ne: product._id },
+            isActive: { $ne: false },
+            category: { $in: categories }
+          })
+            .select('name slug price image images category')
+            .sort({ createdAt: -1 })
+            .limit(4)
+            .lean();
+        }
+        if (!relatedProducts || relatedProducts.length < 2) {
+          relatedProducts = await Product.find({
+            _id: { $ne: product._id },
+            isActive: { $ne: false }
+          })
+            .select('name slug price image images category')
+            .sort({ createdAt: -1 })
+            .limit(4)
+            .lean();
+        }
+
         let html = injectMetaTags(rawHtml, {
           title,
           description,
@@ -508,7 +534,7 @@ async function processSeoRoute(reqPath, rawHtml) {
         });
 
         // Inject semantic product markup into #root
-        const innerRootHtml = renderProductRoot(product);
+        const innerRootHtml = renderProductRoot(product, relatedProducts);
         html = injectRootHtml(html, innerRootHtml);
 
         const seoPayload = {
@@ -550,13 +576,15 @@ async function processSeoRoute(reqPath, rawHtml) {
 }
 
 function getNotFoundResponse(rawHtml) {
-  const html = injectMetaTags(rawHtml, {
+  let html = injectMetaTags(rawHtml, {
     title: 'Page Not Found | Beads and Bloom',
     description: 'The requested page could not be found.',
     canonical: null,
     noindex: true,
     schema: null
   });
+  const innerRootHtml = renderNotFoundRoot();
+  html = injectRootHtml(html, innerRootHtml);
   return {
     statusCode: 404,
     headers: { 'X-Robots-Tag': 'noindex, nofollow' },
