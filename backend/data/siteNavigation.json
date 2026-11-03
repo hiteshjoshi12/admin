@@ -5,67 +5,188 @@
     "tagline": "Handcrafted Luxury",
     "description": "Handcrafted luxury footwear blending Punjabi heritage with double-cushioned modern elegance.",
     "supportEmail": "connect@beadsandbloom.in",
-    "specializingIn": "Handcrafted Punjabi Juttis • Designer Bridal Mojaris • Festive & Party Wear Juttis • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Genuine Leather Footwear • Cash on Delivery (COD) across India • Worldwide Delivery (USA, UK, Canada, Australia, UAE)."
+    "specializingIn": "Handcrafted Punjabi Juttis • Designer Bridal Mojaris • Festive & Party Wear Juttis • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Genuine Leather Footwear • Cash on Delivery (COD) across India • Worldwide Delivery (USA, UK, Canada, Australia, UAE).",
+    "ordersNotice": "Express Dispatched"
   },
   "navLinks": [
-    { "name": "The Collection", "path": "/shop" },
-    { "name": "Bridal", "path": "/collection/bridal" },
-    { "name": "Festive", "path": "/collection/festive" },
-    { "name": "Casual", "path": "/collection/casual" },
-    { "name": "Our Story", "path": "/about" },
-    { "name": "Sale", "path": "/sale", "isSpecial": true }
+    {
+      "name": "The Collection",
+      "path": "/shop"
+    },
+    {
+      "name": "Bridal",
+      "path": "/collection/bridal"
+    },
+    {
+      "name": "Festive",
+      "path": "/collection/festive"
+    },
+    {
+      "name": "Casual",
+      "path": "/collection/casual"
+    },
+    {
+      "name": "Our Story",
+      "path": "/about"
+    },
+    {
+      "name": "Sale",
+      "path": "/sale",
+      "isSpecial": true
+    }
   ],
   "footerSections": {
     "collections": {
       "title": "Handcrafted Juttis",
       "links": [
-        { "name": "Complete Jutti Range", "path": "/shop" },
-        { "name": "Bridal & Wedding Juttis", "path": "/collection/bridal" },
-        { "name": "Festive & Sangeet Juttis", "path": "/collection/festive" },
-        { "name": "Casual Everyday Chic", "path": "/collection/casual" },
-        { "name": "Archive Festive Sale", "path": "/sale" }
+        {
+          "name": "Complete Jutti Range",
+          "path": "/shop"
+        },
+        {
+          "name": "Bridal & Wedding Juttis",
+          "path": "/collection/bridal"
+        },
+        {
+          "name": "Festive & Sangeet Juttis",
+          "path": "/collection/festive"
+        },
+        {
+          "name": "Casual Everyday Chic",
+          "path": "/collection/casual"
+        },
+        {
+          "name": "Archive Festive Sale",
+          "path": "/sale"
+        }
       ]
     },
     "support": {
       "title": "About & Support",
       "links": [
-        { "name": "Our Story & Heritage", "path": "/about" },
-        { "name": "Bridal Footwear Guide", "path": "/bridal-guide" },
-        { "name": "Jutti Care & Cleaning", "path": "/care-guide" },
-        { "name": "Size Guide & Fit", "path": "/size-chart" },
-        { "name": "Worldwide Shipping & COD", "path": "/terms" },
-        { "name": "Customer Care & Contact", "path": "/contact" },
-        { "name": "Track Your Order", "path": "/track-order" }
+        {
+          "name": "Our Story & Heritage",
+          "path": "/about"
+        },
+        {
+          "name": "Bridal Footwear Guide",
+          "path": "/bridal-guide"
+        },
+        {
+          "name": "Jutti Care & Cleaning",
+          "path": "/care-guide"
+        },
+        {
+          "name": "Size Guide & Fit",
+          "path": "/size-chart"
+        },
+        {
+          "name": "Worldwide Shipping & COD",
+          "path": "/terms"
+        },
+        {
+          "name": "Customer Care & Contact",
+          "path": "/contact"
+        },
+        {
+          "name": "Track Your Order",
+          "path": "/track-order"
+        }
       ]
     },
     "legal": {
       "links": [
-        { "name": "Privacy Policy", "path": "/privacy-policy" },
-        { "name": "Terms of Service", "path": "/terms" }
+        {
+          "name": "Privacy Policy",
+          "path": "/privacy-policy"
+        },
+        {
+          "name": "Terms of Service",
+          "path": "/terms"
+        }
       ]
     }
   },
   "allCanonicalNavLinks": [
-    { "path": "/", "name": "Home" },
-    { "path": "/shop", "name": "The Collection" },
-    { "path": "/collection/bridal", "name": "Bridal Juttis" },
-    { "path": "/collection/festive", "name": "Festive Juttis" },
-    { "path": "/collection/casual", "name": "Casual Juttis" },
-    { "path": "/sale", "name": "Archive Festive Sale" },
-    { "path": "/about", "name": "Our Story & Heritage" },
-    { "path": "/size-chart", "name": "Size Guide & Fit" },
-    { "path": "/care-guide", "name": "Jutti Care & Cleaning" },
-    { "path": "/bridal-guide", "name": "Bridal Footwear Guide" },
-    { "path": "/contact", "name": "Customer Care & Contact" },
-    { "path": "/terms", "name": "Terms & Shipping Policies" },
-    { "path": "/privacy-policy", "name": "Privacy Policy" }
+    {
+      "path": "/",
+      "name": "Home"
+    },
+    {
+      "path": "/shop",
+      "name": "The Collection"
+    },
+    {
+      "path": "/collection/bridal",
+      "name": "Bridal Juttis"
+    },
+    {
+      "path": "/collection/festive",
+      "name": "Festive Juttis"
+    },
+    {
+      "path": "/collection/casual",
+      "name": "Casual Juttis"
+    },
+    {
+      "path": "/sale",
+      "name": "Archive Festive Sale"
+    },
+    {
+      "path": "/about",
+      "name": "Our Story & Heritage"
+    },
+    {
+      "path": "/size-chart",
+      "name": "Size Guide & Fit"
+    },
+    {
+      "path": "/care-guide",
+      "name": "Jutti Care & Cleaning"
+    },
+    {
+      "path": "/bridal-guide",
+      "name": "Bridal Footwear Guide"
+    },
+    {
+      "path": "/contact",
+      "name": "Customer Care & Contact"
+    },
+    {
+      "path": "/terms",
+      "name": "Terms & Shipping Policies"
+    },
+    {
+      "path": "/privacy-policy",
+      "name": "Privacy Policy"
+    }
   ],
   "knownCollections": {
-    "bridal": { "name": "The Bridal Edit", "route": "/collection/bridal", "shortName": "Bridal" },
-    "festive": { "name": "The Festive Edit", "route": "/collection/festive", "shortName": "Festive" },
-    "casual": { "name": "Everyday Chic", "route": "/collection/casual", "shortName": "Casual" },
-    "party": { "name": "The Festive Edit", "route": "/collection/festive", "shortName": "Festive" },
-    "everyday": { "name": "Everyday Chic", "route": "/collection/casual", "shortName": "Casual" }
+    "bridal": {
+      "name": "The Bridal Edit",
+      "route": "/collection/bridal",
+      "shortName": "Bridal"
+    },
+    "festive": {
+      "name": "The Festive Edit",
+      "route": "/collection/festive",
+      "shortName": "Festive"
+    },
+    "casual": {
+      "name": "Everyday Chic",
+      "route": "/collection/casual",
+      "shortName": "Casual"
+    },
+    "party": {
+      "name": "The Festive Edit",
+      "route": "/collection/festive",
+      "shortName": "Festive"
+    },
+    "everyday": {
+      "name": "Everyday Chic",
+      "route": "/collection/casual",
+      "shortName": "Casual"
+    }
   },
   "policies": {
     "announcement": "FREE SHIPPING ON ALL ORDERS ABOVE ₹5,000",
@@ -82,9 +203,18 @@
       "resolution": "Size exchange or store credit provided upon video inspection"
     },
     "craftPillars": [
-      { "title": "100% Genuine Leather Sole", "desc": "Breathable, vegetable-tanned leather sole that naturally molds to feet" },
-      { "title": "Dual-Density Memory Foam", "desc": "Double-cushioned footbed engineered for all-day bite-free wear" },
-      { "title": "Master Karigari in Punjab", "desc": "Handcrafted heirloom needlework with zardozi, dabka, sitara and pearls" }
+      {
+        "title": "100% Genuine Leather Sole",
+        "desc": "Breathable, vegetable-tanned leather sole that naturally molds to feet"
+      },
+      {
+        "title": "Dual-Density Memory Foam",
+        "desc": "Double-cushioned footbed engineered for all-day bite-free wear"
+      },
+      {
+        "title": "Master Karigari in Punjab",
+        "desc": "Handcrafted heirloom needlework with zardozi, dabka, sitara and pearls"
+      }
     ],
     "defaultFitTip": "Our juttis fit true to standard EU sizes. If you have broad feet or fall between sizes, we recommend sizing up for effortless all-day comfort.",
     "defaultCareInstructions": [
@@ -95,4 +225,3 @@
     ]
   }
 }
-

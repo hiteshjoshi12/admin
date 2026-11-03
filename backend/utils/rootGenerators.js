@@ -547,11 +547,13 @@ function renderProductRoot(product, relatedProducts = []) {
               </span>
             </div>
 
+${inStock ? `
             <div class="mt-3">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${inStock ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}">
-                ${inStock ? 'In Stock — Handcrafted in India' : 'Sold Out'}
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+                In Stock — Handcrafted in India
               </span>
             </div>
+            ` : ''}
           </div>
 
           <!-- Sizes & Fit Tip -->

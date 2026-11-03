@@ -88,7 +88,7 @@ export default function Footer() {
         <div>
           <h4 className="text-[#C5A059] text-xs font-bold uppercase tracking-widest mb-6">Stay in the Loop</h4>
           <p className="text-gray-400 text-sm mb-4">Subscribe for exclusive bridal edits & festive releases.</p>
-          <div className="flex border-b border-gray-700 pb-2">
+          <div className="flex border-b border-gray-700 pb-2 mb-4">
             <input 
               type="email" 
               placeholder="Enter your email" 
@@ -98,6 +98,10 @@ export default function Footer() {
             <button className="text-xs font-bold uppercase tracking-widest hover:text-[#C5A059] text-white">
               Join
             </button>
+          </div>
+          <div className="text-xs text-gray-400 space-y-1 border-l-2 border-gray-700 pl-3">
+            <p><span className="text-white font-medium">Support:</span> {siteNavigation.brand.supportEmail}</p>
+            <p><span className="text-white font-medium">Orders:</span> {siteNavigation.brand.ordersNotice || 'Express Dispatched'}</p>
           </div>
         </div>
       </div>

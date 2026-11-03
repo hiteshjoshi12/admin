@@ -16,7 +16,8 @@ import {
   Check,
   Tag,
   Shield,
-  Layers
+  Layers,
+  Truck
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -396,6 +397,14 @@ export default function ProductDetail() {
                   Inclusive of all taxes
                 </span>
               </div>
+
+              {((currentProduct.totalStock !== undefined ? currentProduct.totalStock : (Array.isArray(currentProduct.stock) ? currentProduct.stock.reduce((acc, item) => acc + (item.quantity || 0), 0) : 0)) > 0) && (
+                <div className="mt-3">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+                    In Stock — Handcrafted in India
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* PRODUCT OFFERS & COUPONS */}
@@ -425,21 +434,13 @@ export default function ProductDetail() {
                     </span>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById("visual-size-guide");
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    } else {
-                      setIsSizeGuideOpen(true);
-                    }
-                  }}
-                  className="inline-flex items-center gap-1.5 text-xs text-[#FF2865] hover:text-[#1C1917] font-semibold underline underline-offset-4 transition-colors cursor-pointer"
+                <Link
+                  to="/size-chart"
+                  className="inline-flex items-center gap-1.5 text-xs text-[#FF2865] hover:text-[#1C1917] font-semibold underline underline-offset-4 transition-colors"
                 >
                   <Ruler className="w-3.5 h-3.5" />
-                  Visual Size Guide
-                </button>
+                  Jutti Size Chart & Fit Guide →
+                </Link>
               </div>
 
               {/* Size Buttons Grid */}
@@ -731,7 +732,7 @@ export default function ProductDetail() {
                   to="/care-guide"
                   className="text-[11px] font-bold uppercase tracking-wider text-[#8B5E3C] hover:text-[#1C1917] underline"
                 >
-                  Full Care Guide →
+                  Handcrafted Jutti Care Guide →
                 </Link>
               </div>
               <ul className="text-xs text-gray-600 space-y-1.5 list-disc pl-4 leading-relaxed">
@@ -752,6 +753,27 @@ export default function ProductDetail() {
                   Clean delicately with a soft, dry cotton cloth after wearing to maintain beadwork lustre.
                 </li>
               </ul>
+            </div>
+
+            {/* SHIPPING & EXCHANGE POLICIES CARD (Shared from siteNavigation.policies) */}
+            <div className="bg-[#FAF8F5] p-5 rounded-2xl border border-gray-200 text-xs">
+              <div className="flex items-center gap-2 mb-2.5">
+                <Truck className="w-4 h-4 text-[#8B5E3C]" />
+                <h3 className="font-serif text-base font-bold text-[#1C1917]">
+                  Shipping & Exchange Policies
+                </h3>
+              </div>
+              <ul className="space-y-1.5 text-gray-600 leading-relaxed text-xs">
+                <li><strong className="text-gray-900">Dispatch:</strong> {siteNavigation.policies.shipping.dispatch}</li>
+                <li><strong className="text-gray-900">Payment:</strong> {siteNavigation.policies.shipping.cod}. {siteNavigation.policies.shipping.freeThresholdNotice}.</li>
+                <li><strong className="text-gray-900">Exchange Window:</strong> {siteNavigation.policies.exchange.window} ({siteNavigation.policies.exchange.unboxingVideo}).</li>
+                <li><strong className="text-gray-900">Worldwide:</strong> {siteNavigation.policies.shipping.worldwide}.</li>
+              </ul>
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <Link to="/terms" className="text-[11px] font-bold uppercase tracking-wider text-[#8B5E3C] hover:text-[#1C1917] underline">
+                  Read Full Shipping, Returns & Exchange Terms →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
