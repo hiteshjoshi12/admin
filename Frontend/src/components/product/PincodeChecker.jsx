@@ -169,8 +169,8 @@ export default function PincodeChecker({ productPrice = 0 }) {
         <div className="flex items-start gap-2">
           <RefreshCcw className="w-4 h-4 text-[#FF2865] shrink-0 mt-0.5" />
           <div>
-            <strong className="block text-[#1C1917] font-semibold text-[11px]">48-Hour Exchange</strong>
-            <span className="text-[10px] text-gray-500">Size mismatch? Hassle-free swap</span>
+            <strong className="block text-[#1C1917] font-semibold text-[11px]">48-Hour Policy</strong>
+            <span className="text-[10px] text-gray-500">Damaged / defective with unboxing video</span>
           </div>
         </div>
 

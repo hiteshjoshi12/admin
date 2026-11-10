@@ -193,7 +193,7 @@ export default function SizeGuideModal({ isOpen, onClose, selectedSize, onSelect
               <ul className="list-disc pl-5 space-y-0.5 text-gray-700">
                 <li><strong>Broad or High Arch Feet:</strong> We strongly advise choosing <strong>one size larger</strong> for comfort.</li>
                 <li><strong>Genuine Leather Footbed:</strong> Authentic handcrafted juttis will gently stretch and mold to your exact foot shape after 1–2 wears.</li>
-                <li><strong>Easy 48-Hour Exchange:</strong> In case the fit isn't 100% perfect, request a free size exchange within 48 hours of delivery!</li>
+                <li><strong>Fit Concierge & Policy:</strong> For sizing advice, consult our measurements above or contact us before ordering. Exchanges are strictly limited to damaged, defective, or incorrect items reported within 48 hours with an uninterrupted unboxing video.</li>
               </ul>
             </div>
           </div>

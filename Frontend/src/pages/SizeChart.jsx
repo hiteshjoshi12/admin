@@ -24,7 +24,7 @@ export default function SizeChart() {
     },
     {
       question: "Can I exchange my juttis if the size does not fit?",
-      answer: "Yes, we accept exchanges for size within 48 hours of delivery, provided the juttis are unworn, in original packaging, and accompanied by a continuous unboxing video."
+      answer: "Each pair is handcrafted to order. In accordance with our store policy, exchanges are permitted only for damaged, defective, or incorrect items reported within 48 hours of delivery with a mandatory uninterrupted unboxing video. We do not offer size exchanges or refunds. Please consult our size chart carefully before purchasing or reach out for sizing recommendations."
     }
   ];
 

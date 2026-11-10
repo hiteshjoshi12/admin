@@ -763,8 +763,8 @@ export default function ProductDetail() {
               <ul className="space-y-1.5 text-gray-600 leading-relaxed text-xs">
                 <li><strong className="text-gray-900">Dispatch:</strong> {siteNavigation.policies.shipping.dispatch}</li>
                 <li><strong className="text-gray-900">Payment:</strong> {siteNavigation.policies.shipping.cod}. {siteNavigation.policies.shipping.freeThresholdNotice}.</li>
-                <li><strong className="text-gray-900">Exchange Window:</strong> {siteNavigation.policies.exchange.window} ({siteNavigation.policies.exchange.unboxingVideo}).</li>
-                <li><strong className="text-gray-900">Worldwide:</strong> {siteNavigation.policies.shipping.worldwide}.</li>
+                <li><strong className="text-gray-900">Exchange Policy:</strong> {siteNavigation.policies.exchange.policy}</li>
+                <li><strong className="text-gray-900">Worldwide:</strong> {siteNavigation.policies.shipping.worldwide}</li>
               </ul>
               <div className="mt-3 pt-3 border-t border-gray-200">
                 <Link to="/terms" className="text-[11px] font-bold uppercase tracking-wider text-[#8B5E3C] hover:text-[#1C1917] underline">

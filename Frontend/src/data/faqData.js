@@ -1,7 +1,7 @@
 export const FAQ_DATA = [
   {
     question: "How do I purchase Beads & Bloom juttis?",
-    answer: "You can shop our complete artisanal footwear catalog online at beadsandbloom.in! We deliver across India with Cash on Delivery (COD) and ship worldwide to the USA, UK, Canada, Australia, and UAE with door-to-door express tracking.",
+    answer: "You can shop our complete artisanal footwear catalog online at beadsandbloom.in! We deliver across India with Cash on Delivery (COD) and offer prepaid worldwide shipping with door-to-door express tracking.",
   },
   {
     question: "What range of handcrafted juttis do you offer?",
@@ -9,7 +9,7 @@ export const FAQ_DATA = [
   },
   {
     question: "Do you ship handcrafted juttis worldwide?",
-    answer: "Yes, we ship globally! We regularly deliver to our valued clients across the United States (USA), United Kingdom (UK), Canada, Australia, the United Arab Emirates (UAE), Europe, and Singapore via reliable international express couriers.",
+    answer: "Worldwide shipping, prepaid, including the USA, UK, Canada, Australia, UAE, Europe and Singapore.",
   },
   {
     question: "Do you offer Cash on Delivery (COD) and Online Payments?",

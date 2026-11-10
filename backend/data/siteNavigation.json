@@ -5,7 +5,7 @@
     "tagline": "Handcrafted Luxury",
     "description": "Handcrafted luxury footwear blending Punjabi heritage with double-cushioned modern elegance.",
     "supportEmail": "connect@beadsandbloom.in",
-    "specializingIn": "Handcrafted Punjabi Juttis • Designer Bridal Mojaris • Festive & Party Wear Juttis • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Genuine Leather Footwear • Cash on Delivery (COD) across India • Worldwide Delivery (USA, UK, Canada, Australia, UAE).",
+    "specializingIn": "Handcrafted Punjabi Juttis • Designer Bridal Mojaris • Festive & Party Wear Juttis • Casual Ethnic Flats • Double-Cushioned Comfort Soles • Genuine Leather Footwear • Cash on Delivery (COD) across India • Worldwide shipping, prepaid, including the USA, UK, Canada, Australia, UAE, Europe and Singapore.",
     "ordersNotice": "Express Dispatched"
   },
   "navLinks": [
@@ -194,13 +194,11 @@
     "shipping": {
       "dispatch": "Standard Express Delivery: 2-4 days across India",
       "cod": "Cash on Delivery (COD) available across India",
-      "worldwide": "Worldwide Express Shipping available (USA, UK, Canada, Australia, UAE)",
+      "worldwide": "Worldwide shipping, prepaid, including the USA, UK, Canada, Australia, UAE, Europe and Singapore.",
       "freeThresholdNotice": "Free domestic shipping on prepaid & COD orders above ₹5,000"
     },
     "exchange": {
-      "window": "48-Hour Exchange Window from delivery",
-      "unboxingVideo": "Mandatory uninterrupted unboxing video required for any transit damage or size exchange claim",
-      "resolution": "Size exchange or store credit provided upon video inspection"
+      "policy": "Exchanges permitted only for damaged, defective, or incorrect items reported within 48 hours of delivery with mandatory uninterrupted unboxing video. Strictly no refunds or size exchanges."
     },
     "craftPillars": [
       {

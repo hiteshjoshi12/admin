@@ -669,8 +669,8 @@ ${inStock ? `
             <div class="text-xs text-gray-600 space-y-2 leading-relaxed">
               <p><strong class="text-gray-900">Dispatch:</strong> ${escapeHtml(siteNavigation.policies.shipping.dispatch)}</p>
               <p><strong class="text-gray-900">Payment:</strong> ${escapeHtml(siteNavigation.policies.shipping.cod)}. ${escapeHtml(siteNavigation.policies.shipping.freeThresholdNotice)}.</p>
-              <p><strong class="text-gray-900">Exchange Window:</strong> ${escapeHtml(siteNavigation.policies.exchange.window)} (${escapeHtml(siteNavigation.policies.exchange.unboxingVideo)}).</p>
-              <p><strong class="text-gray-900">Worldwide:</strong> ${escapeHtml(siteNavigation.policies.shipping.worldwide)}.</p>
+              <p><strong class="text-gray-900">Exchange Policy:</strong> ${escapeHtml(siteNavigation.policies.exchange.policy)}</p>
+              <p><strong class="text-gray-900">Worldwide:</strong> ${escapeHtml(siteNavigation.policies.shipping.worldwide)}</p>
             </div>
             <div class="pt-2 border-t border-gray-100">
               <a href="/terms" class="text-xs text-[#FF2865] hover:underline font-semibold">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FAQ_DATA } from '../../data/faqData';
+import siteNavigation from "@shared/siteNavigation.json";
 export { FAQ_DATA };
 
 const TRUST_HALLMARKS = [
@@ -21,12 +22,12 @@ const TRUST_HALLMARKS = [
     number: "03",
     title: "Worldwide Express",
     subtitle: "Doorstep International Delivery",
-    detail: "Fast insured shipping to USA, UK, Canada, Australia, and the UAE."
+    detail: siteNavigation.policies.shipping.worldwide
   },
   {
     number: "04",
     title: "Pan-India COD",
-    subtitle: "Hassle-Free Exchange",
+    subtitle: "Verified Dispatch",
     detail: "Cash on delivery available nationwide."
   }
 ];

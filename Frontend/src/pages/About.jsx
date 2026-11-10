@@ -406,7 +406,7 @@ export default function About() {
             <div>
               <h4 className="font-serif text-base text-[#1C1917] mb-1">Global Shipping</h4>
               <p className="text-xs text-gray-500 font-light leading-relaxed">
-                Reliable worldwide express courier delivery to the USA, UK, Canada, Australia, UAE, Europe, and beyond.
+                Worldwide shipping, prepaid, including the USA, UK, Canada, Australia, UAE, Europe and Singapore.
               </p>
             </div>
           </div>

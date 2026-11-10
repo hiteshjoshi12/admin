@@ -12,7 +12,7 @@ const defaultFestiveContent = {
     "10+ Hr Bite-Free Dance Cushioning",
     "100% Pure Leather Soles",
     "Heirloom Zardozi & Mirror Work",
-    "Pan-India COD & 48h Size Exchange"
+    "Pan-India COD & 48h Defect Exchange"
   ],
   occasions: [
     {
@@ -222,7 +222,7 @@ const defaultFestiveContent = {
     },
     {
       question: "What are the delivery times and Cash on Delivery (COD) options for upcoming festivals?",
-      answer: "We offer Cash on Delivery (COD) across India, alongside UPI, Net Banking, and Credit/Debit cards. Standard domestic transit takes 3 to 7 business days, with expedited 2 to 3-day express dispatch available for metro cities (Delhi NCR, Mumbai, Bengaluru, Hyderabad). We also ship internationally to the USA, UK, Canada, Australia, and the UAE."
+      answer: "We offer Cash on Delivery (COD) across India, alongside UPI, Net Banking, and Credit/Debit cards. Standard domestic transit takes 3 to 7 business days, with expedited 2 to 3-day express dispatch available for metro cities (Delhi NCR, Mumbai, Bengaluru, Hyderabad). Worldwide shipping, prepaid, including the USA, UK, Canada, Australia, UAE, Europe and Singapore."
     }
   ]
 };
