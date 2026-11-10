@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-serif: "Playfair Display", serif;
-  --font-sans: "Inter", sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --color-brand-bg: #F9F8F6;
   --color-brand-text: #1C1917;
   --color-brand-gold: #C5A059;
@@ -23,7 +23,10 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: clip;
-   -webkit-overflow-scrolling: touch; /* Adds momentum on iOS */
+  -webkit-overflow-scrolling: touch; /* Adds momentum on iOS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* --- NATIVE ANIMATIONS --- */
