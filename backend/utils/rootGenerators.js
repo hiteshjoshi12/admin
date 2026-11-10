@@ -203,12 +203,15 @@ function renderHomeRoot(siteContent, featuredProducts = []) {
                 ${escapeHtml(subtitle)}
               </div>
             ` : ''}
-            <h1 class="font-serif leading-[1.08] drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]">
-              <span class="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white">
-                ${escapeHtml(line1)}
+            <p class="font-serif text-lg sm:text-xl md:text-2xl text-white/90 italic tracking-wide mb-2 md:mb-3">
+              ${escapeHtml(rawTitle)}
+            </p>
+            <h1 class="font-serif leading-[1.12] drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] max-w-3xl">
+              <span class="block text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-white">
+                Handcrafted Punjabi Juttis
               </span>
-              <span class="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl italic font-light mt-1 md:mt-2 text-[#FD61A7]">
-                ${escapeHtml(line2)}
+              <span class="block text-xl sm:text-3xl md:text-4xl lg:text-5xl italic font-light mt-1 md:mt-2 text-[#FD61A7]">
+                for Brides, Festive Days &amp; Everyday
               </span>
             </h1>
             <div class="mt-6 md:mt-8">
@@ -309,7 +312,7 @@ function renderShopRoot(products = []) {
       <div class="bg-[#fffdf9] py-16 px-6 text-center relative overflow-hidden mt-6">
         <div class="max-w-2xl mx-auto">
           <span class="text-[#8B5E3C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4 block">Handcrafted Luxury</span>
-          <h1 class="text-4xl md:text-6xl font-serif text-[#1C1917] mb-3">The Handcrafted Jutti Collection</h1>
+          <h1 class="text-4xl md:text-6xl font-serif text-[#1C1917] mb-3">Shop All Handcrafted Punjabi Juttis</h1>
           <p class="text-sm text-gray-500 font-light max-w-lg mx-auto mb-6">
             Artisanal Punjabi juttis and ethnic footwear crafted with double-cushioned comfort, genuine leather soles, and heirloom embroidery.
           </p>
@@ -343,7 +346,9 @@ function renderShopRoot(products = []) {
 /**
  * 3. Collection Page Semantic Markup
  */
-function renderCollectionRoot(displayName, description, products = []) {
+function renderCollectionRoot(displayName, description, products = [], h1Text = null, badgeText = null) {
+  const finalH1 = h1Text || displayName;
+  const finalBadge = badgeText || displayName;
   const productCardsHtml = products.map((p, idx) => `
     <div class="group relative flex flex-col">
       <a href="/product/${p.slug}" class="block relative mb-4">
@@ -374,9 +379,15 @@ function renderCollectionRoot(displayName, description, products = []) {
     <div class="bg-white min-h-screen pt-20">
       ${renderServerNavbar()}
       <div class="bg-[#fffdf9] py-16 px-6 text-center mt-6">
-        <div class="max-w-2xl mx-auto">
-          <span class="text-[#8B5E3C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4 block">Curated Edition</span>
-          <h1 class="text-4xl md:text-6xl font-serif text-[#1C1917] mb-3">${escapeHtml(displayName)}</h1>
+        <div class="max-w-3xl mx-auto">
+          <div class="mb-4">
+            <span class="inline-block uppercase tracking-[0.25em] text-xs font-semibold px-4 py-1.5 rounded-full bg-stone-100 text-[#8B5E3C]">
+              ${escapeHtml(finalBadge)}
+            </span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-serif text-[#1C1917] mb-3 leading-tight">
+            ${escapeHtml(finalH1)}
+          </h1>
           <p class="text-sm text-gray-500 font-light max-w-lg mx-auto mb-6">
             ${escapeHtml(description)}
           </p>

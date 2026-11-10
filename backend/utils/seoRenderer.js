@@ -4,6 +4,8 @@ const NodeCache = require('node-cache');
 const Product = require('../models/Product');
 const SiteContent = require('../models/SiteContent');
 const routesManifest = require('./routesManifest.json');
+const seoCopy = require('../data/seoCopy.json');
+const { formatProductTitle, formatProductMeta } = require('./productSeo');
 const {
   renderHomeRoot,
   renderShopRoot,
@@ -51,15 +53,6 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;');
 }
 
-// Product title: "<Product Name> | Beads and Bloom", dropped when exceeding ~60 chars
-function formatProductTitle(name) {
-  if (!name) return 'Handcrafted Juttis | Beads and Bloom';
-  const withBrand = `${name} | Beads and Bloom`;
-  if (withBrand.length <= 60) {
-    return withBrand;
-  }
-  return name;
-}
 
 // Breadcrumb Schema Generator
 function getBreadcrumbsSchema(crumbs) {
@@ -400,13 +393,16 @@ async function processSeoRoute(reqPath, rawHtml) {
           };
         }
       } else if (normalizedPath.startsWith('/collection/')) {
+        const seoData = seoCopy.routes[normalizedPath] || {};
+        const h1Text = seoData.h1 || displayName;
+        const badgeText = seoData.badge || displayName;
         schema = getCollectionSchema(displayName, config.description, config.canonical);
         let categoryQuery = /bridal/i;
         if (normalizedPath.includes('festive')) categoryQuery = /festive|party/i;
         if (normalizedPath.includes('casual')) categoryQuery = /casual|everyday|office/i;
 
         const products = await Product.find({ isActive: { $ne: false }, category: categoryQuery }).sort({ createdAt: -1 }).lean();
-        innerRootHtml = renderCollectionRoot(displayName, config.description, products);
+        innerRootHtml = renderCollectionRoot(displayName, config.description, products, h1Text, badgeText);
         if (products.length > 0 && products[0].image) {
           preloadImage = {
             href: getOptimizedImageUrl(products[0].image, 600),
@@ -481,9 +477,7 @@ async function processSeoRoute(reqPath, rawHtml) {
       const product = await Product.findOne({ slug }).lean();
       if (product) {
         const title = formatProductTitle(product.name);
-        const description = product.description 
-          ? `Shop ${product.name}. Handcrafted Indian jutti with pure leather soles & double-cushioned comfort in EU sizes 36-41.`
-          : `Handcrafted ${product.name} with pure leather soles by Beads and Bloom.`;
+        const description = formatProductMeta(product);
         const canonical = `${SITE_URL}/product/${product.slug}`;
         const ogImage = product.images?.[0] || product.image || `${SITE_URL}/logo.png`;
         const schema = getProductSchema(product);

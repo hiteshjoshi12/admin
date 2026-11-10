@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../redux/productSlice";
 import { toggleWishlistAPI, toggleWishlistLocal } from "../redux/wishlistSlice";
 import SEO from "../components/seo/SEO";
+import seoCopy from "@shared/seoCopy.json";
 import { getCollectionSchema, getBreadcrumbSchema } from "../components/seo/schemaUtils";
 
 export default function Shop() {
@@ -95,8 +96,8 @@ export default function Shop() {
   return (
     <div className="bg-white min-h-screen pt-20" ref={topRef}>
       <SEO
-        title="The Collection — Handcrafted Juttis & Mojris | Beads and Bloom"
-        description="Explore our complete catalog of handcrafted juttis. From opulent bridal zardosi to chic everyday ethnic flats, find your perfect pair with cushioned comfort."
+        title={seoCopy.routes["/shop"].title}
+        description={seoCopy.routes["/shop"].metaDescription}
         canonical="/shop"
         keywords="handcrafted juttis collection, designer juttis, bridal mojris, everyday ethnic flats, punjabi jutti shop, double cushioned flats"
         schema={shopSchema}
@@ -106,7 +107,7 @@ export default function Shop() {
       <div className="bg-[#fffdf9] py-16 px-6 text-center relative overflow-hidden">
         <div className="max-w-2xl mx-auto animate-fade-up">
             <span className="text-[#8B5E3C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4 block">Handcrafted Luxury</span>
-            <h1 className="text-4xl md:text-6xl font-serif text-[#1C1917] mb-3">The Handcrafted Jutti Collection</h1>
+            <h1 className="text-4xl md:text-6xl font-serif text-[#1C1917] mb-3">{seoCopy.routes["/shop"].h1}</h1>
             <p className="text-sm text-gray-500 font-light max-w-lg mx-auto mb-6">
               Artisanal Punjabi juttis and ethnic footwear crafted with double-cushioned comfort, genuine leather soles, and heirloom embroidery.
             </p>

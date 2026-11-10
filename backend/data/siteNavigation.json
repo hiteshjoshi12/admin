@@ -192,7 +192,7 @@
     "announcement": "FREE SHIPPING ON ALL ORDERS ABOVE ₹5,000",
     "freeShippingThreshold": 5000,
     "shipping": {
-      "dispatch": "Standard Express Delivery: 3-7 business days across India",
+      "dispatch": "Standard Express Delivery: 2-4 days across India",
       "cod": "Cash on Delivery (COD) available across India",
       "worldwide": "Worldwide Express Shipping available (USA, UK, Canada, Australia, UAE)",
       "freeThresholdNotice": "Free domestic shipping on prepaid & COD orders above ₹5,000"

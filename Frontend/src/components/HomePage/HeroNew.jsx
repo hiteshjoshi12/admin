@@ -213,16 +213,21 @@ export default function HeroNew() {
               </div>
             )}
 
-            {/* Redesigned Balanced Headline - Scaled appropriately for video visibility */}
-            <h1 className="animate-fade-up delay-100 font-serif leading-[1.08] drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]">
-              <span className="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-white">
-                {currentSlide.titleLine1 || 'Handcrafted'}
+            {/* Slogan / Title as a styled non-heading element */}
+            <p className="animate-fade-up font-serif text-lg sm:text-xl md:text-2xl text-white/90 italic tracking-wide mb-2 md:mb-3">
+              {currentSlide.title || `${currentSlide.titleLine1 || ''} ${currentSlide.titleLine2 || ''}`.trim() || 'Walk in Poetry'}
+            </p>
+
+            {/* Approved Visible H1 */}
+            <h1 className="animate-fade-up delay-100 font-serif leading-[1.12] drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)] max-w-3xl">
+              <span className="block text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-white">
+                Handcrafted Punjabi Juttis
               </span>
               <span
-                className="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl italic font-light mt-1 md:mt-2"
+                className="block text-xl sm:text-3xl md:text-4xl lg:text-5xl italic font-light mt-1 md:mt-2"
                 style={{ color: brandPink }}
               >
-                {currentSlide.titleLine2 || 'Juttis'}
+                for Brides, Festive Days &amp; Everyday
               </span>
             </h1>
 
@@ -241,7 +246,11 @@ export default function HeroNew() {
           </div>
         </div>
       ) : (
-        <h1 className="sr-only">Beads and Bloom</h1>
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4">
+          <h1 className="font-serif leading-[1.12] text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
+            Handcrafted Punjabi Juttis for Brides, Festive Days &amp; Everyday
+          </h1>
+        </div>
       )}
 
       {/* 3. AUDIO MUTE / UNMUTE BUTTON (Appears when active slide is a video) */}

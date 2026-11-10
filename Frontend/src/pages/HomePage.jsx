@@ -6,6 +6,7 @@ import { getOrganizationSchema, getWebSiteSchema, getStoreSchema, getFAQSchema }
 import Hero from "../components/HomePage/HeroNew";
 import EditorialBanner from "../components/HomePage/EditorialBanner";
 import { FAQ_DATA } from "../data/faqData";
+import seoCopy from "@shared/seoCopy.json";
 
 // --- 2. LAZY IMPORTS (Loaded On Demand to Preserve Fast TBT and PageSpeed) ---
 const CollectionTiles = lazy(() => import("../components/HomePage/CollectionTiles"));
@@ -42,8 +43,8 @@ const HomePage = () => {
   return (
     <div className="bg-white">
       <SEO
-        title="Handcrafted Punjabi Juttis | Luxury Bridal, Festive & Casual Mojaris - Beads and Bloom"
-        description="Discover luxury handcrafted Punjabi juttis, bridal mojris & festive footwear at Beads and Bloom. Pure leather soles, double-cushioned comfort, worldwide shipping & Cash on Delivery (COD) available."
+        title={seoCopy.routes["/"].title}
+        description={seoCopy.routes["/"].metaDescription}
         canonical="/"
         keywords="handcrafted juttis, bridal juttis, punjabi juttis online, festive footwear, wedding mojris, casual juttis, beads and bloom, cash on delivery juttis, worldwide shipping juttis"
         schema={homeSchema}

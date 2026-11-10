@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/seo/SEO';
 import { getBreadcrumbSchema, getFAQSchema } from '../components/seo/schemaUtils';
+import seoCopy from '@shared/seoCopy.json';
 
 export default function BridalGuide() {
   useEffect(() => {
@@ -131,8 +132,8 @@ export default function BridalGuide() {
   return (
     <div className="bg-[#FAF8F5] min-h-screen pt-24 pb-24">
       <SEO
-        title="Bridal Jutti Guide: Footwear for Lehengas & Weddings | Beads and Bloom"
-        description="Expert bridal jutti styling and buying guide for Indian weddings. How to match handcrafted juttis with lehengas, 10-hour pheras comfort, and personalized bridal consultations."
+        title={seoCopy.routes["/bridal-guide"].title}
+        description={seoCopy.routes["/bridal-guide"].metaDescription}
         canonical="/bridal-guide"
         keywords="bridal jutti guide, wedding footwear for lehenga, bridal mojris comfort, pheras footwear india, punjabi juttis for brides, lehenga matching juttis"
         schema={bridalSchema}
@@ -155,6 +156,15 @@ export default function BridalGuide() {
           From the mandap to the sangeet stage, Indian wedding celebrations demand hours on your feet. 
           Discover how handcrafted Punjabi juttis deliver royal bridal elegance with 10-hour bite-free comfort.
         </p>
+        <div className="mt-6">
+          <Link
+            to="/collection/bridal"
+            className="inline-flex items-center gap-2 text-xs md:text-sm font-bold uppercase tracking-wider text-[#FF2865] hover:underline"
+          >
+            <span>Shop handcrafted bridal juttis</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-6">
@@ -323,7 +333,7 @@ export default function BridalGuide() {
               <ul className="space-y-3 text-xs text-gray-600 font-light">
                 <li className="flex items-start gap-2">
                   <span className="font-bold text-[#FF2865] shrink-0">4–6 Weeks Before:</span>
-                  <span>Select and order bridal jutti designs to allow standard 3–7 day delivery across India.</span>
+                  <span>Select and order bridal jutti designs to allow standard 2-4 day delivery across India.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="font-bold text-[#FF2865] shrink-0">2–3 Weeks Before:</span>

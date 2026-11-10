@@ -1,0 +1,43 @@
+{
+  "routes": {
+    "/": {
+      "title": "Handcrafted Punjabi Juttis Online | Beads and Bloom",
+      "h1": "Handcrafted Punjabi Juttis for Brides, Festive Days & Everyday",
+      "metaDescription": "Shop handcrafted Punjabi juttis for brides, festive occasions and everyday wear. Pure leather soles, double-padded comfort. COD in India, ships worldwide.",
+      "canonical": "https://beadsandbloom.in/"
+    },
+    "/shop": {
+      "title": "Shop Handcrafted Juttis for Women | Beads and Bloom",
+      "h1": "Shop All Handcrafted Punjabi Juttis",
+      "metaDescription": "Browse our full range of handcrafted Punjabi juttis: bridal, festive and casual styles with pure leather soles. COD in India, 2-4 day delivery.",
+      "canonical": "https://beadsandbloom.in/shop"
+    },
+    "/collection/bridal": {
+      "title": "Bridal Juttis for Wedding & Lehenga | Beads and Bloom",
+      "h1": "Handcrafted Bridal Juttis for Your Wedding Lehenga",
+      "badge": "The Bridal Edit",
+      "metaDescription": "Handcrafted bridal juttis with pearl, zardozi and floral embroidery for your wedding lehenga. Pure leather soles. COD in India, 2-4 day delivery.",
+      "canonical": "https://beadsandbloom.in/collection/bridal"
+    },
+    "/collection/festive": {
+      "title": "Festive & Party Wear Juttis for Women | Beads and Bloom",
+      "h1": "Festive Juttis for Sangeet, Mehendi & Celebrations",
+      "badge": "The Festive Edit",
+      "metaDescription": "Handcrafted festive juttis for sangeet, mehendi, Diwali and parties. Embroidered, pure leather soles, double-padded. COD in India, 2-4 day delivery.",
+      "canonical": "https://beadsandbloom.in/collection/festive"
+    },
+    "/collection/casual": {
+      "title": "Casual Juttis for Women | Beads and Bloom",
+      "h1": "Casual Juttis for Everyday Wear",
+      "badge": "Everyday Chic",
+      "metaDescription": "Handcrafted casual Punjabi juttis for everyday wear, with pure leather soles and double-padded comfort. COD in India, 2-4 day delivery.",
+      "canonical": "https://beadsandbloom.in/collection/casual"
+    },
+    "/bridal-guide": {
+      "title": "Bridal Jutti Guide: How to Choose for Your Lehenga",
+      "h1": "Bridal Jutti Buying & Styling Guide",
+      "metaDescription": "How to choose bridal juttis for your lehenga: styles, colours, fit and comfort for every wedding function. Then shop our handcrafted bridal collection.",
+      "canonical": "https://beadsandbloom.in/bridal-guide"
+    }
+  }
+}

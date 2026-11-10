@@ -36,9 +36,9 @@ export default function SEO({
       : `${SITE_URL}${canonical}`
     : `${SITE_URL}${location.pathname === '/' ? '' : location.pathname}`;
 
-  // Ensure title contains brand suffix if not already present
+  // Ensure title contains brand suffix if not already present, but never exceed 60 characters
   const fullTitle = title
-    ? title.includes('Beads and Bloom') || title.includes('Beads & Bloom')
+    ? (title.includes('Beads and Bloom') || title.includes('Beads & Bloom') || (title + ' | Beads and Bloom').length > 60)
       ? title
       : `${title} | Beads and Bloom`
     : DEFAULT_TITLE;

@@ -37,6 +37,7 @@ import {
   getItemListSchema 
 } from "../components/seo/schemaUtils";
 import { defaultFestiveContent } from "../data/defaultFestiveContent";
+import seoCopy from "@shared/seoCopy.json";
 
 export default function FestiveCollection() {
   const [products, setProducts] = useState([]);
@@ -233,8 +234,8 @@ export default function FestiveCollection() {
   return (
     <div className="min-h-screen mt-23 bg-[#FAF8F5] text-[#1C1917] transition-colors duration-700 selection:bg-[#C5A059]/20 selection:text-[#1C1917]">
       <SEO
-        title="Buy Festive Juttis Online — Handcrafted Party Wear Mojris | Beads and Bloom"
-        description="Shop luxury handcrafted festive juttis & party wear mojris at Beads and Bloom. Featuring authentic mirror work (sheesha), zardozi, dabka & double-cushioned memory foam soles. Cash on delivery & express shipping across India."
+        title={seoCopy.routes["/collection/festive"].title}
+        description={seoCopy.routes["/collection/festive"].metaDescription}
         canonical="/collection/festive"
         keywords="buy festive juttis online, festive juttis, party wear mojris, sangeet footwear, punjabi juttis for women, mirror work juttis, comfortable wedding flats, ethnic mojari India, haldi footwear, mehendi juttis, designer celebration footwear"
         schema={collectionSchema}
@@ -255,12 +256,12 @@ export default function FestiveCollection() {
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF0DC] border border-[#E4CE9E] text-[#8A5B28] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
             <Sparkles className="w-3 h-3 text-[#C5A059]" />
-            <span>{hero?.eyebrow || "The Celebration Atelier"}</span>
+            <span>{seoCopy.routes["/collection/festive"].badge || "The Festive Edit"}</span>
           </div>
 
           {/* Main H1 Title */}
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#1C1917] tracking-tight leading-tight mb-4">
-            {hero?.title || "Handcrafted Festive Juttis & Sangeet Mojris"}
+            {seoCopy.routes["/collection/festive"].h1}
           </h1>
 
           {/* Concise Lead Paragraph */}

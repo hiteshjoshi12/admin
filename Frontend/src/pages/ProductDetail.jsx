@@ -1,4 +1,5 @@
 import siteNavigation from "@shared/siteNavigation.json";
+import { formatProductTitle, formatProductMeta } from "../util/productSeo";
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -282,12 +283,8 @@ export default function ProductDetail() {
   return (
     <div className="bg-[#FAF9F6] min-h-screen pt-20 text-[#1C1917]">
       <SEO
-        title={
-          (currentProduct.name + ' | Beads and Bloom').length <= 60
-            ? `${currentProduct.name} | Beads and Bloom`
-            : currentProduct.name
-        }
-        description={`Shop ${currentProduct.name}. Handcrafted Indian jutti with pure leather soles & double-cushioned comfort in EU sizes 36-41.`}
+        title={formatProductTitle(currentProduct.name)}
+        description={formatProductMeta(currentProduct)}
         canonical={`/product/${currentProduct.slug}`}
         type="product"
         image={getOptimizedImage(mainImage, 1000)}

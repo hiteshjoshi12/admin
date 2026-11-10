@@ -11,6 +11,7 @@ import { API_BASE_URL } from "../util/config";
 import SEO from "../components/seo/SEO";
 import { getCollectionSchema, getBreadcrumbSchema } from "../components/seo/schemaUtils";
 import FestiveCollection from "./FestiveCollection";
+import seoCopy from "@shared/seoCopy.json";
 
 // --- 🎨 COLLECTION CONFIGURATION ---
 const collectionConfig = {
@@ -168,22 +169,27 @@ export default function Collection() {
   const isBridal = category?.toLowerCase() === 'bridal';
   const isFestive = category?.toLowerCase() === 'festive';
   const isCasual = category?.toLowerCase() === 'casual';
+  const routeKey = `/collection/${category?.toLowerCase()}`;
+  const seoData = seoCopy.routes[routeKey] || {};
 
-  const seoTitle = isBridal
-    ? "The Bridal Edit — Luxury Wedding Juttis & Mojris | Beads and Bloom"
+  const seoTitle = seoData.title || (isBridal
+    ? "Bridal Juttis for Wedding & Lehenga | Beads and Bloom"
     : isFestive
-    ? "The Festive Edit — Festive & Occasion Juttis | Beads and Bloom"
+    ? "Festive & Party Wear Juttis for Women | Beads and Bloom"
     : isCasual
-    ? "Everyday Chic — Casual & Office Wear Juttis | Beads and Bloom"
-    : `${config.title} — Handcrafted Juttis | Beads and Bloom`;
+    ? "Casual Juttis for Women | Beads and Bloom"
+    : `${config.title} — Handcrafted Juttis | Beads and Bloom`);
 
-  const seoDescription = isBridal
-    ? "Walk down the aisle in sublime comfort. Shop exquisite handcrafted bridal juttis featuring heavy zardosi, pearls, and double-padded soles for wedding ceremonies."
+  const seoDescription = seoData.metaDescription || (isBridal
+    ? "Handcrafted bridal juttis with pearl, zardozi and floral embroidery for your wedding lehenga. Pure leather soles. COD in India, 2-4 day delivery."
     : isFestive
-    ? "Celebrate every special occasion in artisanal luxury. Shop handcrafted festive juttis featuring dabka, zari, and pearl embroidery with double-cushioned comfort."
+    ? "Handcrafted festive juttis for sangeet, mehendi, Diwali and parties. Embroidered, pure leather soles, double-padded. COD in India, 2-4 day delivery."
     : isCasual
-    ? "Step into effortless elegance with our casual handcrafted juttis. Designed for daily wear and office rotations with lightweight, bite-free cushioned soles."
-    : config.description;
+    ? "Handcrafted casual Punjabi juttis for everyday wear, with pure leather soles and double-padded comfort. COD in India, 2-4 day delivery."
+    : config.description);
+
+  const h1Text = seoData.h1 || config.title;
+  const badgeText = seoData.badge || config.title;
 
   const seoKeywords = isBridal
     ? "bridal juttis, wedding juttis online, bridal mojaris, punjabi bridal jutti, dulhan footwear, embroidered wedding juttis, bridal shoes india"
@@ -228,11 +234,13 @@ export default function Collection() {
             <span className="font-bold opacity-100">{config.title}</span>
           </nav>
 
-          <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-4 block opacity-80">
-            {config.subtitle}
-          </span>
-          <h1 className="font-serif text-5xl md:text-7xl mb-6 leading-tight tracking-tight">
-            {config.title}
+          <div className="mb-4">
+            <span className="inline-block uppercase tracking-[0.25em] text-xs font-semibold px-4 py-1.5 rounded-full bg-black/5 opacity-90">
+              {badgeText}
+            </span>
+          </div>
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl mb-6 leading-tight tracking-tight">
+            {h1Text}
           </h1>
           <p className="text-sm md:text-lg opacity-80 leading-relaxed font-light max-w-xl mx-auto">
             {config.description}
