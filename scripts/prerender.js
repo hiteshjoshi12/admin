@@ -120,16 +120,28 @@ async function runPrerender() {
       const url = `http://localhost:${port}${route}`;
       console.log(`[prerender] Capturing ${route} ...`);
 
-      try {
-        const rawOutput = execSync(
-          `"${chromePath}" --headless --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --virtual-time-budget=5000 --dump-dom "${url}"`,
-          {
-            encoding: 'utf8',
-            maxBuffer: 20 * 1024 * 1024,
-            timeout: 15000
+      let rawOutput = null;
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          rawOutput = execSync(
+            `"${chromePath}" --headless=new --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu --virtual-time-budget=6000 --dump-dom "${url}"`,
+            {
+              encoding: 'utf8',
+              maxBuffer: 20 * 1024 * 1024,
+              timeout: 35000
+            }
+          );
+          if (rawOutput && rawOutput.includes('<div id="root">')) {
+            break;
           }
-        );
+        } catch (retryErr) {
+          if (attempt === 2) throw retryErr;
+          console.warn(`[RETRY] ${route}: Attempt 1 timed out or lagged. Retrying...`);
+          await new Promise(r => setTimeout(r, 1000));
+        }
+      }
 
+      try {
         const startTag = '<div id="root">';
         const startIdx = rawOutput.indexOf(startTag);
         if (startIdx === -1) {
