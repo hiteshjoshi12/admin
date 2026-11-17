@@ -44,6 +44,8 @@ export default function Navbar() {
   const location = useLocation();
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
+  const searchContainerRef = useRef(null);
+  const searchButtonRef = useRef(null);
 
   const { userInfo } = useSelector((state) => state.auth);
   const { items: cartItems = [] } = useSelector((state) => state.cart);
@@ -94,14 +96,43 @@ export default function Navbar() {
   }, [isSearchOpen]);
 
   useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
+      if (
+        isSearchOpen &&
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target) &&
+        searchButtonRef.current &&
+        !searchButtonRef.current.contains(event.target)
+      ) {
+        setIsSearchOpen(false);
+      }
     }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsSearchOpen(false);
+        setIsDropdownOpen(false);
+      }
+    }
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSearchOpen]);
 
   const handleLogout = () => {
     dispatch(logout()); dispatch(clearCart()); dispatch(clearWishlist());
@@ -112,7 +143,8 @@ export default function Navbar() {
     e.preventDefault();
     if (searchQuery.trim()) {
       setIsSearchOpen(false);
-      navigate(`/shop?keyword=${searchQuery}`);
+      setIsMobileMenuOpen(false);
+      navigate(`/shop?keyword=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setSearchResults([]);
     }
@@ -133,7 +165,7 @@ export default function Navbar() {
         }`}>
           
           {/* 1. LOGO - ALWAYS VISIBLE */}
-          <Link to="/" className="flex flex-col group z-50 relative shrink-0" onClick={() => setIsMobileMenuOpen(false)}>
+          <Link to="/" className="flex flex-col group z-50 relative shrink-0" onClick={() => { setIsMobileMenuOpen(false); setIsSearchOpen(false); }}>
             <span className="font-serif text-xl font-bold tracking-wide text-[#1C1917] leading-none group-hover:text-gray-600 transition-colors">
               BEADS & BLOOM
             </span>
@@ -176,22 +208,29 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* 3. SEARCH BAR - CENTERED, DROPS FROM TOP */}
+          {/* 3. SEARCH BAR */}
           <div 
-            className={`hidden border rounded-2xl border-gray-200 lg:flex absolute left-1/2 -translate-x-1/2 top-0 h-full w-[600px] bg-white z-40 items-center justify-center  transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${isSearchOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}
+            ref={searchContainerRef}
+            className={`absolute top-0 h-full z-[60] bg-white border border-gray-200 transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] flex items-center px-4 md:px-5 ${
+              isScrolled ? "rounded-none" : "rounded-full"
+            } ${
+              isSearchOpen 
+                ? "opacity-100 translate-y-0 pointer-events-auto" 
+                : "opacity-0 -translate-y-full pointer-events-none"
+            } left-0 w-full lg:left-1/2 lg:-translate-x-1/2 lg:w-[600px]`}
           >
-             <form onSubmit={handleSearchSubmit} className="relative w-full flex items-center">
+             <form onSubmit={handleSearchSubmit} className="relative w-full h-full flex items-center">
                 {/* Search Icon Left */}
-                <Search className="absolute left-3 text-gray-400 w-6 h-6" />
+                <Search className="text-gray-400 w-5 h-5 shrink-0" />
                 
                 {/* Input Field */}
                 <input 
                    ref={searchInputRef}
                    type="text" 
-                   placeholder="Search..." 
+                   placeholder="Search handcrafted luxury..." 
                    value={searchQuery}
                    onChange={(e) => setSearchQuery(e.target.value)}
-                   className="w-full bg-transparent  pl-12 pr-8 py-2 text-sm text-left focus:outline-none focus:border-[#1C1917] placeholder:text-gray-400 transition-all font-medium "
+                   className="w-full bg-transparent pl-3 pr-8 py-2 text-sm md:text-base text-left focus:outline-none placeholder:text-gray-400 transition-all font-medium text-[#1C1917]"
                 />
                 
                 {/* Close Button Right */}
@@ -199,20 +238,20 @@ export default function Navbar() {
                    type="button" 
                    onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }} 
                    aria-label="Close search bar"
-                   className="absolute right-4 text-gray-400 hover:text-red-500 p-1"
+                   className="text-gray-400 hover:text-red-500 p-1.5 rounded-full hover:bg-gray-100 transition-colors shrink-0"
                 >
-                   <X size={16} />
+                   <X size={18} />
                 </button>
 
                 {/* Dropdown Results */}
-                {isSearchOpen && (searchResults.length > 0 || isSearching) && (
-                   <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-fade-up text-left">
+                {isSearchOpen && (searchResults.length > 0 || isSearching || (debouncedSearchTerm && searchResults.length === 0)) && (
+                   <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-fade-up text-left">
                       {isSearching ? (
                          <div className="p-4 text-center text-xs text-gray-400 flex items-center justify-center gap-2">
-                            <Loader2 className="animate-spin w-3 h-3"/> Searching...
+                            <Loader2 className="animate-spin w-4 h-4 text-[#1C1917]"/> Searching...
                          </div>
-                      ) : (
-                         <div className="max-h-[400px] overflow-y-auto">
+                      ) : searchResults.length > 0 ? (
+                         <div className="max-h-[60vh] md:max-h-[400px] overflow-y-auto">
                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest px-4 py-2 bg-gray-50 sticky top-0">Top Results</p>
                            {searchResults.map((product) => (
                               <Link 
@@ -221,16 +260,20 @@ export default function Navbar() {
                                 onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
                                 className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
                               >
-                                 <img src={getOptimizedImage(product.image, 100)} alt={product.name} className="w-10 h-10 object-cover rounded-md" />
+                                 <img src={getOptimizedImage(product.image, 100)} alt={product.name} className="w-10 h-10 object-cover rounded-md shrink-0" />
                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold text-gray-800 truncate group-hover:text-[#C5A059]">{product.name}</p>
+                                    <p className="text-sm font-bold text-gray-800 truncate hover:text-[#C5A059]">{product.name}</p>
                                     <p className="text-xs text-gray-500">₹{product.price}</p>
                                  </div>
                               </Link>
                            ))}
-                           <Link to={`/shop?keyword=${searchQuery}`} onClick={() => setIsSearchOpen(false)} className="block text-center text-xs font-bold uppercase text-[#1C1917] py-3 bg-gray-50 hover:bg-gray-100 transition-colors sticky bottom-0">
+                           <Link to={`/shop?keyword=${encodeURIComponent(searchQuery)}`} onClick={() => setIsSearchOpen(false)} className="block text-center text-xs font-bold uppercase text-[#1C1917] py-3 bg-gray-50 hover:bg-gray-100 transition-colors sticky bottom-0">
                               View All Results
                            </Link>
+                         </div>
+                      ) : (
+                         <div className="p-4 text-center text-xs text-gray-500">
+                           No products found for "{debouncedSearchTerm}"
                          </div>
                       )}
                    </div>
@@ -239,13 +282,15 @@ export default function Navbar() {
           </div>
 
           {/* 4. RIGHT ICONS */}
-          <div className="flex items-center gap-2 md:gap-4 z-50 bg-white/0 pl-4">
+          <div className="flex items-center gap-2 md:gap-4 z-40 bg-white/0 pl-4">
             <button 
+              ref={searchButtonRef}
               onClick={() => {
+                 setIsMobileMenuOpen(false);
                  setIsSearchOpen(!isSearchOpen);
                  if(!isSearchOpen) setSearchQuery(""); 
               }} 
-              aria-label="Open search bar"
+              aria-label={isSearchOpen ? "Close search bar" : "Open search bar"}
               className={`p-2 rounded-full transition-colors ${isSearchOpen ? 'text-[#1C1917] bg-gray-100' : 'text-gray-700 hover:bg-gray-100'}`}
             >
               <Search className="w-5 h-5" />
@@ -310,7 +355,14 @@ export default function Navbar() {
               )}
             </div>
 
-            <button className="md:hidden p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle navigation menu">
+            <button 
+              className="md:hidden p-2" 
+              onClick={() => {
+                setIsSearchOpen(false);
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }} 
+              aria-label="Toggle navigation menu"
+            >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -318,19 +370,7 @@ export default function Navbar() {
       </div>
 
       {/* --- MOBILE MENU --- */}
-      <div className={`fixed inset-0 z-40 bg-white flex flex-col pt-32 px-6 transition-all duration-500 ease-in-out ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
-        
-        <form onSubmit={handleSearchSubmit} className="relative mb-8">
-           <input 
-              type="text" 
-              placeholder="Search..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-full px-6 py-4 text-lg outline-none focus:border-black"
-           />
-           <button type="submit" aria-label="Search products" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"><Search /></button>
-        </form>
-
+      <div className={`fixed inset-0 z-40 bg-white flex flex-col pt-28 md:pt-32 px-6 overflow-y-auto pb-12 transition-all duration-500 ease-in-out ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
         <div className="flex flex-col gap-4">
           {navLinks.map((link) => {
             const active = isLinkActive(link.path);
