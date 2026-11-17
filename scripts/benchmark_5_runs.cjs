@@ -73,3 +73,4 @@ async function runBenchmark(suiteName = 'current') {
 
 const suite = process.argv[2] || 'branch';
 runBenchmark(suite).catch(console.error);
+
